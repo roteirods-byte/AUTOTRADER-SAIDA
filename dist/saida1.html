@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AUTOTRADER-SAÍDA — SAÍDA 1</title>
+  <style>
+    :root{
+      --bg:#061e2b;
+      --card:#072a3a;
+      --card2:#063145;
+      --line:rgba(255,255,255,.08);
+      --txt:#eaf2f7;
+      --muted:rgba(234,242,247,.7);
+      --abobora:#ff9f1a;
+      --green:#00d084;
+      --red:#ff3b6b;
+      --btn:#0a3a52;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--txt);
+    }
+    .wrap{max-width:1180px;margin:26px auto;padding:0 18px}
+    .topbar{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px
+    }
+    h1{margin:0;font-size:26px;letter-spacing:.5px}
+    .sub{margin-top:6px;color:var(--muted);font-size:13px}
+    .pill{
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;
+      color:var(--muted);
+      min-width:220px;
+      text-align:right;
+    }
+    .pill b{color:var(--abobora);font-weight:700}
+    .card{
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:18px;
+    }
+    .title{
+      color:var(--abobora);
+      font-weight:800;
+      font-size:20px;
+      margin:0 0 12px 0;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 220px 220px 220px 220px 220px;
+      gap:14px;
+      align-items:end;
+    }
+    label{display:block;color:var(--abobora);font-size:13px;margin:0 0 6px 0}
+    select,input{
+      width:100%;
+      background:rgba(0,0,0,.15);
+      border:1px solid var(--line);
+      color:var(--txt);
+      padding:12px 12px;
+      border-radius:12px;
+      outline:none;
+    }
+    input::placeholder{color:rgba(234,242,247,.35)}
+    .sideRow{display:flex;gap:10px}
+    .btn{
+      background:var(--btn);
+      border:1px solid var(--line);
+      color:var(--txt);
+      padding:12px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s;
+      user-select:none;
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btnSide{width:100%}
+    .btnLong.active{border-color:rgba(0,208,132,.8); box-shadow:0 0 0 2px rgba(0,208,132,.18) inset}
+    .btnShort.active{border-color:rgba(255,59,107,.85); box-shadow:0 0 0 2px rgba(255,59,107,.16) inset}
+    .btnLong{color:var(--green)}
+    .btnShort{color:var(--red)}
+    /* BOTÃO PRINCIPAL: TEXTO ABÓBORA */
+    #btnAdd{color:var(--abobora)}
+    .hint{margin-top:10px;color:var(--muted);font-size:12px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    thead th{
+      text-align:left;
+      font-size:12px;
+      padding:12px 10px;
+      color:var(--abobora);
+      border-bottom:1px solid var(--line);
+      letter-spacing:.4px;
+    }
+    tbody td{
+      padding:14px 10px;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+    }
+    .tagSide{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .tagLong{color:var(--green)}
+    .tagShort{color:var(--red)}
+    .btnDel{
+      background:transparent;
+      border:1px solid rgba(255,59,107,.55);
+      color:var(--red);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .btnDel:hover{filter:brightness(1.08)}
+    .rowSmall{color:var(--muted);font-size:12px}
+    @media (max-width:1100px){
+      .grid{grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>AUTOTRADER-SAÍDA — SAÍDA 1</h1>
+        <div class="sub">Entrada manual de operações (salva em <b>saida_ops.json</b>). Use o SAÍDA 2 para monitorar.</div>
+      </div>
+      <div class="pill">Atualizado: <b id="upd">—</b></div>
+    </div>
+
+    <div class="card">
+      <div class="title">ENTRADA DE OPERAÇÃO</div>
+
+      <div class="grid">
+        <div>
+          <label>Par</label>
+          <select id="par">
+            <option>BTC</option><option>ETH</option><option>BNB</option><option>SOL</option><option>XRP</option>
+            <option>ADA</option><option>AVAX</option><option>DOT</option><option>LINK</option><option>LTC</option>
+            <option>UNI</option><option>NEAR</option><option>OP</option><option>ARB</option><option>APT</option>
+            <option>ATOM</option><option>INJ</option><option>FIL</option><option>RENDER</option><option>RUNE</option>
+            <option>SEI</option><option>SUI</option><option>TON</option><option>TRX</option><option>WIF</option>
+            <option>PEPE</option><option>SHIB</option><option>DOGE</option><option>POL</option><option>RATS</option>
+            <option>FET</option><option>ICP</option><option>LDO</option><option>TIA</option><option>TNSR</option>
+            <option>AAVE</option><option>AXS</option><option>BCH</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Side</label>
+          <div class="sideRow">
+            <button class="btn btnSide btnLong active" id="btnLong">LONG</button>
+            <button class="btn btnSide btnShort" id="btnShort">SHORT</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Entrada</label>
+          <input id="entrada" type="number" step="0.0001" placeholder="ex: 0.4633" />
+        </div>
+
+        <div>
+          <label>Alav</label>
+          <input id="alav" type="number" step="1" min="1" max="200" value="1" />
+        </div>
+
+        <div>
+          <button class="btn" id="btnAdd" style="width:100%">Adicionar Operação</button>
+          <div class="hint">Dica: depois monitore em <b>SAÍDA 2</b>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title">OPERAÇÕES CADASTRADAS</div>
+      <div class="rowSmall" id="count">—</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALAV</th><th>DATA</th><th>HORA</th><th>EXCLUIR</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const $ = (id)=>document.getElementById(id);
+
+  let side = 'LONG';
+  function setSide(s){
+    side = s;
+    $('btnLong').classList.toggle('active', s==='LONG');
+    $('btnShort').classList.toggle('active', s==='SHORT');
+  }
+  $('btnLong').onclick = ()=>setSide('LONG');
+  $('btnShort').onclick = ()=>setSide('SHORT');
+
+  function fmtNum(v, d=3){
+    const n = Number(v);
+    if (!Number.isFinite(n)) return '—';
+    return n.toFixed(d);
+  }
+
+  function fmtBrtDate(ts){
+    try{
+      const d = new Date(ts);
+      const f = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit' });
+      const p = f.formatToParts(d);
+      const y = p.find(x=>x.type==='year').value;
+      const m = p.find(x=>x.type==='month').value;
+      const da= p.find(x=>x.type==='day').value;
+      return `${y}-${m}-${da}`;
+    }catch(e){ return '—'; }
+  }
+  function fmtBrtTime(ts){
+    try{
+      const d = new Date(ts);
+      const f = new Intl.DateTimeFormat('pt-BR',{ timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit', hour12:false });
+      return f.format(d);
+    }catch(e){ return '—'; }
+  }
+
+  async function api(path, body){
+    const opt = body ? {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)} : {};
+    const r = await fetch(path, opt);
+    if(!r.ok) throw new Error(await r.text());
+    return await r.json();
+  }
+
+  function renderOps(list){
+    const tb = $('tb');
+    tb.innerHTML = '';
+    const ops = Array.isArray(list) ? list : [];
+    $('count').textContent = `Total: ${ops.length}`;
+    for(const o of ops){
+      const tr = document.createElement('tr');
+
+      const tdPar = document.createElement('td');
+      tdPar.style.color = 'var(--abobora)';
+      tdPar.style.fontWeight = '900';
+      tdPar.textContent = (o.par||'').toUpperCase();
+
+      const tdSide = document.createElement('td');
+      const sp = document.createElement('span');
+      sp.className = 'tagSide ' + ((String(o.side||'').toUpperCase()==='SHORT') ? 'tagShort' : 'tagLong');
+      sp.textContent = (String(o.side||'').toUpperCase()==='SHORT') ? 'SHORT' : 'LONG';
+      tdSide.appendChild(sp);
+
+      const tdEnt = document.createElement('td');
+      tdEnt.textContent = fmtNum(o.entrada, 3);
+
+      const tdAlav = document.createElement('td');
+      tdAlav.textContent = Number(o.alav||0) || '—';
+
+      const tdData = document.createElement('td');
+      tdData.textContent = fmtBrtDate(o.created_ts || Date.now());
+
+      const tdHora = document.createElement('td');
+      tdHora.textContent = fmtBrtTime(o.created_ts || Date.now());
+
+      const tdDel = document.createElement('td');
+      const b = document.createElement('button');
+      b.className = 'btnDel';
+      b.textContent = 'Excluir';
+      b.onclick = async ()=>{
+        if(!confirm('Excluir esta operação?')) return;
+        await api('/api/ops/del', {id: o.id});
+        await loadOps();
+      };
+      tdDel.appendChild(b);
+
+      tr.appendChild(tdPar);
+      tr.appendChild(tdSide);
+      tr.appendChild(tdEnt);
+      tr.appendChild(tdAlav);
+      tr.appendChild(tdData);
+      tr.appendChild(tdHora);
+      tr.appendChild(tdDel);
+
+      tb.appendChild(tr);
+    }
+  }
+
+  async function loadOps(){
+    const d = await api('/api/ops');
+    $('upd').textContent = d.updated_brt || d.updated || '—';
+    renderOps(d.ops || []);
+  }
+
+  $('btnAdd').onclick = async ()=>{
+    const par = String($('par').value||'').trim().toUpperCase();
+    const entrada = Number($('entrada').value);
+    const alav = Number($('alav').value);
+    if(!par){ alert('Escolha o PAR.'); return; }
+    if(!Number.isFinite(entrada) || entrada<=0){ alert('Digite a ENTRADA.'); return; }
+    if(!Number.isFinite(alav) || alav<=0){ alert('Digite a ALAV.'); return; }
+
+    await api('/api/ops/add', {par, side, entrada, alav});
+    $('entrada').value = '';
+    await loadOps();
+  };
+
+  loadOps();
+  setInterval(loadOps, 5000);
+</script>
+</body>
+</html>
