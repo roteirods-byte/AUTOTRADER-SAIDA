@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AUTOTRADER-SAÍDA</title>
+<style>
+  :root{
+    --bg:#061b22;
+    --card:#08242c;
+    --line:#0d3a44;
+    --txt:#e9f3f6;
+    --muted:#9fb3bb;
+    --pumpkin:#ff8c00;
+    --ok:#2ecc71;
+    --bad:#ff4d4d;
+  }
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial;}
+  body{margin:0;background:var(--bg);color:var(--txt);}
+  .wrap{max-width:1120px;margin:26px auto;padding:0 16px;}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  h1{margin:0;font-size:34px;letter-spacing:1px;}
+  .sub{color:var(--muted);margin-top:4px;}
+  .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#052028;}
+  .pill b{color:var(--pumpkin);}
+  .card{margin-top:18px;padding:18px;border-radius:16px;background:linear-gradient(180deg,var(--card),#062028);border:1px solid #062e36;}
+  .h{color:var(--pumpkin);font-weight:800;letter-spacing:1px;margin-bottom:12px;font-size:18px;}
+  .grid{display:grid;grid-template-columns:110px 170px 1fr 1fr 110px 210px;gap:12px;align-items:end;}
+  label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px;}
+  input,select{width:100%;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--txt);padding:0 10px;outline:none;}
+  select{color:var(--pumpkin);font-weight:700;}
+  option{color:var(--pumpkin);background:#041b22;}
+  .sideBox{display:flex;gap:10px;}
+  .sideBtn{flex:1;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--muted);font-weight:800;cursor:pointer}
+  .sideBtn.onLong{border-color:#0f6b49;color:var(--ok);box-shadow:0 0 0 2px rgba(46,204,113,.15) inset;}
+  .sideBtn.onShort{border-color:#7a1c33;color:#ff4da1;box-shadow:0 0 0 2px rgba(255,77,161,.12) inset;}
+  .btn{height:40px;border-radius:12px;border:1px solid #5c2a0a;background:#0c2d38;color:var(--pumpkin);font-weight:900;cursor:pointer}
+  .msg{margin-top:10px;color:var(--muted);font-size:13px}
+  .msg b{color:var(--pumpkin)}
+  .warn{color:#ffb266}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;font-size:13px}
+  th{color:var(--pumpkin);font-weight:800}
+  .par{color:var(--pumpkin);font-weight:900}
+  .tag{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-weight:900}
+  .long{color:var(--ok);border-color:#0f6b49}
+  .short{color:#ff4da1;border-color:#7a1c33}
+  .pctPos{color:var(--ok);font-weight:900}
+  .pctNeg{color:var(--bad);font-weight:900}
+  .foot{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+  .xbtn{height:34px;border-radius:10px;border:1px solid #7a1c33;background:#2a0d1a;color:#ff4da1;font-weight:900;cursor:pointer;padding:0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>AUTOTRADER-SAÍDA</h1>
+      <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
+    </div>
+    <div class="pill">Atualizado: <b id="updated">—</b></div>
+  </div>
+
+  <div class="card">
+    <div class="h">DADOS DE ENTRADA NA OPERAÇÃO</div>
+    <div class="grid">
+      <div>
+        <label>PAR</label>
+        <select id="par"></select>
+      </div>
+
+      <div>
+        <label>SIDE</label>
+        <div class="sideBox">
+          <button class="sideBtn" id="btnLong">LONG</button>
+          <button class="sideBtn" id="btnShort">SHORT</button>
+        </div>
+      </div>
+
+      <div>
+        <label>ENTRADA</label>
+        <input id="entrada" type="number" step="0.0001" placeholder="ex: 1.3371" />
+      </div>
+
+      <div>
+        <label>US ALVO (do PRO, congelado)</label>
+        <input id="alvo" type="number" step="0.0001" readonly />
+      </div>
+
+      <div>
+        <label>ALAV</label>
+        <input id="alav" type="number" step="1" value="10" />
+      </div>
+
+      <div>
+        <button class="btn" id="btnAdd">Adicionar Operação</button>
+      </div>
+    </div>
+    <div class="msg" id="info">Alvo do PRO: <b id="proInfo">—</b> <span id="err" class="warn"></span></div>
+  </div>
+
+  <div class="card">
+    <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
+    <div class="msg">Total: <b id="total">0</b></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+          <th>ATUAL</th><th>GANHO / ALVO</th><th>GANHO / ATUAL</th>
+          <th>SITUAÇÃO</th><th>DATA</th><th>HORA</th><th>EXCLUIR</th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+
+    <div class="foot">
+      <div class="chip">Auto-refresh: 15s</div>
+      <div class="chip">Worker: 5 min</div>
+      <div class="chip">ALVO fixo (congelado no ADD)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (id)=>document.getElementById(id);
+
+  const MOEDAS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
+
+  function fmtPx(v){
+    const n = Number(v);
+    if (!Number.isFinite(n)) return "0.000";
+    return n.toFixed(3);
+  }
+  function fmtPct(v){
+    const n = Number(v);
+    if (!Number.isFinite(n)) return "0.00";
+    return n.toFixed(2);
+  }
+
+  let side = "LONG";
+  function paintSide(){
+    $("btnLong").classList.toggle("onLong", side==="LONG");
+    $("btnShort").classList.toggle("onShort", side==="SHORT");
+  }
+
+  $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); fetchAlvo(); };
+  $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); fetchAlvo(); };
+
+  function setErr(t){
+    $("err").textContent = t ? (" — " + t) : "";
+  }
+
+  async function fetchAlvo(){
+    setErr("");
+    $("alvo").value = "";
+    const par = $("par").value;
+
+    try{
+      const r = await fetch(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.msg || "Sem alvo");
+      $("alvo").value = j.alvo;
+      $("proInfo").textContent = (j.updated_brt ? ("PRO atualizado: " + j.updated_brt) : "OK");
+    }catch(e){
+      $("proInfo").textContent = "Sem alvo no PRO";
+      setErr("Alvo indisponível");
+    }
+  }
+
+  async function refresh(){
+    try{
+      const r = await fetch("/api/saida/monitor");
+      const j = await r.json();
+
+      $("updated").textContent = (j.updated_brt || "—");
+      $("total").textContent = (j.ops ? j.ops.length : 0);
+
+      const tb = $("tb");
+      tb.innerHTML = "";
+
+      (j.ops || []).forEach(op=>{
+        const tr = document.createElement("tr");
+
+        const pctA = Number(op.ganho_alvo_pct ?? op.pnl_pct);
+        const pctB = Number(op.ganho_atual_pct ?? op.pct_atual);
+
+        const clsA = (Number.isFinite(pctA) && pctA < 0) ? "pctNeg" : "pctPos";
+        const clsB = (Number.isFinite(pctB) && pctB < 0) ? "pctNeg" : "pctPos";
+
+        tr.innerHTML = `
+          <td class="par">${op.par || ""}</td>
+          <td><span class="tag ${String(op.side)==="SHORT" ? "short":"long"}">${op.side || ""}</span></td>
+          <td>${fmtPx(op.entrada)}</td>
+          <td>${fmtPx(op.alvo)}</td>
+          <td>${op.alav ?? ""}</td>
+          <td>${fmtPx(op.atual)}</td>
+          <td class="${clsA}">${fmtPct(op.ganho_alvo_pct ?? op.pnl_pct)}</td>
+          <td class="${clsB}">${fmtPct(op.ganho_atual_pct ?? op.pct_atual)}</td>
+          <td>${op.situacao || ""}</td>
+          <td>${op.data || ""}</td>
+          <td>${op.hora || ""}</td>
+          <td><button class="xbtn" data-id="${op.id}">Excluir</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+
+        tb.querySelectorAll("button.xbtn").forEach(b=>{
+          b.onclick = async ()=>{
+            const id = b.getAttribute("data-id");
+            try{
+              let r = await fetch("/api/saida/del", {
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body: JSON.stringify({ id })
+              });
+
+              if (!r.ok) {
+                const t = await r.text().catch(()=> "");
+                throw new Error(`HTTP ${r.status} ${t}`);
+              }
+
+              let j = await r.json().catch(()=> ({}));
+
+              if (!j.ok){
+                // fallback antigo
+                r = await fetch("/api/saida/delete", {
+                  method:"POST",
+                  headers:{ "Content-Type":"application/json" },
+                  body: JSON.stringify({ id })
+                });
+
+                if (!r.ok) {
+                  const t = await r.text().catch(()=> "");
+                  throw new Error(`HTTP ${r.status} ${t}`);
+                }
+
+                j = await r.json().catch(()=> ({}));
+                if (!j.ok) throw new Error(j.msg || "Falha ao excluir");
+              }
+
+              await refresh();
+            }catch(e){
+              alert("ERRO NO EXCLUIR: " + (e?.message || e));
+            }
+          };
+        });
+      }catch(e){
+        setErr("Falha ao atualizar");
+      }
+    }
+
+    $("par").innerHTML = MOEDAS.map(m=>`<option value="${m}">${m}</option>`).join("");
+    paintSide();
+    fetchAlvo();
+    refresh();
+    setInterval(refresh, 15000);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# runtime / dados (NÃO versionar)
+data/*.json
+logs/
+__pycache__/
+*.pyc
+
+# node
+node_modules/
+
+# tmp
+*.log
+.DS_Store

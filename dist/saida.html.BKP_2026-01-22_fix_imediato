@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AUTOTRADER-SAÍDA</title>
+<style>
+  :root{
+    --bg:#061b22;
+    --card:#08242c;
+    --line:#0d3a44;
+    --txt:#e9f3f6;
+    --muted:#9fb3bb;
+    --pumpkin:#ff8c00;
+    --ok:#2ecc71;
+    --bad:#ff4d4d;
+  }
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial;}
+  body{margin:0;background:var(--bg);color:var(--txt);}
+  .wrap{max-width:1120px;margin:26px auto;padding:0 16px;}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  h1{margin:0;font-size:34px;letter-spacing:1px;}
+  .sub{color:var(--muted);margin-top:4px;}
+  .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#052028;}
+  .pill b{color:var(--pumpkin);}
+  .card{margin-top:18px;padding:18px;border-radius:16px;background:linear-gradient(180deg,var(--card),#062028);border:1px solid #062e36;}
+  .h{color:var(--pumpkin);font-weight:800;letter-spacing:1px;margin-bottom:12px;font-size:18px;}
+  .grid{display:grid;grid-template-columns:110px 170px 1fr 1fr 110px 210px;gap:12px;align-items:end;}
+  label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px;}
+  input,select{width:100%;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--txt);padding:0 10px;outline:none;}
+  select{color:var(--pumpkin);font-weight:700;}
+  option{color:var(--pumpkin);background:#041b22;}
+  .sideBox{display:flex;gap:10px;}
+  .sideBtn{flex:1;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--muted);font-weight:800;cursor:pointer}
+  .sideBtn.onLong{border-color:#0f6b49;color:var(--ok);box-shadow:0 0 0 2px rgba(46,204,113,.15) inset;}
+  .sideBtn.onShort{border-color:#7a1c33;color:#ff4da1;box-shadow:0 0 0 2px rgba(255,77,161,.12) inset;}
+  .btn{height:40px;border-radius:12px;border:1px solid #5c2a0a;background:#0c2d38;color:var(--pumpkin);font-weight:900;cursor:pointer}
+  .msg{margin-top:10px;color:var(--muted);font-size:13px}
+  .msg b{color:var(--pumpkin)}
+  .warn{color:#ffb266}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;font-size:13px}
+  th{color:var(--pumpkin);font-weight:800}
+  .par{color:var(--pumpkin);font-weight:900}
+  .tag{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-weight:900}
+  .long{color:var(--ok);border-color:#0f6b49}
+  .short{color:#ff4da1;border-color:#7a1c33}
+  .pctPos{color:var(--ok);font-weight:900}
+  .pctNeg{color:var(--bad);font-weight:900}
+  .foot{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+  .xbtn{height:34px;border-radius:10px;border:1px solid #7a1c33;background:#2a0d1a;color:#ff4da1;font-weight:900;cursor:pointer;padding:0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>AUTOTRADER-SAÍDA</h1>
+      <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
+    </div>
+    <div class="pill">Atualizado: <b id="updated">—</b></div>
+  </div>
+
+  <div class="card">
+    <div class="h">DADOS DE ENTRADA NA OPERAÇÃO</div>
+    <div class="grid">
+      <div>
+        <label>PAR</label>
+        <select id="par"></select>
+      </div>
+
+      <div>
+        <label>SIDE</label>
+        <div class="sideBox">
+          <button class="sideBtn" id="btnLong">LONG</button>
+          <button class="sideBtn" id="btnShort">SHORT</button>
+        </div>
+      </div>
+
+      <div>
+        <label>ENTRADA</label>
+        <input id="entrada" type="text" inputmode="decimal" placeholder="ex: 1.3371" />
+      </div>
+
+      <div>
+        <label>US ALVO (do PRO, congelado)</label>
+        <input id="alvo" type="number" step="0.0001" readonly />
+      </div>
+
+      <div>
+        <label>ALAV</label>
+        <input id="alav" type="text" inputmode="numeric" value="10" />
+      </div>
+
+      <div>
+        <button class="btn" id="btnAdd">Adicionar Operação</button>
+      </div>
+    </div>
+    <div class="msg" id="info">Alvo do PRO: <b id="proInfo">—</b> <span id="err" class="warn"></span></div>
+  </div>
+
+  <div class="card">
+    <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
+    <div class="msg">Total: <b id="total">0</b></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+          <th>ATUAL</th><th>GANHO / ALVO</th><th>GANHO / ATUAL</th>
+          <th>SITUAÇÃO</th><th>DATA</th><th>HORA</th><th>EXCLUIR</th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+
+    <div class="foot">
+      <div class="chip">Auto-refresh: 15s</div>
+      <div class="chip">Worker: 5 min</div>
+      <div class="chip">ALVO fixo (congelado no ADD)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = (id)=>document.getElementById(id);
+  const pick = (...ids)=>ids.map($).find(Boolean);
+
+  const elUpd = ()=>pick("upd","updated");
+  const elMsg = ()=>pick("msg","err");
+  const elTb  = ()=>pick("tb");
+  const elTot = ()=>pick("total");
+  const elPro = ()=>pick("proInfo");
+  const elBuild = ()=>pick("build");
+
+  function setMsg(t){
+    const e = elMsg();
+    if (e) e.textContent = t ? (" — " + t) : "";
+  }
+
+  let side = "LONG";
+  function setSide(s){
+    side = s;
+    const bL = $("btnLong"), bS = $("btnShort");
+    if (bL) bL.classList.toggle("active", s==="LONG");
+    if (bS) bS.classList.toggle("active", s==="SHORT");
+    fetchAlvo();
+  }
+  if ($("btnLong")) $("btnLong").onclick = (e)=>{ e.preventDefault(); setSide("LONG"); };
+  if ($("btnShort")) $("btnShort").onclick = (e)=>{ e.preventDefault(); setSide("SHORT"); };
+
+  function fmtPx(v){
+    const n = Number(v);
+    if (!Number.isFinite(n)) return "0.000";
+    return n.toFixed(3);
+  }
+  function fmtPct(v){
+    const n = Number(v);
+    if (!Number.isFinite(n)) return "0.00";
+    return n.toFixed(2);
+  }
+  function clsPct(n){
+    if (!Number.isFinite(n)) return "";
+    if (n > 0) return "pos";
+    if (n < 0) return "neg";
+    return "warn";
+  }
+
+  // garante moedas no select (mesmo se tiver sido apagado)
+  const MOEDAS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
+  function ensureMoedas(){
+    const sel = $("par");
+    if (!sel) return;
+    if (!sel.options || sel.options.length===0){
+      sel.innerHTML = MOEDAS.map(m=>`<option value="${m}">${m}</option>`).join("");
+    }
+  }
+
+  async function fetchAlvo(){
+    setMsg("");
+    const par = $("par") ? $("par").value : "";
+    const alvo = $("alvo");
+    if (alvo) alvo.value = "";
+
+    try{
+      const r = await fetch(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`, { cache:"no-store" });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.msg || "Sem alvo");
+      if (alvo) alvo.value = j.alvo;
+      const pinfo = elPro(); 
+      if (pinfo) pinfo.textContent = (j.updated_brt ? ("PRO atualizado: " + j.updated_brt) : "OK");
+    }catch(e){
+      const pinfo = elPro();
+      if (pinfo) pinfo.textContent = "Sem alvo no PRO";
+      setMsg("Alvo indisponível");
+    }
+  }
+  if ($("par")) $("par").onchange = fetchAlvo;
+
+  async function refresh(){
+    try{
+      const r = await fetch("/api/saida/monitor", { cache:"no-store" });
+      const j = await r.json();
+
+      const u = elUpd();
+      if (u) u.textContent = (j.updated_brt || "—");
+
+      const ops = Array.isArray(j.ops) ? j.ops : [];
+      const t = elTot();
+      if (t) t.textContent = ops.length;
+
+      const tb = elTb();
+      if (!tb) return;
+      tb.innerHTML = "";
+
+      for (const o of ops){
+        const gA = Number(o.ganho_alvo_pct ?? o.pnl_pct);
+        const gU = Number(o.ganho_atual_pct ?? o.pct_atual);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="par">${o.par||""}</td>
+          <td><span class="tag ${String(o.side)==="SHORT" ? "short":"long"}">${o.side||""}</span></td>
+          <td>${fmtPx(o.entrada)}</td>
+          <td>${fmtPx(o.alvo)}</td>
+          <td>${o.alav ?? ""}</td>
+          <td>${fmtPx(o.atual)}</td>
+          <td class="${clsPct(gA)}">${fmtPct(gA)}</td>
+          <td class="${clsPct(gU)}">${fmtPct(gU)}</td>
+          <td>${o.situacao||""}</td>
+          <td>${o.data||""}</td>
+          <td>${o.hora||""}</td>
+          <td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
+        `;
+        tb.appendChild(tr);
+      }
+
+      tb.querySelectorAll("button.xbtn").forEach(b=>{
+        b.onclick = async ()=>{
+          const id = b.getAttribute("data-id");
+          try{
+            let r = await fetch("/api/saida/del", {
+              method:"POST",
+              headers:{ "Content-Type":"application/json" },
+              body: JSON.stringify({ id })
+            });
+
+            // fallback (compat)
+            if (!r.ok){
+              r = await fetch("/api/saida/delete", {
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body: JSON.stringify({ id })
+              });
+            }
+
+            const j = await r.json().catch(()=>({}));
+            if (!j.ok) throw new Error(j.msg || "Falha ao excluir");
+            await refresh();
+          }catch(e){
+            alert("ERRO NO EXCLUIR: " + (e?.message || e));
+          }
+        };
+      });
+    }catch(e){
+      setMsg("Falha ao atualizar");
+    }
+  }
+
+  if ($("btnAdd")) $("btnAdd").onclick = async ()=>{
+    try{
+      const par = $("par").value;
+      const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
+      const entrada = Number(entrada_txt);
+      const alav = Number(String($("alav").value||"").trim());
+
+      if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
+      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
+
+      const r = await fetch("/api/saida/add", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ par, side, entrada, alav })
+      });
+
+      const j = await r.json().catch(()=>({}));
+      if (!j.ok) throw new Error(j.msg || "Falha ao adicionar");
+
+      $("entrada").value = "";
+      await refresh();
+    }catch(e){
+      alert("ERRO NO ADD: " + (e?.message || e));
+    }
+  };
+
+  // init
+  ensureMoedas();
+  setSide("LONG");
+  fetchAlvo();
+  refresh();
+  setInterval(refresh, 15000);
+</script>
+</body>
+</html>
