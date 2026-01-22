@@ -5,6 +5,7 @@ Painel web de **SAÍDA** (monitoramento) + API + Worker (timer a cada 5 min).
 ## Rotas
 - Painel: `https://saida1jorge.duckdns.org/saida`
 - Health: `/health`
+- Version/Build: `/api/saida/version` (mostra BUILD para validar deploy)
 - API monitor: `/api/saida/monitor`
 - API cadastrar operação: `POST /api/saida/ops` (JSON: `{par, side, entrada, alav}`)
 
@@ -51,3 +52,9 @@ curl -sS http://127.0.0.1:8096/api/saida/monitor | head -c 300 ; echo
 
 ## Observação importante
 Se alguma operação der erro no worker, ela **continua aparecendo** no painel com “ERRO — ver log”, e o detalhe fica em `data/saida_worker_err.log`.
+
+
+## Build (evitar confusão de revisão)
+- O arquivo `VERSION` define o BUILD.
+- O painel exibe o BUILD e a API retorna em `/api/saida/version`.
+- Para atualizar o build e validar rápido: `./scripts/apply_validate_vm.sh`.
