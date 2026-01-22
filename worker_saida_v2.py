@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 import json, os, time
-from datetime import datetime
+from datetime import datetime, timedelta
+
+try:
+    from zoneinfo import ZoneInfo
+except Exception:
+    ZoneInfo = None
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
@@ -15,11 +20,15 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 # BRT fixo (sem depender do sistema)
 # Brasil (SP): UTC-3
-def brt_now():
-    return datetime.utcnow().timestamp() - 3 * 3600
-
 def brt_dt():
-    return datetime.utcfromtimestamp(brt_now())
+    """Data/hora em BRT (America/Sao_Paulo)."""
+    if ZoneInfo is not None:
+        try:
+            return datetime.now(ZoneInfo("America/Sao_Paulo"))
+        except Exception:
+            pass
+    # fallback simples (UTC-3) se ZoneInfo falhar
+    return datetime.utcnow() - timedelta(hours=3)
 
 def http_json(url: str, timeout=10):
     req = Request(url, headers={

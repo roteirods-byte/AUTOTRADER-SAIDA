@@ -13,38 +13,18 @@ const DIST_DIR = process.env.DIST_DIR || path.join(__dirname, "dist");
 // caminho do PRO (para puxar o ALVO fixo)
 const PRO_JSON = process.env.PRO_JSON || "/home/roteiro_ds/AUTOTRADER-PRO/data/pro.json";
 
-const STARTED_AT = new Date();
-
+fs.mkdirSync(DATA_DIR, { recursive: true });
+// versão/build do deploy (para confirmar que a revisão entrou no ar)
 const VERSION_FILE = process.env.VERSION_FILE || path.join(__dirname, "VERSION");
-
-function brtIso(d) {
-  // BRT fixo (UTC-3) sem depender do timezone do sistema
-  const t = new Date(d.getTime() - 3 * 3600 * 1000);
-  const yyyy = t.getUTCFullYear();
-  const mm = String(t.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(t.getUTCDate()).padStart(2, "0");
-  const hh = String(t.getUTCHours()).padStart(2, "0");
-  const mi = String(t.getUTCMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
-}
-
-function safeReadText(p, fallback) {
+function readVersion() {
   try {
-    if (!fs.existsSync(p)) return fallback;
-    const t = fs.readFileSync(p, "utf-8");
-    const v = String(t || "").trim();
-    return v || fallback;
-  } catch {
-    return fallback;
+    const v = fs.readFileSync(VERSION_FILE, "utf-8").trim();
+    return v || "unknown";
+  } catch (e) {
+    return String(process.env.BUILD_ID || "unknown");
   }
 }
 
-function readVersionInfo() {
-  const build = safeReadText(VERSION_FILE, "dev");
-  return { build, started_brt: brtIso(STARTED_AT) };
-}
-
-fs.mkdirSync(DATA_DIR, { recursive: true });
 
 app.use(express.json({ limit: "200kb" }));
 app.use((req, res, next) => {
@@ -124,18 +104,20 @@ function writeOps(d) {
 // --- ROTAS ---
 app.get("/health", (req, res) => res.json({ ok: true, service: "autotrader-saida-v2", ts: new Date().toISOString() }));
 
-// versão/build (para validar deploy e evitar "revisão não apareceu")
-app.get(["/api/saida/version", "/version"], (req, res) => {
-  const v = readVersionInfo();
-  res.json({ ok: true, build: v.build, started_brt: v.started_brt });
-});
-
-
 // serve página única (2 painéis)
 app.use("/dist", express.static(DIST_DIR));
 app.get("/", (req, res) => res.redirect("/saida"));
 app.get("/saida", (req, res) => res.sendFile(path.join(DIST_DIR, "saida.html")));
 app.get("/saida2", (req, res) => res.redirect("/saida")); // compatibilidade
+
+// versão (para debug de deploy)
+app.get("/api/saida/version", (req, res) => {
+  res.json({ ok: true, version: readVersion(), now_utc: new Date().toISOString() });
+});
+app.get("/version", (req, res) => {
+  res.json({ ok: true, version: readVersion(), now_utc: new Date().toISOString() });
+});
+
 
 // alvo do PRO (para preencher no painel antes de adicionar)
 app.get("/api/saida/alvo", (req, res) => {

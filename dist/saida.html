@@ -22,6 +22,7 @@
     body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial}
     .wrap{max-width:1180px;margin:22px auto;padding:0 14px}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
     .title{font-size:28px;font-weight:900;letter-spacing:.5px}
     .pill{background:rgba(255,255,255,.06);border:1px solid var(--line);padding:8px 12px;border-radius:999px}
     .pill b{color:var(--orange)}
@@ -70,10 +71,10 @@
         <div class="title">AUTOTRADER-SAÍDA</div>
         <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-      <div class="pill">Atualizado: <b id="upd">—</b></div>
-      <div class="pill" style="font-size:12px">Build: <b id="build">—</b></div>
-    </div>
+      <div class="right">
+        <div class="pill">Atualizado: <b id="upd">—</b></div>
+        <div class="pill">Build: <b id="build">—</b></div>
+      </div>
     </div>
 
     <!-- PAINEL 1: ENTRADA -->
@@ -165,8 +166,7 @@
     side = s;
     $("btnLong").classList.toggle("active", s==="LONG");
     $("btnShort").classList.toggle("active", s==="SHORT");
-    fetchVersion();
-  fetchAlvo();
+    fetchAlvo();
   }
   $("btnLong").onclick = (e)=>{ e.preventDefault(); setSide("LONG"); };
   $("btnShort").onclick = (e)=>{ e.preventDefault(); setSide("SHORT"); };
@@ -180,20 +180,6 @@
     const n = Number(v);
     if (!Number.isFinite(n)) return "0.00%";
     return n.toFixed(2) + "%";
-  }
-
-
-  async function fetchVersion(){
-    try{
-      const r = await fetch("/api/saida/version", { cache: "no-store" });
-      const j = await r.json();
-      if (j && j.ok){
-        $("build").textContent = j.build || "—";
-        $("build").title = (j.started_brt ? ("START: " + j.started_brt) : "");
-      }
-    }catch(e){
-      // não trava o painel
-    }
   }
 
   async function fetchAlvo(){
@@ -261,6 +247,17 @@
     return "warn";
   }
 
+  async function fetchVersion(){
+  try{
+    const r = await fetch("/api/saida/version");
+    const j = await r.json();
+    if (!j.ok) throw new Error("no");
+    $("build").textContent = j.version || "—";
+  }catch(e){
+    $("build").textContent = "indisponível";
+  }
+}
+
   async function refresh(){
     const r = await fetch("/api/saida/monitor");
     const j = await r.json();
@@ -300,9 +297,9 @@
   window.__del = delOp;
 
   fetchAlvo();
+  fetchVersion();
   refresh();
   setInterval(refresh, 15000);
-  setInterval(fetchVersion, 60000);
 </script>
 </body>
 </html>
