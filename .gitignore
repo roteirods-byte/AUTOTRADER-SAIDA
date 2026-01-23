@@ -23,3 +23,6 @@ backups_ops/
 logs/
 *.log
 _ORPHANS_*/
+*.BKP*
+*.bak*
+*BROKEN*
