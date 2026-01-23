@@ -303,4 +303,49 @@ app.get("/api/saida/history.pdf", (req,res)=>{
 
   doc.fontSize(16).text("AUTOTRADER - HISTÓRICO SAÍDA", { align: "center" });
   doc.moveDown(0.4);
-  doc.fontSize(9).text(`Gerado (UTC): ${new Date().toISOStri
+  doc.fontSize(9).text(`Gerado (UTC): ${new Date().toISOString()}`, { align: "center" });
+  doc.moveDown(0.8);
+
+  doc.fontSize(10).text(`Total de operações encerradas: ${items.length}`);
+  doc.moveDown(0.6);
+
+  // cabeçalho
+  doc.fontSize(9);
+  doc.text("PAR", 28, doc.y, { continued: true, width: 45 });
+  doc.text("SIDE", { continued: true, width: 55 });
+  doc.text("ENTRADA", { continued: true, width: 65 });
+  doc.text("ALVO", { continued: true, width: 60 });
+  doc.text("ALAV", { continued: true, width: 45 });
+  doc.text("REG", { continued: true, width: 85 });
+  doc.text("SAÍDA", { width: 85 });
+  doc.moveDown(0.3);
+  doc.text("".padEnd(110, "-"));
+  doc.moveDown(0.3);
+
+  for (const op of items){
+    const reg = `${op.data_reg || ""} ${op.hora_reg || ""}`.trim();
+    const ext = `${op.data_exit || ""} ${op.hora_exit || ""}`.trim();
+
+    doc.text(String(op.par || ""), 28, doc.y, { continued: true, width: 45 });
+    doc.text(String(op.side || ""), { continued: true, width: 55 });
+    doc.text(String(op.entrada ?? ""), { continued: true, width: 65 });
+    doc.text(String(op.alvo ?? ""), { continued: true, width: 60 });
+    doc.text(String(op.alav ?? ""), { continued: true, width: 45 });
+    doc.text(reg, { continued: true, width: 85 });
+    doc.text(ext, { width: 85 });
+
+    if (doc.y > 760) doc.addPage();
+  }
+
+  doc.end();
+});
+
+// rota antiga (compatível com página velha)
+app.post("/api/saida/delete", (req,res)=> {
+  req.url = "/api/saida/del";
+  app._router.handle(req, res);
+});
+
+app.listen(PORT, "0.0.0.0", ()=> {
+  console.log("AUTOTRADER-SAIDA rodando na porta", PORT);
+});
