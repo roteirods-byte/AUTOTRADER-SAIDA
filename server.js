@@ -112,17 +112,46 @@ function readProAndFindAlvo(par, side){
   return { ok:false, msg:"Sem alvo do PRO para essa moeda.", updated_brt };
 }
 
+// ====== DATA/HORA BRT (FIXA NO REGISTRO) ======
+function nowBRT_DDMMYYYY_HHMM(){
+  const d = new Date();
+  const data = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(d); // DD/MM/AAAA
+
+  const hora = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(d); // HH:MM
+
+  return { data, hora };
+}
+
 const OPS_FILE = path.join(DATA_DIR, "saida_ops.json");
 const MON_FILE = path.join(DATA_DIR, "saida_monitor.json");
+const HISTORY_FILE = path.join(DATA_DIR, "saida_history.json");
 
 function readOps(){
   const d = safeReadJson(OPS_FILE, { ops: [] });
   if (!d.ops || !Array.isArray(d.ops)) d.ops = [];
   return d;
 }
-
 function writeOps(d){
   safeWriteJson(OPS_FILE, d);
+}
+
+function readHistory(){
+  const d = safeReadJson(HISTORY_FILE, { history: [] });
+  if (!d.history || !Array.isArray(d.history)) d.history = [];
+  return d;
+}
+function writeHistory(d){
+  safeWriteJson(HISTORY_FILE, d);
 }
 
 app.use("/dist", express.static(DIST_DIR));
@@ -137,7 +166,6 @@ app.get("/api/saida/version", (req,res)=>{
   res.json({ ok:true, version: v, now_utc: new Date().toISOString() });
 });
 
-
 app.get("/api/saida/monitor", (req,res)=>{
   const d = safeReadJson(MON_FILE, { updated_brt: null, ops: [] });
   res.json(d);
@@ -145,6 +173,10 @@ app.get("/api/saida/monitor", (req,res)=>{
 
 app.get("/api/saida/ops", (req,res)=>{
   res.json(readOps());
+});
+
+app.get("/api/saida/history", (req,res)=>{
+  res.json(readHistory());
 });
 
 app.get("/api/saida/alvo", (req,res)=>{
@@ -158,6 +190,7 @@ app.get("/api/saida/alvo", (req,res)=>{
   res.json({ ok:true, par, side, alvo:r.alvo, updated_brt:r.updated_brt });
 });
 
+// ADD (cria operação + DATA/HORA FIXAS)
 app.post("/api/saida/add", (req,res)=>{
   const par = up(req.body?.par);
   const side = up(req.body?.side);
@@ -173,6 +206,8 @@ app.post("/api/saida/add", (req,res)=>{
   if (!r.ok) return res.status(400).json({ ok:false, msg:"Sem alvo do PRO para adicionar.", updated_brt:r.updated_brt || null });
 
   const id = `${par}-${Date.now()}`;
+  const reg = nowBRT_DDMMYYYY_HHMM();
+
   const d = readOps();
   d.ops.push({
     id,
@@ -181,13 +216,55 @@ app.post("/api/saida/add", (req,res)=>{
     entrada,
     alvo: r.alvo,
     alav,
-    created_ts: new Date().toISOString(),
+
+    // FIXO (auditoria)
+    data_reg: reg.data,
+    hora_reg: reg.hora,
+
+    // técnico
+    created_ts_utc: new Date().toISOString(),
     pro_updated_brt: r.updated_brt || null
   });
+
   writeOps(d);
   res.json({ ok:true, id });
 });
 
+// SAIR (fecha operação -> move para histórico permanente)
+app.post("/api/saida/exit", (req,res)=>{
+  const id = String(req.body?.id || "").trim();
+  const preco_saida = num(req.body?.preco_saida); // opcional (se mandar)
+  const motivo = String(req.body?.motivo || "").trim(); // opcional
+
+  if (!id) return res.status(400).json({ ok:false, msg:"ID inválido." });
+
+  const d = readOps();
+  const idx = d.ops.findIndex(x => String(x.id) === id);
+  if (idx < 0) return res.status(404).json({ ok:false, msg:"Operação não encontrada (ops)." });
+
+  const op = d.ops[idx];
+  d.ops.splice(idx, 1);
+  writeOps(d);
+
+  const ex = nowBRT_DDMMYYYY_HHMM();
+  const hd = readHistory();
+  hd.history.push({
+    ...op,
+
+    // FECHAMENTO (auditoria)
+    data_exit: ex.data,
+    hora_exit: ex.hora,
+    exit_ts_utc: new Date().toISOString(),
+    preco_saida: Number.isFinite(preco_saida) && preco_saida > 0 ? preco_saida : null,
+    motivo: motivo || null,
+    status_final: "SAIU"
+  });
+  writeHistory(hd);
+
+  res.json({ ok:true, moved_to_history: 1 });
+});
+
+// EXCLUIR (remove da lista em andamento - NÃO vai pro histórico)
 app.post("/api/saida/del", (req,res)=>{
   const id = String(req.body?.id || "").trim();
   if (!id) return res.status(400).json({ ok:false, msg:"ID inválido." });
@@ -200,12 +277,30 @@ app.post("/api/saida/del", (req,res)=>{
   res.json({ ok:true, removed: before - d.ops.length });
 });
 
-// rota antiga (compatível com página velha)
-app.post("/api/saida/delete", (req,res)=> {
-  req.url = "/api/saida/del";
-  app._router.handle(req, res);
-});
+// PDF do HISTÓRICO (arquivo real)
+app.get("/api/saida/history.pdf", (req,res)=>{
+  let PDFDocument;
+  try{
+    PDFDocument = require("pdfkit");
+  }catch{
+    return res.status(500).json({
+      ok:false,
+      msg:"Falta instalar pdfkit. Rode: npm install pdfkit"
+    });
+  }
 
-app.listen(PORT, "0.0.0.0", ()=> {
-  console.log("AUTOTRADER-SAIDA rodando na porta", PORT);
-});
+  const hd = readHistory();
+  const items = Array.isArray(hd.history) ? hd.history : [];
+
+  const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+  const filename = `historico_saida_${ts}.pdf`;
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+  const doc = new PDFDocument({ size: "A4", margin: 28 });
+  doc.pipe(res);
+
+  doc.fontSize(16).text("AUTOTRADER - HISTÓRICO SAÍDA", { align: "center" });
+  doc.moveDown(0.4);
+  doc.fontSize(9).text(`Gerado (UTC): ${new Date().toISOStri
