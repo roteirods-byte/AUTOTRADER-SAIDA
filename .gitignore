@@ -10,3 +10,9 @@ node_modules/
 # tmp
 *.log
 .DS_Store
+
+# --- DADOS VIVOS (NAO VERSIONAR) ---
+data/
+backups_ops/
+logs/
+*.log
