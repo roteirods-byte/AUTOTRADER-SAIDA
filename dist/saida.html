@@ -111,14 +111,17 @@
 
   <div class="card">
     <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
-    <div class="msg">Total: <b id="total">0</b></div>
 
+<div class="msg">
+  Total: <b id="total">0</b>
+  <button class="btn" id="btnPdf" style="margin-left:12px">Baixar PDF</button>
+</div>
     <table>
       <thead>
         <tr>
-          <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+<th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th><th>DATA REG</th><th>HORA REG</th>
           <th>ATUAL</th><th>GANHO / ALVO</th><th>GANHO / ATUAL</th>
-          <th>SITUAÇÃO</th><th>DATA</th><th>HORA</th><th>EXCLUIR</th>
+<th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th><th>SAIR</th><th>EXCLUIR</th>
         </tr>
       </thead>
       <tbody id="tb"></tbody>
@@ -178,6 +181,42 @@
     if (!Number.isFinite(n)) return "—";
     return n.toFixed(2);
   }
+
+<script>
+  function fmtDateBR(v){
+    if (!v) return "";
+    // se vier "DD/MM/AAAA" já retorna
+    if (typeof v === "string" && v.includes("/")) return v;
+    const d = new Date(v);
+    if (!Number.isFinite(d.getTime())) return "";
+    return d.toLocaleDateString("pt-BR", { timeZone:"America/Sao_Paulo" });
+  }
+
+  function fmtTimeBR(v){
+    if (!v) return "";
+    // se vier "HH:MM" já retorna
+    if (typeof v === "string" && v.includes(":") && v.length <= 5) return v;
+    const d = new Date(v);
+    if (!Number.isFinite(d.getTime())) return "";
+    return d.toLocaleTimeString("pt-BR", { timeZone:"America/Sao_Paulo", hour:"2-digit", minute:"2-digit" });
+  }
+
+  async function postJson(url, body){
+    const r = await fetch(url, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(body || {})
+    });
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok || !j.ok) throw new Error(j.msg || ("Falha em " + url));
+    return j;
+  }
+
+  async function sairOperacao(id){
+    return await postJson("/api/saida/exit", { id });
+  }
+</script>
+
   function clsPct(n){
     if (!Number.isFinite(n)) return "";
     if (n > 0) return "pos";
@@ -220,6 +259,13 @@
   // ---- REFRESH IMEDIATO (OPS + MONITOR) ----
   async function refresh(){
     try{
+    // BOTÃO PDF (liga 1 vez)
+    const btnPdf = document.getElementById("btnPdf");
+    if (btnPdf && !btnPdf.dataset.bound){
+      btnPdf.dataset.bound = "1";
+      btnPdf.onclick = ()=> window.open("/api/saida/history.pdf", "_blank");
+    }
+
       const [mon, opsdoc] = await Promise.all([
         fetch("/api/saida/monitor", { cache:"no-store" }).then(r=>r.json()),
         fetch("/api/saida/ops", { cache:"no-store" }).then(r=>r.json())
@@ -260,8 +306,9 @@
           <td>${o.situacao || (o.atual ? "" : "AGUARDANDO WORKER")}</td>
           <td>${o.data || ""}</td>
           <td>${o.hora || ""}</td>
-          <td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
-        `;
+<td><button class="sbtn" data-id="${o.id}">Sair</button></td>
+<td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
+      `;
         tb.appendChild(tr);
       }
 
@@ -293,10 +340,23 @@
         };
       });
 
-    }catch(e){
-      setMsg("Falha ao atualizar");
-    }
-  }
+      // ---- SAIR ----
+      tb.querySelectorAll("button.sbtn").forEach(b=>{
+        b.onclick = async ()=>{
+          const id = b.getAttribute("data-id");
+          if (!id) return;
+          if (!confirm("Confirmar SAIR desta operação?")) return;
+          try{
+            b.disabled = true;
+            await sairOperacao(id);   // usa /api/saida/exit (já existe no server.js)
+            await refresh();
+          }catch(e){
+            alert("ERRO NO SAIR: " + (e?.message || e));
+          }finally{
+            b.disabled = false;
+          }
+        };
+      });
 
   // ---- ADD ----
   if ($("btnAdd")) $("btnAdd").onclick = async ()=>{
