@@ -304,8 +304,8 @@
           <td class="${clsPct(gA)}">${fmtPct(gA)}</td>
           <td class="${clsPct(gU)}">${fmtPct(gU)}</td>
           <td>${o.situacao || (o.atual ? "" : "AGUARDANDO WORKER")}</td>
-          <td>${o.data || ""}</td>
-          <td>${o.hora || ""}</td>
+               <td>${fmtDateBR(o.created_ts)}</td>
+<td>${fmtTimeBR(o.created_ts)}</td>      
 <td><button class="sbtn" data-id="${o.id}">Sair</button></td>
 <td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
       `;
