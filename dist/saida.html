@@ -182,7 +182,7 @@
     return n.toFixed(2);
   }
 
-<script>
+
   function fmtDateBR(v){
     if (!v) return "";
     // se vier "DD/MM/AAAA" já retorna
@@ -215,7 +215,7 @@
   async function sairOperacao(id){
     return await postJson("/api/saida/exit", { id });
   }
-</script>
+
 
   function clsPct(n){
     if (!Number.isFinite(n)) return "";
