@@ -466,4 +466,34 @@
 
       if (!par) return alert("Selecione a moeda (PAR).");
       if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALA
+      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
+
+      const r = await fetch("/api/saida/add", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ par, side, entrada, alav })
+      });
+      const j = await r.json().catch(()=>({}));
+      if (!j.ok) throw new Error(j.msg || "Falha ao adicionar");
+
+      $("entrada").value = "";
+      await refresh(); // aparece NA HORA via /ops
+    }catch(e){
+      alert("ERRO NO ADD: " + (e?.message || e));
+    }finally{
+      btn.disabled = false;
+    }
+  };
+
+  // PDF
+  $("btnPdf").onclick = ()=>{ window.location.href = "/api/saida/history.pdf"; };
+
+  // init
+  ensureMoedas();
+  paintSide();
+  fetchAlvo();
+  refresh();
+  setInterval(refresh, 15000);
+</script>
+</body>
+</html>
