@@ -1,400 +1,440 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AUTOTRADER-SAÍDA</title>
-<style>
-/* COLOR_PATCH */
-#btnLong.active{ background:#0bbf6a !important; color:#001b24 !important; font-weight:800 !important; }
-#btnShort.active{ background:#ff3b3b !important; color:#001b24 !important; font-weight:800 !important; }
-#btnLong{ border-color:#0bbf6a !important; }
-#btnShort{ border-color:#ff3b3b !important; }
-.pos{ color:#0bbf6a !important; font-weight:700 !important; }
-.neg{ color:#ff3b3b !important; font-weight:700 !important; }
-/* END_COLOR_PATCH */
-
-  :root{
-    --bg:#061b22;
-    --card:#08242c;
-    --line:#0d3a44;
-    --txt:#e9f3f6;
-    --muted:#9fb3bb;
-    --pumpkin:#ff8c00;
-    --ok:#2ecc71;
-    --bad:#ff4d4d;
-  }
-  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial;}
-  body{margin:0;background:var(--bg);color:var(--txt);}
-  .wrap{max-width:1120px;margin:26px auto;padding:0 16px;}
-  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-  h1{margin:0;font-size:34px;letter-spacing:1px;}
-  .sub{color:var(--muted);margin-top:4px;}
-  .pill{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#052028;}
-  .pill b{color:var(--pumpkin);}
-  .card{margin-top:18px;padding:18px;border-radius:16px;background:linear-gradient(180deg,var(--card),#062028);border:1px solid #062e36;}
-  .h{color:var(--pumpkin);font-weight:800;letter-spacing:1px;margin-bottom:12px;font-size:18px;}
-  .grid{display:grid;grid-template-columns:110px 170px 1fr 1fr 110px 210px;gap:12px;align-items:end;}
-  label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px;}
-  input,select{width:100%;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--txt);padding:0 10px;outline:none;}
-  select{color:var(--pumpkin);font-weight:700;}
-  option{color:var(--pumpkin);background:#041b22;}
-  .sideBox{display:flex;gap:10px;}
-  .sideBtn{flex:1;height:38px;border-radius:10px;border:1px solid var(--line);background:#041b22;color:var(--muted);font-weight:800;cursor:pointer}
-  .sideBtn.onLong{border-color:#0f6b49;color:var(--ok);box-shadow:0 0 0 2px rgba(46,204,113,.15) inset;}
-  .sideBtn.onShort{border-color:#7a1c33;color:#ff4da1;box-shadow:0 0 0 2px rgba(255,77,161,.12) inset;}
-  .btn{height:40px;border-radius:12px;border:1px solid #5c2a0a;background:#0c2d38;color:var(--pumpkin);font-weight:900;cursor:pointer}
-  .msg{margin-top:10px;color:var(--muted);font-size:13px}
-  .msg b{color:var(--pumpkin)}
-  .warn{color:#ffb266}
-  table{width:100%;border-collapse:collapse;margin-top:10px}
-  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;font-size:13px}
-  th{color:var(--pumpkin);font-weight:800}
-  .par{color:var(--pumpkin);font-weight:900}
-  .tag{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-weight:900}
-  .long{color:var(--ok);border-color:#0f6b49}
-  .short{color:#ff4da1;border-color:#7a1c33}
-  .pctPos{color:var(--ok);font-weight:900}
-  .pctNeg{color:var(--bad);font-weight:900}
-  .foot{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-  .chip{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
-  .xbtn{height:34px;border-radius:10px;border:1px solid #7a1c33;background:#2a0d1a;color:#ff4da1;font-weight:900;cursor:pointer;padding:0 14px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AUTOTRADER-SAÍDA</title>
+  <style>
+    :root{
+      --bg:#061a22;
+      --card:#082633;
+      --card2:#07212c;
+      --txt:#e8f3f7;
+      --muted:#9db3be;
+      --orange:#ff8a00;
+      --green:#2ee59d;
+      --red:#ff4d4d;
+      --line:rgba(255,255,255,.08);
+      --btn:#0b3343;
+      --btn2:#0a2a37;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 20% 0%, #0a2d3b 0%, var(--bg) 55%) fixed;
+      color:var(--txt);
+      font: 14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    .wrap{max-width:1120px;margin:22px auto;padding:0 16px}
+    .top{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px
+    }
+    h1{margin:0;font-size:34px;letter-spacing:.5px}
+    .sub{color:var(--muted);margin-top:6px}
+    .pill{
+      background:rgba(0,0,0,.25);
+      border:1px solid var(--line);
+      padding:10px 14px;border-radius:999px;min-width:150px;text-align:center
+    }
+    .pill b{display:block;color:var(--muted);font-weight:700;margin-bottom:3px}
+    .card{
+      background:linear-gradient(180deg,var(--card) 0%, var(--card2) 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:18px 18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      margin-bottom:16px;
+    }
+    .title{
+      color:var(--orange);
+      font-weight:900;
+      letter-spacing:.6px;
+      margin:0 0 14px 0;
+      font-size:16px;
+    }
+    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    select,input{
+      width:100%;
+      background:rgba(0,0,0,.18);
+      border:1px solid var(--line);
+      color:var(--txt);
+      border-radius:10px;
+      padding:10px 10px;
+      outline:none;
+    }
+    input[readonly]{opacity:.9}
+    .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    .col{flex:1;min-width:120px}
+    .col.small{flex:0 0 120px}
+    .col.med{flex:0 0 160px}
+    .sideBox{display:flex;gap:10px}
+    .sbtn{
+      flex:1;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:var(--btn2);
+      color:var(--txt);
+      cursor:pointer;
+      font-weight:800;
+    }
+    .sbtn.on.long{outline:2px solid rgba(46,229,157,.45);border-color:rgba(46,229,157,.45)}
+    .sbtn.on.short{outline:2px solid rgba(255,77,77,.45);border-color:rgba(255,77,77,.45)}
+    .btn{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,138,0,.45);
+      background:rgba(255,138,0,.12);
+      color:var(--orange);
+      font-weight:900;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .muted{color:var(--muted)}
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+    th{color:var(--orange);text-align:left;font-size:12px;letter-spacing:.5px}
+    td .tag{font-weight:900}
+    .tag.long{color:var(--green)}
+    .tag.short{color:var(--red)}
+    .pct.pos{color:var(--green);font-weight:800}
+    .pct.neg{color:var(--red);font-weight:800}
+    .actions{display:flex;gap:8px}
+    .mini{
+      padding:7px 10px;border-radius:10px;border:1px solid var(--line);
+      background:rgba(0,0,0,.18);color:var(--txt);cursor:pointer;font-weight:800
+    }
+    .mini.danger{border-color:rgba(255,77,77,.35);color:var(--red)}
+    .mini.warn{border-color:rgba(255,138,0,.35);color:var(--orange)}
+    .foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:12px}
+    .foot span{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.15)}
+    .err{color:var(--red);font-weight:800;margin-top:10px;display:none}
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div>
-      <h1>AUTOTRADER-SAÍDA</h1>
-      <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
-    </div>
-    <div class="pill">Atualizado: <b id="updated">—</b></div>
-  </div>
-
-  <div class="card">
-    <div class="h">DADOS DE ENTRADA NA OPERAÇÃO</div>
-    <div class="grid">
+  <div class="wrap">
+    <div class="top">
       <div>
-        <label>PAR</label>
-        <select id="par"></select>
+        <h1>AUTOTRADER-SAÍDA</h1>
+        <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático</div>
       </div>
+      <div class="pill">
+        <b>Atualizado:</b>
+        <div id="updated">—</div>
+      </div>
+    </div>
 
-      <div>
-        <label>SIDE</label>
-        <div class="sideBox">
-          <button class="sideBtn" id="btnLong">LONG</button>
-          <button class="sideBtn" id="btnShort">SHORT</button>
+    <div class="card">
+      <div class="title">DADOS DE ENTRADA NA OPERAÇÃO</div>
+
+      <div class="row">
+        <div class="col small">
+          <label>PAR</label>
+          <select id="par"></select>
+        </div>
+
+        <div class="col med">
+          <label>SIDE</label>
+          <div class="sideBox">
+            <button class="sbtn long on" id="btnLong" type="button">LONG</button>
+            <button class="sbtn short" id="btnShort" type="button">SHORT</button>
+          </div>
+        </div>
+
+        <div class="col small">
+          <label>ENTRADA</label>
+          <input id="entrada" inputmode="decimal" placeholder="ex: 1.234" />
+        </div>
+
+        <div class="col small">
+          <label>US ALVO (do PRO, congelado)</label>
+          <input id="alvo" readonly value="—" />
+        </div>
+
+        <div class="col small">
+          <label>ALAV</label>
+          <input id="alav" inputmode="numeric" value="10" />
+        </div>
+
+        <div class="col" style="flex:0 0 190px">
+          <button class="btn" id="btnAdd" type="button">Adicionar Operação</button>
         </div>
       </div>
 
-      <div>
-        <label>ENTRADA</label>
-        <input id="entrada" type="text" inputmode="decimal" placeholder="ex: 1.3371" />
-      </div>
-
-      <div>
-        <label>US ALVO (do PRO, congelado)</label>
-        <input id="alvo" type="number" step="0.0001" readonly />
-      </div>
-
-      <div>
-        <label>ALAV</label>
-        <input id="alav" type="text" inputmode="numeric" value="10" />
-      </div>
-
-      <div>
-        <button class="btn" id="btnAdd">Adicionar Operação</button>
-      </div>
+      <div class="muted" style="margin-top:10px">Alvo do PRO: <span id="alvoTxt">—</span></div>
+      <div class="err" id="errTop">ERRO: —</div>
     </div>
-    <div class="msg" id="info">Alvo do PRO: <b id="proInfo">—</b> <span id="err" class="warn"></span></div>
-  </div>
 
-  <div class="card">
-    <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
+    <div class="card">
+      <div class="title">MONITORAMENTO DAS OPERAÇÕES</div>
 
-<div class="msg">
-  Total: <b id="total">0</b>
-  <button class="btn" id="btnPdf" style="margin-left:12px">Baixar PDF</button>
-</div>
-    <table>
-      <thead>
-        <tr>
-<th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th><th>DATA REG</th><th>HORA REG</th>
-          <th>ATUAL</th><th>GANHO / ALVO</th><th>GANHO / ATUAL</th>
-<th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th><th>SAIR</th><th>EXCLUIR</th>
-        </tr>
-      </thead>
-      <tbody id="tb"></tbody>
-    </table>
+      <div class="row" style="align-items:center">
+        <div class="muted">Total: <b id="total">0</b></div>
+        <button class="btn" id="btnPdf" type="button">Baixar PDF</button>
+      </div>
 
-    <div class="foot">
-      <div class="chip">Auto-refresh: 15s</div>
-      <div class="chip">Worker: 5 min</div>
-      <div class="chip">ALVO fixo (congelado no ADD)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+            <th>HORA REG</th><th>ATUAL</th><th>GANHO/ALVO</th><th>GANHO ATUAL</th>
+            <th>SITUAÇÃO</th><th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+
+      <div class="foot">
+        <span>Auto-refresh: 15s</span>
+        <span>Worker: 5 min</span>
+        <span>ALVO fixo (congelado no ADD)</span>
+      </div>
+
+      <div class="err" id="errBot">ERRO: —</div>
     </div>
   </div>
-</div>
 
-<script>
-  const $ = (id)=>document.getElementById(id);
-  const pick = (...ids)=>ids.map($).find(Boolean);
+  <script>
+  (function(){
+    "use strict";
 
-  const elUpd = ()=>pick("upd","updated");
-  const elMsg = ()=>pick("msg","err");
-  const elTb  = ()=>pick("tb");
-  const elTot = ()=>pick("total");
-  const elPro = ()=>pick("proInfo");
+    const MOEDAS = [
+      "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC",
+      "DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK",
+      "LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB",
+      "SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"
+    ];
 
-  function setMsg(t){
-    const e = elMsg();
-    if (e) e.textContent = t ? (" — " + t) : "";
-  }
+    const $ = (id)=>document.getElementById(id);
 
-  // ---- SIDE (destacar o escolhido) ----
-  let side = "LONG";
-  function paintSide(){
-    const bL = $("btnLong"), bS = $("btnShort");
-    if (bL){
-      bL.classList.toggle("active", side==="LONG");
-      bL.style.filter = (side==="LONG") ? "brightness(1.35)" : "brightness(0.85)";
-    }
-    if (bS){
-      bS.classList.toggle("active", side==="SHORT");
-      bS.style.filter = (side==="SHORT") ? "brightness(1.35)" : "brightness(0.85)";
-    }
-  }
-  function setSide(s){
-    side = s;
-    paintSide();
-    fetchAlvo();
-  }
-  if ($("btnLong")) $("btnLong").onclick = (e)=>{ e.preventDefault(); setSide("LONG"); };
-  if ($("btnShort")) $("btnShort").onclick = (e)=>{ e.preventDefault(); setSide("SHORT"); };
-
-  function fmtPx(v){
-    const n = Number(v);
-    if (!Number.isFinite(n)) return "—";
-    return n.toFixed(3);
-  }
-  function fmtPct(v){
-    const n = Number(v);
-    if (!Number.isFinite(n)) return "—";
-    return n.toFixed(2);
-  }
-
-
-  function fmtDateBR(v){
-    if (!v) return "";
-    // se vier "DD/MM/AAAA" já retorna
-    if (typeof v === "string" && v.includes("/")) return v;
-    const d = new Date(v);
-    if (!Number.isFinite(d.getTime())) return "";
-    return d.toLocaleDateString("pt-BR", { timeZone:"America/Sao_Paulo" });
-  }
-
-  function fmtTimeBR(v){
-    if (!v) return "";
-    // se vier "HH:MM" já retorna
-    if (typeof v === "string" && v.includes(":") && v.length <= 5) return v;
-    const d = new Date(v);
-    if (!Number.isFinite(d.getTime())) return "";
-    return d.toLocaleTimeString("pt-BR", { timeZone:"America/Sao_Paulo", hour:"2-digit", minute:"2-digit" });
-  }
-
-  async function postJson(url, body){
-    const r = await fetch(url, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(body || {})
-    });
-    const j = await r.json().catch(()=>({}));
-    if (!r.ok || !j.ok) throw new Error(j.msg || ("Falha em " + url));
-    return j;
-  }
-
-  async function sairOperacao(id){
-    return await postJson("/api/saida/exit", { id });
-  }
-
-
-  function clsPct(n){
-    if (!Number.isFinite(n)) return "";
-    if (n > 0) return "pos";
-    if (n < 0) return "neg";
-    return "warn";
-  }
-
-  // moedas (fallback)
-  const MOEDAS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
-  function ensureMoedas(){
-    const sel = $("par");
-    if (!sel) return;
-    if (!sel.options || sel.options.length===0){
-      sel.innerHTML = MOEDAS.map(m=>`<option value="${m}">${m}</option>`).join("");
-    }
-  }
-
-  // ---- ALVO (PRO) ----
-  async function fetchAlvo(){
-    setMsg("");
-    const par = $("par") ? $("par").value : "";
-    const alvo = $("alvo");
-    if (alvo) alvo.value = "";
-
-    try{
-      const r = await fetch(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`, { cache:"no-store" });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.msg || "Sem alvo");
-      if (alvo) alvo.value = j.alvo;
-      const pinfo = elPro();
-      if (pinfo) pinfo.textContent = (j.updated_brt ? ("PRO atualizado: " + j.updated_brt) : "OK");
-    }catch(e){
-      const pinfo = elPro();
-      if (pinfo) pinfo.textContent = "Sem alvo no PRO";
-      setMsg("Alvo indisponível");
-    }
-  }
-  if ($("par")) $("par").onchange = fetchAlvo;
-
-  // ---- REFRESH IMEDIATO (OPS + MONITOR) ----
-  async function refresh(){
-    try{
-    // BOTÃO PDF (liga 1 vez)
-    const btnPdf = document.getElementById("btnPdf");
-    if (btnPdf && !btnPdf.dataset.bound){
-      btnPdf.dataset.bound = "1";
-      btnPdf.onclick = ()=> window.open("/api/saida/history.pdf", "_blank");
-    }
-
-      const [mon, opsdoc] = await Promise.all([
-        fetch("/api/saida/monitor", { cache:"no-store" }).then(r=>r.json()),
-        fetch("/api/saida/ops", { cache:"no-store" }).then(r=>r.json())
-      ]);
-
-      const u = elUpd();
-      if (u) u.textContent = (mon.updated_brt || "—");
-
-      const ops_list = Array.isArray(opsdoc?.ops) ? opsdoc.ops : [];
-      const mon_list = Array.isArray(mon?.ops) ? mon.ops : [];
-      const mon_map = {};
-      for (const m of mon_list) mon_map[m.id] = m;
-
-      // junta: sempre mostra o que está salvo (ops) e, se já tiver cálculo do worker, sobrescreve com monitor
-      const rows = ops_list.map(o => Object.assign({}, o, mon_map[o.id] || {}));
-
-      const t = elTot();
-      if (t) t.textContent = rows.length;
-
-      const tb = elTb();
-      if (!tb) return;
-      tb.innerHTML = "";
-
-      for (const o of rows){
-        const gA = Number(o.ganho_alvo_pct ?? o.pnl_pct);
-        const gU = Number(o.ganho_atual_pct ?? o.pct_atual);
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="par">${o.par||""}</td>
-          <td><span class="tag ${String(o.side)==="SHORT" ? "short":"long"}">${o.side||""}</span></td>
-          <td>${fmtPx(o.entrada)}</td>
-          <td>${fmtPx(o.alvo)}</td>
-          <td>${o.alav ?? ""}</td>
-          <td>${fmtPx(o.atual)}</td>
-          <td class="${clsPct(gA)}">${fmtPct(gA)}</td>
-          <td class="${clsPct(gU)}">${fmtPct(gU)}</td>
-          <td>${o.situacao || (o.atual ? "" : "AGUARDANDO WORKER")}</td>
-               <td>${fmtDateBR(o.created_ts)}</td>
-<td>${fmtTimeBR(o.created_ts)}</td>      
-<td><button class="sbtn" data-id="${o.id}">Sair</button></td>
-<td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
-      `;
-        tb.appendChild(tr);
+    let side = "LONG";
+    function paintSide(){
+      $("btnLong").classList.toggle("on", side==="LONG");
+      $("btnShort").classList.toggle("on", side==="SHORT");
+      $("btnLong").classList.toggle("long", true);
+      $("btnShort").classList.toggle("short", true);
+      if (side==="LONG"){
+        $("btnLong").classList.add("on","long");
+        $("btnShort").classList.remove("on");
+      } else {
+        $("btnShort").classList.add("on","short");
+        $("btnLong").classList.remove("on");
       }
+    }
 
-      tb.querySelectorAll("button.xbtn").forEach(b=>{
-        b.onclick = async ()=>{
-          const id = b.getAttribute("data-id");
+    function fmt3(n){
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(3);
+    }
+    function fmt2(n){
+      if (!Number.isFinite(n)) return "—";
+      const v = n.toFixed(2);
+      return (n>0?"+":"") + v + "%";
+    }
+
+    function setErr(topOrBot, msg){
+      const el = topOrBot==="top" ? $("errTop") : $("errBot");
+      if (!msg){
+        el.style.display="none";
+        el.textContent="ERRO: —";
+        return;
+      }
+      el.style.display="block";
+      el.textContent = "ERRO: " + msg;
+    }
+
+    function fillMoedas(){
+      const sel = $("par");
+      sel.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value=""; opt0.textContent="—";
+      sel.appendChild(opt0);
+      MOEDAS.forEach(m=>{
+        const o=document.createElement("option");
+        o.value=m; o.textContent=m;
+        sel.appendChild(o);
+      });
+    }
+
+    async function jget(url){
+      const r = await fetch(url, { cache:"no-store" });
+      const t = await r.text();
+      let j;
+      try{ j = JSON.parse(t); }catch{ j = null; }
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      if (j && j.ok===false) throw new Error(j.msg || j.error || "Falha");
+      return j ?? { raw:t };
+    }
+
+    async function fetchAlvo(){
+      try{
+        const j = await jget("/api/saida/alvo");
+        const alvo = (j && Number.isFinite(Number(j.alvo))) ? Number(j.alvo) : null;
+        $("alvo").value = alvo==null ? "—" : fmt3(alvo);
+        $("alvoTxt").textContent = alvo==null ? "—" : fmt3(alvo);
+        setErr("top", "");
+      }catch(e){
+        $("alvo").value = "—";
+        $("alvoTxt").textContent = "—";
+        setErr("top", (e && e.message) ? e.message : String(e));
+      }
+    }
+
+    function calcPct(entry, x, isShort){
+      if (!Number.isFinite(entry) || entry<=0 || !Number.isFinite(x)) return null;
+      const raw = isShort ? ((entry - x)/entry*100) : ((x - entry)/entry*100);
+      return raw;
+    }
+
+    function rowHtml(op){
+      const par = op.par || "—";
+      const isShort = (op.side || "").toUpperCase()==="SHORT";
+      const entrada = Number(op.entrada);
+      const alvo = Number(op.alvo);
+      const alav = Number(op.alav);
+      const atual = Number(op.atual);
+
+      const pctAlvo = calcPct(entrada, alvo, isShort);
+      const pctAtual = calcPct(entrada, atual, isShort);
+
+      const tag = isShort ? `<span class="tag short">SHORT</span>` : `<span class="tag long">LONG</span>`;
+      const p1 = (pctAlvo==null) ? "—" : `<span class="pct ${pctAlvo>=0?"pos":"neg"}">${fmt2(pctAlvo)}</span>`;
+      const p2 = (pctAtual==null) ? "—" : `<span class="pct ${pctAtual>=0?"pos":"neg"}">${fmt2(pctAtual)}</span>`;
+
+      const horaReg = (op.pro_updated_brt || op.created_ts || "—").toString().slice(11,16) || "—";
+      const situ = (op.situacao || op.status || "—");
+
+      const id = op.id || "";
+      const btnSair = id ? `<button class="mini warn" data-act="exit" data-id="${id}">SAIR</button>` : "";
+      const btnDel  = id ? `<button class="mini danger" data-act="del" data-id="${id}">EXCLUIR</button>` : "";
+
+      return `
+        <tr>
+          <td>${par}</td>
+          <td>${tag}</td>
+          <td>${fmt3(entrada)}</td>
+          <td>${fmt3(alvo)}</td>
+          <td>${Number.isFinite(alav)? alav : "—"}</td>
+          <td>${horaReg}</td>
+          <td>${fmt3(atual)}</td>
+          <td>${p1}</td>
+          <td>${p2}</td>
+          <td class="muted">${situ}</td>
+          <td><div class="actions">${btnSair}${btnDel}</div></td>
+        </tr>
+      `;
+    }
+
+    async function refresh(){
+      try{
+        let j;
+        try{
+          j = await jget("/api/saida/monitor");
+        }catch{
+          j = await jget("/api/saida/ops");
+        }
+
+        const ops = (j && Array.isArray(j.ops)) ? j.ops : [];
+        $("total").textContent = String(ops.length);
+
+        const updated = j.updated_brt || j.now_brt || j.now_utc || "";
+        $("updated").textContent = updated ? String(updated).slice(0,16) : "—";
+
+        const tb = $("tb");
+        tb.innerHTML = ops.map(rowHtml).join("") || `<tr><td colspan="11" class="muted">Sem operações no momento.</td></tr>`;
+
+        bindRowButtons();
+        setErr("bot", "");
+      }catch(e){
+        setErr("bot", (e && e.message) ? e.message : String(e));
+      }
+    }
+
+    function bindRowButtons(){
+      document.querySelectorAll("button[data-act][data-id]").forEach(btn=>{
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-id");
+          const act = btn.getAttribute("data-act");
+          if (!id) return;
+
+          const msg = act==="exit" ? "Confirmar SAIR desta operação?" : "Confirmar EXCLUIR esta operação?";
+          if (!confirm(msg)) return;
+
+          btn.disabled = true;
           try{
-            b.disabled = true;
-            let r = await fetch("/api/saida/del", {
+            const url = act==="exit" ? "/api/saida/exit" : "/api/saida/del";
+            const r = await fetch(url, {
               method:"POST",
               headers:{ "Content-Type":"application/json" },
               body: JSON.stringify({ id })
             });
-            if (!r.ok){
-              r = await fetch("/api/saida/delete", {
-                method:"POST",
-                headers:{ "Content-Type":"application/json" },
-                body: JSON.stringify({ id })
-              });
-            }
             const j = await r.json().catch(()=>({}));
-            if (!j.ok) throw new Error(j.msg || "Falha ao excluir");
-            await refresh(); // agora some NA HORA
-          }catch(e){
-            alert("ERRO NO EXCLUIR: " + (e?.message || e));
-          }finally{
-            b.disabled = false;
-          }
-        };
-      });
-
-      // ---- SAIR ----
-      tb.querySelectorAll("button.sbtn").forEach(b=>{
-        b.onclick = async ()=>{
-          const id = b.getAttribute("data-id");
-          if (!id) return;
-          if (!confirm("Confirmar SAIR desta operação?")) return;
-          try{
-            b.disabled = true;
-            await sairOperacao(id);   // usa /api/saida/exit (já existe no server.js)
+            if (!r.ok || j.ok===false) throw new Error(j.msg || j.error || ("HTTP " + r.status));
             await refresh();
           }catch(e){
-            alert("ERRO NO SAIR: " + (e?.message || e));
+            alert("ERRO: " + ((e && e.message) ? e.message : String(e)));
           }finally{
-            b.disabled = false;
+            btn.disabled = false;
           }
-        };
+        });
       });
-
-  // ---- ADD ----
-  if ($("btnAdd")) $("btnAdd").onclick = async ()=>{
-    const btn = $("btnAdd");
-    try{
-      btn.disabled = true;
-
-      const par = $("par").value;
-      const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
-      const entrada = Number(entrada_txt);
-      const alav = Number(String($("alav").value||"").trim());
-
-      if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
-
-      const r = await fetch("/api/saida/add", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ par, side, entrada, alav })
-      });
-      const j = await r.json().catch(()=>({}));
-      if (!j.ok) throw new Error(j.msg || "Falha ao adicionar");
-
-      $("entrada").value = "";
-      await refresh(); // agora aparece NA HORA (via /ops)
-    }catch(e){
-      alert("ERRO NO ADD: " + (e?.message || e));
-    }finally{
-      btn.disabled = false;
     }
-  };
 
-  // init
-  ensureMoedas();
-  paintSide();
-  fetchAlvo();
-  refresh();
-  setInterval(refresh, 15000);
-</script>
+    async function addOp(){
+      const btn = $("btnAdd");
+      btn.disabled = true;
+      try{
+        const par = ($("par").value || "").trim();
+        const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
+        const entrada = Number(entrada_txt);
+        const alav = Number(String($("alav").value || "").trim());
+
+        if (!par) return alert("Selecione o PAR.");
+        if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
+        if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
+
+        const r = await fetch("/api/saida/add", {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ par, side, entrada, alav })
+        });
+        const j = await r.json().catch(()=>({}));
+        if (!r.ok || j.ok===false) throw new Error(j.msg || j.error || ("HTTP " + r.status));
+
+        $("entrada").value = "";
+        await fetchAlvo();
+        await refresh();
+      }catch(e){
+        alert("ERRO NO ADD: " + ((e && e.message) ? e.message : String(e)));
+      }finally{
+        btn.disabled = false;
+      }
+    }
+
+    function bindTop(){
+      $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); };
+      $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); };
+
+      $("btnAdd").onclick = addOp;
+
+      $("btnPdf").onclick = ()=> window.open("/api/saida/history.pdf", "_blank");
+    }
+
+    // init (blindado)
+    try{
+      fillMoedas();
+      paintSide();
+      bindTop();
+      fetchAlvo();
+      refresh();
+      setInterval(refresh, 15000);
+    }catch(e){
+      alert("ERRO AO INICIAR: " + ((e && e.message) ? e.message : String(e)));
+    }
+  })();
+  </script>
 </body>
 </html>
