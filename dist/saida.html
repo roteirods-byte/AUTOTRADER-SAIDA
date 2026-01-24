@@ -1,650 +1,604 @@
-cd /home/roteiro_ds/AUTOTRADER-SAIDA || exit 1
-
-# backup seguro
-cp -a dist/saida.html "dist/saida.html.bak.$(date +%F_%H%M%S)"
-
-# grava o HTML novo
-cat > dist/saida.html <<'HTML'
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AUTOTRADER-SAÍDA</title>
-
-  <!-- evita erro de favicon -->
-  <link rel="icon" href="data:,">
-
   <style>
     :root{
-      --bg:#041b23;
-      --card:#062a34;
-      --card2:#06303a;
-      --txt:#e9f3f6;
-      --muted:#9fb3ba;
-      --orange:#ff8b1f;
-      --green:#17c964;
-      --red:#ff3b30;
-      --pink:#ff3bc8;
-      --btn:#0b3c47;
-      --line:#0b4250;
+      --bg:#061a20;
+      --panel:#07232b;
+      --panel2:#062029;
+      --text:#d7e6ea;
+      --muted:#8fb1ba;
+      --orange:#ff8a1f;
+      --line:#0d3a44;
+      --green:#10b981;
+      --red:#ef4444;
+      --pink:#ff3b9a;
+      --btn:#0b2a33;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-      background:var(--bg);
-      color:var(--txt);
+      background: radial-gradient(1200px 600px at 30% 0%, #0a2a33 0%, var(--bg) 55%);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
     .wrap{
-      width:96%;
-      max-width:1400px; /* AUMENTA LARGURA DO PAINEL */
-      margin:26px auto 60px;
+      max-width: 1480px; /* MAIS LARGO */
+      margin: 28px auto;
+      padding: 0 18px 40px;
     }
-    h1{
-      margin:0 0 6px;
-      letter-spacing:1px;
-      font-weight:800;
-      font-size:42px;
-    }
-    .sub{
-      color:var(--muted);
-      margin:0 0 18px;
-      font-size:14px;
-    }
-    .topbar{
+    .top{
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:8px;
+      margin-bottom:16px;
     }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+    h1{
+      margin:0;
+      font-size:42px;
+      letter-spacing:1px;
+      font-weight:800;
+    }
+    .sub{
+      margin-top:4px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .pill{
       padding:10px 14px;
       border-radius:999px;
-      background:rgba(7,54,66,.6);
-      border:1px solid rgba(255,139,31,.35);
-      color:var(--txt);
+      background: rgba(10,42,51,.55);
+      border:1px solid rgba(255,138,31,.35);
+      box-shadow: var(--shadow);
       font-size:14px;
-      min-width:210px;
-      justify-content:center;
+      color:var(--text);
+      white-space:nowrap;
     }
-    .badge b{color:var(--orange)}
+    .pill b{color:var(--orange)}
     .card{
-      background:linear-gradient(180deg, rgba(6,42,52,.92), rgba(6,48,58,.86));
-      border:1px solid rgba(255,255,255,.06);
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-      border-radius:18px;
+      background: linear-gradient(180deg, rgba(9,47,56,.85), rgba(6,32,41,.85));
+      border:1px solid rgba(16,185,129,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding:18px 18px 16px;
-      margin:14px 0;
+      margin-top:18px;
     }
-    .title{
+    .h{
       color:var(--orange);
-      font-weight:800;
-      letter-spacing:1px;
-      margin:0 0 12px;
+      font-weight:900;
+      letter-spacing:.6px;
       font-size:18px;
+      margin-bottom:14px;
     }
-
-    /* FORM */
-    .grid{
+    .row{
       display:grid;
-      grid-template-columns: 120px 170px 1fr 220px 110px 180px;
-      gap:12px;
+      grid-template-columns: 160px 170px 220px 320px 120px 1fr;
+      gap:14px;
       align-items:end;
     }
-    .field label{
+    label{
       display:block;
       font-size:12px;
       color:var(--muted);
-      margin:0 0 6px;
-      letter-spacing:.6px;
+      margin-bottom:6px;
     }
     select,input{
       width:100%;
       padding:12px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.08);
-      background:#04232c;
-      color:var(--txt);
+      border-radius:12px;
+      border:1px solid rgba(143,177,186,.22);
+      background: rgba(7,35,43,.75);
+      color:var(--text);
       outline:none;
     }
-    input[disabled]{opacity:.85}
-    .row{
-      display:flex; gap:10px; align-items:center;
+    input::placeholder{color:rgba(143,177,186,.55)}
+    .sidebox{
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
-    .btn{
-      cursor:pointer;
-      border:1px solid rgba(255,139,31,.55);
-      background:rgba(255,139,31,.08);
-      color:var(--orange);
-      padding:12px 14px;
-      border-radius:10px;
+    .btnSide{
+      flex:1;
+      padding:12px 10px;
+      border-radius:12px;
+      border:1px solid rgba(143,177,186,.22);
+      background: rgba(7,35,43,.75);
+      color:var(--text);
       font-weight:800;
-      letter-spacing:.2px;
-      transition:.12s ease;
+      cursor:pointer;
+      transition:.15s;
+    }
+    .btnSide.on.long{border-color: rgba(16,185,129,.7); box-shadow:0 0 0 2px rgba(16,185,129,.12) inset;}
+    .btnSide.on.short{border-color: rgba(239,68,68,.7); box-shadow:0 0 0 2px rgba(239,68,68,.12) inset;}
+    .btnMain{
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,138,31,.5);
+      background: rgba(13,58,68,.7);
+      color:var(--orange);
+      font-weight:900;
+      cursor:pointer;
       white-space:nowrap;
     }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:disabled{opacity:.6; cursor:not-allowed; transform:none}
-    .toggle{
-      display:flex; gap:10px;
-    }
-    .tbtn{
-      cursor:pointer;
-      border-radius:10px;
-      padding:12px 16px;
-      font-weight:900;
-      border:1px solid rgba(255,255,255,.12);
-      background:#04232c;
-      color:var(--muted);
-    }
-    .tbtn.on.long{border-color:rgba(23,201,100,.6); color:var(--green)}
-    .tbtn.on.short{border-color:rgba(255,59,48,.65); color:var(--red)}
-    .hint{
+    .btnMain:disabled{opacity:.6; cursor:not-allowed}
+    .muteline{
       margin-top:10px;
-      color:var(--muted);
       font-size:13px;
+      color:var(--muted);
     }
-    .hint b{color:var(--orange)}
-
-    /* TABELA */
+    .muteline b{color:var(--orange)}
     .bar{
       display:flex;
-      justify-content:space-between;
       align-items:center;
+      gap:14px;
       margin-bottom:10px;
-      gap:12px;
     }
-    .bar .left{
-      display:flex; align-items:center; gap:12px;
-      color:var(--muted);
-      font-size:13px;
+    .bar .msg{color:var(--muted); font-size:14px;}
+    .bar .msg b{color:var(--text)}
+    .btnPdf{
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,138,31,.5);
+      background: rgba(13,58,68,.7);
+      color:var(--orange);
+      font-weight:900;
+      cursor:pointer;
     }
-
     table{
       width:100%;
       border-collapse:separate;
-      border-spacing:0 10px;
-      table-layout:auto;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(13,58,68,.75);
+      background: rgba(6,32,41,.6);
     }
     thead th{
       text-align:left;
-      font-size:13px;
+      font-size:12px;
+      padding:12px 10px;
       color:var(--orange);
-      font-weight:900;
-      padding:0 10px;
-      white-space:nowrap; /* NÃO QUEBRA CABEÇALHO */
-    }
-    tbody tr{
-      background:rgba(4,35,44,.85);
-      border:1px solid rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(13,58,68,.9);
+      white-space:nowrap;
     }
     tbody td{
-      padding:10px 10px;
+      padding:12px 10px;
       font-size:13px;
-      border-top:1px solid rgba(255,255,255,.04);
-      border-bottom:1px solid rgba(255,255,255,.04);
-      white-space:nowrap; /* NÃO QUEBRA DATA/SITUAÇÃO */
+      border-bottom:1px solid rgba(13,58,68,.55);
+      vertical-align:middle;
     }
-    tbody tr td:first-child{
-      border-left:1px solid rgba(255,255,255,.04);
-      border-top-left-radius:12px;
-      border-bottom-left-radius:12px;
-    }
-    tbody tr td:last-child{
-      border-right:1px solid rgba(255,255,255,.04);
-      border-top-right-radius:12px;
-      border-bottom-right-radius:12px;
-    }
-    .pill{
-      display:inline-flex;
+    tbody tr:last-child td{border-bottom:none}
+    .tag{
+      display:inline-block;
       padding:6px 10px;
       border-radius:999px;
       font-weight:900;
-      letter-spacing:.3px;
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .pill.short{color:var(--pink); border-color:rgba(255,59,200,.35)}
-    .pill.long{color:var(--green); border-color:rgba(23,201,100,.35)}
-    .pos{color:var(--green); font-weight:900}
-    .neg{color:var(--red); font-weight:900}
-    .muted{color:var(--muted)}
-    .sit{min-width:150px}       /* AUMENTA SITUAÇÃO */
-    .dateAtual{min-width:110px} /* AUMENTA DATA ATUAL */
-    .horaAtual{min-width:70px}
-    .actions{display:flex; gap:10px; justify-content:flex-start}
-
-    /* BOTÕES AÇÃO */
-    .sbtn{
-      cursor:pointer;
-      border-radius:8px;
-      padding:7px 10px;
-      font-weight:900;
-      border:1px solid rgba(255,255,255,.12);
-      background:#0b2c34;
-      color:#fff;
-    }
-    .sbtn:hover{transform:translateY(-1px)}
-    .sbtn:disabled{opacity:.6; cursor:not-allowed; transform:none}
-
-    /* SAIR VERDE (pedido 3) */
-    .sbtn.sair{
-      background:rgba(23,201,100,.14);
-      border-color:rgba(23,201,100,.55);
-      color:var(--green);
-    }
-
-    .sbtn.del{
-      background:rgba(255,59,48,.12);
-      border-color:rgba(255,59,48,.45);
-      color:var(--pink);
-    }
-
-    .foot{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top:12px;
-      color:var(--muted);
       font-size:12px;
+      letter-spacing:.3px;
+      white-space:nowrap;
+    }
+    .tag.long{color:var(--green); border:1px solid rgba(16,185,129,.6);}
+    .tag.short{color:var(--pink); border:1px solid rgba(255,59,154,.55);}
+    .num{font-variant-numeric: tabular-nums; white-space:nowrap;}
+    .pos{color:var(--green); font-weight:900;}
+    .neg{color:var(--red); font-weight:900;}
+    .nowrap{white-space:nowrap;}
+    /* LARGURAS (para não quebrar linha) */
+    .col-sit{min-width:180px; white-space:nowrap;}     /* SITUAÇÃO mais larga */
+    .col-dateA{min-width:140px; white-space:nowrap;}   /* DATA ATUAL mais larga */
+    .col-timeA{min-width:90px;  white-space:nowrap;}
+    .btnMini{
+      padding:7px 10px;
+      border-radius:10px;
+      font-weight:900;
+      cursor:pointer;
+      border:1px solid rgba(143,177,186,.25);
+      background: rgba(7,35,43,.65);
+      color:var(--text);
+      white-space:nowrap;
+    }
+    .btnSair{ /* SAIR VERDE */
+      border-color: rgba(16,185,129,.55);
+      background: rgba(16,185,129,.14);
+      color: #bff7e5;
+    }
+    .btnEx{
+      border-color: rgba(239,68,68,.55);
+      background: rgba(239,68,68,.12);
+      color:#ffd1d1;
+    }
+    .foot{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
     }
     .chip{
-      padding:6px 10px;
+      font-size:12px;
+      padding:7px 10px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(7,54,66,.35);
+      border:1px solid rgba(13,58,68,.75);
+      background: rgba(7,35,43,.55);
+      color:var(--muted);
       white-space:nowrap;
     }
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <div class="topbar">
+    <div class="top">
       <div>
         <h1>AUTOTRADER-SAÍDA</h1>
-        <p class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</p>
+        <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
       </div>
-      <div class="badge">Atualizado: <b id="lblUpdated">—</b></div>
+      <div class="pill">Atualizado: <b id="updated">—</b></div>
     </div>
 
     <div class="card">
-      <div class="title">DADOS DE ENTRADA NA OPERAÇÃO</div>
+      <div class="h">DADOS DE ENTRADA NA OPERAÇÃO</div>
 
-      <div class="grid">
-        <div class="field">
+      <div class="row">
+        <div>
           <label>PAR</label>
           <select id="par"></select>
         </div>
 
-        <div class="field">
+        <div>
           <label>SIDE</label>
-          <div class="toggle">
-            <button class="tbtn long on" id="btnLong" type="button">LONG</button>
-            <button class="tbtn short" id="btnShort" type="button">SHORT</button>
+          <div class="sidebox">
+            <button id="btnLong" class="btnSide long on long" type="button">LONG</button>
+            <button id="btnShort" class="btnSide short" type="button">SHORT</button>
           </div>
         </div>
 
-        <div class="field">
+        <div>
           <label>ENTRADA</label>
           <input id="entrada" placeholder="ex: 1.3371" />
         </div>
 
-        <div class="field">
+        <div>
           <label>US ALVO (do PRO, congelado)</label>
           <input id="alvo" disabled />
         </div>
 
-        <div class="field">
+        <div>
           <label>ALAV</label>
           <input id="alav" value="10" />
         </div>
 
-        <div class="field">
-          <button class="btn" id="btnAdd" type="button">Adicionar Operação</button>
+        <div style="display:flex;justify-content:flex-end">
+          <button id="btnAdd" class="btnMain" type="button">Adicionar Operação</button>
         </div>
       </div>
 
-      <div class="hint">Alvo do PRO: <b id="lblPro">—</b></div>
+      <div class="muteline">Alvo do PRO: <b id="proInfo">—</b></div>
+      <div class="muteline" id="msg" style="margin-top:6px;"></div>
     </div>
 
     <div class="card">
+      <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
+
       <div class="bar">
-        <div class="title" style="margin:0">MONITORAMENTO DAS OPERAÇÕES</div>
-        <div class="left">
-          <span>Total: <b id="lblTotal">0</b></span>
-          <button class="btn" id="btnPdf" type="button" style="padding:10px 12px">Baixar PDF</button>
-        </div>
+        <div class="msg">Total: <b id="total">0</b></div>
+        <button id="btnPdf" class="btnPdf" type="button">Baixar PDF</button>
       </div>
 
-      <div style="overflow:auto; border-top:1px solid rgba(255,255,255,.06); padding-top:10px;">
-        <table>
-          <thead>
-            <tr>
-              <th>PAR</th>
-              <th>SIDE</th>
-              <th>ENTRADA</th>
-              <th>ALVO</th>
-              <th>ALAV</th>
-              <th>DATA REG</th>
-              <th>HORA REG</th>
-              <th>ATUAL</th>
-              <th>GANHO ALVO</th>   <!-- pedido 6 -->
-              <th>GANHO ATUAL</th>  <!-- pedido 6 -->
-              <th class="sit">SITUAÇÃO</th>
-              <th class="dateAtual">DATA ATUAL</th>
-              <th class="horaAtual">HORA ATUAL</th>
-              <th>SAIR</th>
-              <th>EXCLUIR</th>
-            </tr>
-          </thead>
-          <tbody id="tbOps">
-            <!-- linhas -->
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>PAR</th>
+            <th>SIDE</th>
+            <th>ENTRADA</th>
+            <th>ALVO</th>
+            <th>ALAV</th>
+            <th>DATA REG</th>
+            <th>HORA REG</th>
+            <th>ATUAL</th>
+            <th>GANHO ALVO</th>   <!-- sem "/" -->
+            <th>GANHO ATUAL</th>  <!-- sem "/" -->
+            <th class="col-sit">SITUAÇÃO</th>
+            <th class="col-dateA">DATA ATUAL</th>
+            <th class="col-timeA">HORA ATUAL</th>
+            <th>SAIR</th>
+            <th>EXCLUIR</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
 
       <div class="foot">
-        <span class="chip">Auto-refresh: 15s</span>
-        <span class="chip">Worker: 5 min</span>
-        <span class="chip">ALVO fixo (congelado no ADD)</span>
+        <div class="chip">Auto-refresh: 15s</div>
+        <div class="chip">Worker: 5 min</div>
+        <div class="chip">ALVO fixo (congelado no ADD)</div>
       </div>
     </div>
   </div>
 
-  <script>
-    const COINS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
+<script>
+  const $ = (id)=>document.getElementById(id);
 
-    const $ = (id)=>document.getElementById(id);
+  const MOEDAS = [
+    "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
+    "LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"
+  ];
 
-    let side = "LONG";
+  let side = "LONG";
 
-    function setUpdated(v){
-      $("lblUpdated").textContent = v || "—";
-    }
+  function setMsg(t){
+    const el = $("msg");
+    el.textContent = t || "";
+    el.style.color = t ? "#ffb168" : "";
+  }
 
-    function to2(n){
-      const x = Number(n);
-      if (!Number.isFinite(x)) return "—";
-      return x.toFixed(2);
+  function toBRTDateTime(iso){
+    if(!iso) return {d:"—", t:"—"};
+    try{
+      const dt = new Date(iso);
+      const s = dt.toLocaleString("pt-BR", { timeZone:"America/Sao_Paulo" });
+      // s: "24/01/2026 03:42:14"
+      const [d, tt] = s.split(" ");
+      return { d: d || "—", t: (tt||"").slice(0,5) || "—" };
+    }catch(e){
+      return {d:"—", t:"—"};
     }
-    function to3(n){
-      const x = Number(n);
-      if (!Number.isFinite(x)) return "—";
-      return x.toFixed(3);
+  }
+
+  function parseUpdatedBrt(s){
+    // "YYYY-MM-DD HH:MM"
+    if(!s) return {d:"—", t:"—"};
+    const [d, t] = String(s).split(" ");
+    if(!d) return {d:"—", t:"—"};
+    const parts = d.split("-");
+    if(parts.length===3){
+      const dd = parts[2]+"/"+parts[1]+"/"+parts[0];
+      return { d: dd, t: (t||"").slice(0,5) || "—" };
     }
-    function fmtDateBR_fromYMD(s){
-      // "2026-01-24" -> "24/01/2026"
-      if (!s) return "—";
-      const t = String(s).trim();
-      if (t.includes("/")) return t; // já está BR
-      const m = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (!m) return t;
-      return `${m[3]}/${m[2]}/${m[1]}`;
+    return { d, t:(t||"").slice(0,5) || "—" };
+  }
+
+  function paintSide(){
+    const bL = $("btnLong"), bS = $("btnShort");
+    bL.classList.remove("on"); bS.classList.remove("on");
+    if(side==="LONG"){ bL.classList.add("on"); bL.classList.add("long"); bS.classList.remove("short"); }
+    else { bS.classList.add("on"); bS.classList.add("short"); bL.classList.remove("long"); }
+  }
+
+  function ensureMoedas(){
+    const sel = $("par");
+    sel.innerHTML = "";
+    MOEDAS.forEach(m=>{
+      const o = document.createElement("option");
+      o.value = m; o.textContent = m;
+      sel.appendChild(o);
+    });
+  }
+
+  async function fetchJSON(url){
+    const r = await fetch(url, { cache:"no-store" });
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  }
+
+  async function fetchAlvo(){
+    // se existir endpoint no server, ótimo; senão, só mantém o último valor
+    try{
+      const j = await fetchJSON("/api/saida/pro");
+      // esperado: { ok:true, alvo:..., updated_brt:"..." }
+      if(j && j.ok){
+        $("alvo").value = (j.alvo ?? "");
+        $("proInfo").textContent = j.updated_brt ? ("PRO atualizado: " + j.updated_brt) : "—";
+      }
+    }catch(e){
+      // silencioso (não trava a página)
     }
-    function fmtDateBR(d){
-      try{ return d.toLocaleDateString("pt-BR"); }catch{ return "—"; }
-    }
-    function fmtTimeBR(d){
+  }
+
+  async function sairOperacao(id){
+    const r = await fetch("/api/saida/exit", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ id })
+    });
+    const j = await r.json().catch(()=>({}));
+    if(!j.ok) throw new Error(j.msg || "Falha ao sair");
+  }
+
+  async function excluirOperacao(id){
+    // tenta vários endpoints para não quebrar
+    const tries = ["/api/saida/delete","/api/saida/remove","/api/saida/excluir"];
+    let last = null;
+    for(const u of tries){
       try{
-        return d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-      }catch{ return "—"; }
-    }
-
-    function regFromOp(op){
-      // pedido 1/2: se created_ts falhar, usa o timestamp do ID (PAR-<epoch>)
-      let dt = null;
-
-      if (op && op.created_ts){
-        const d = new Date(op.created_ts);
-        if (!isNaN(d.getTime())) dt = d;
-      }
-
-      if (!dt){
-        const id = String(op?.id || "");
-        const m = id.match(/-(\d{10,})$/);
-        if (m){
-          const d2 = new Date(Number(m[1]));
-          if (!isNaN(d2.getTime())) dt = d2;
-        }
-      }
-
-      if (!dt) return {date:"—", time:"—"};
-      return {date: fmtDateBR(dt), time: fmtTimeBR(dt)};
-    }
-
-    function paintSide(){
-      $("btnLong").classList.toggle("on", side==="LONG");
-      $("btnShort").classList.toggle("on", side==="SHORT");
-      $("btnLong").classList.toggle("long", true);
-      $("btnShort").classList.toggle("short", true);
-    }
-
-    function ensureMoedas(){
-      const sel = $("par");
-      sel.innerHTML = "";
-      for (const c of COINS){
-        const o = document.createElement("option");
-        o.value = c;
-        o.textContent = c;
-        sel.appendChild(o);
-      }
-    }
-
-    async function fetchAlvo(){
-      const par = $("par").value;
-      $("alvo").value = "";
-      $("lblPro").textContent = "—";
-      try{
-        const r = await fetch(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
-        const j = await r.json().catch(()=>({}));
-        if (!j.ok) throw new Error(j.msg || "Falha no alvo");
-        $("alvo").value = String(j.alvo ?? "");
-        $("lblPro").textContent = j.updated_brt ? `PRO atualizado: ${j.updated_brt}` : "OK";
-      }catch(e){
-        $("alvo").value = "";
-        $("lblPro").textContent = (e?.message || "Sem alvo do PRO");
-      }
-    }
-
-    async function addOperacao(){
-      const btn = $("btnAdd");
-      const par = $("par").value;
-
-      const entrada_txt = String($("entrada").value||"").replace(",", ".").trim();
-      const alav_txt = String($("alav").value||"").replace(",", ".").trim();
-
-      const entrada = Number(entrada_txt);
-      const alav = Math.floor(Number(alav_txt));
-
-      if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
-
-      try{
-        btn.disabled = true;
-        const r = await fetch("/api/saida/add",{
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ par, side, entrada, alav })
-        });
-        const j = await r.json().catch(()=>({}));
-        if (!j.ok) throw new Error(j.msg || "Falha ao adicionar");
-        $("entrada").value = "";
-        await refresh(); // aparece na hora (com DATA/HORA REG pelo ID fallback)
-      }catch(e){
-        alert("ERRO NO ADD: " + (e?.message || e));
-      }finally{
-        btn.disabled = false;
-      }
-    }
-
-    async function sairOperacao(id){
-      let r = await fetch("/api/saida/exit",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ id })
-      });
-      const j = await r.json().catch(()=>({ ok:false, msg:"Falha" }));
-      if (!j.ok) throw new Error(j.msg || "Falha ao sair");
-    }
-
-    async function excluirOperacao(id){
-      // tenta /del, depois /delete (compat)
-      let r = await fetch("/api/saida/del",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ id })
-      });
-      if (!r.ok){
-        r = await fetch("/api/saida/delete",{
+        let r = await fetch(u, {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
           body: JSON.stringify({ id })
         });
-      }
-      const j = await r.json().catch(()=>({}));
-      if (!j.ok) throw new Error(j.msg || "Falha ao excluir");
-    }
-
-    function pctClass(v){
-      const n = Number(v);
-      if (!Number.isFinite(n)) return "muted";
-      return n >= 0 ? "pos" : "neg";
-    }
-
-    async function refresh(){
-      try{
-        const [opsR, monR] = await Promise.all([
-          fetch("/api/saida/ops").then(r=>r.json()).catch(()=>({ops:[]})),
-          fetch("/api/saida/monitor").then(r=>r.json()).catch(()=>({ops:[], updated_brt:null}))
-        ]);
-
-        const ops = Array.isArray(opsR?.ops) ? opsR.ops : [];
-        const mon = monR || { ops:[], updated_brt:null };
-
-        setUpdated(mon.updated_brt || "—");
-        $("lblTotal").textContent = String(ops.length);
-
-        const monMap = new Map();
-        if (Array.isArray(mon.ops)){
-          for (const x of mon.ops){
-            if (x && x.id) monMap.set(String(x.id), x);
-          }
-        }
-
-        const tb = $("tbOps");
-        tb.innerHTML = "";
-
-        for (const op of ops){
-          const id = String(op.id || "");
-          const m = monMap.get(id) || null;
-
-          const reg = regFromOp(op);
-
-          const par = op.par || "—";
-          const sideTxt = (op.side || "—").toUpperCase();
-          const isLong = sideTxt === "LONG";
-
-          const entrada = to3(op.entrada);
-          const alvo = to3(op.alvo);
-          const alav = Number(op.alav);
-          const alavTxt = Number.isFinite(alav) ? String(alav) : "—";
-
-          const atual = m ? to3(m.atual) : "—";
-          const ganhoAlvo = m ? to2(m.ganho_alvo_pct) : "—";
-          const ganhoAtual = m ? to2(m.ganho_atual_pct) : "—";
-
-          const situacao = m ? (m.situacao || "—") : "AGUARDANDO WORKER";
-
-          // data/hora atual (formata e evita quebra)
-          const dataAtual = m ? fmtDateBR_fromYMD(m.data) : "—";
-          const horaAtual = m ? (m.hora || "—") : "—";
-
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td><b>${par}</b></td>
-            <td>${isLong ? `<span class="pill long">LONG</span>` : `<span class="pill short">SHORT</span>`}</td>
-            <td>${entrada}</td>
-            <td>${alvo}</td>
-            <td>${alavTxt}</td>
-            <td>${reg.date}</td>
-            <td>${reg.time}</td>
-            <td>${atual}</td>
-            <td class="${pctClass(m?.ganho_alvo_pct)}">${ganhoAlvo}</td>
-            <td class="${pctClass(m?.ganho_atual_pct)}">${ganhoAtual}</td>
-            <td class="sit">${situacao}</td>
-            <td class="dateAtual">${dataAtual}</td>
-            <td class="horaAtual">${horaAtual}</td>
-            <td>
-              <button class="sbtn sair" data-id="${id}" type="button">Sair</button>
-            </td>
-            <td>
-              <button class="sbtn del" data-id="${id}" type="button">Excluir</button>
-            </td>
-          `;
-
-          tb.appendChild(tr);
-        }
-
-        // bind SAIR
-        tb.querySelectorAll("button.sbtn.sair").forEach(b=>{
-          b.onclick = async ()=>{
-            const id = b.getAttribute("data-id");
-            if (!id) return;
-            if (!confirm("Confirmar SAIR desta operação?")) return;
-            try{
-              b.disabled = true;
-              await sairOperacao(id);
-              await refresh();
-            }catch(e){
-              alert("ERRO NO SAIR: " + (e?.message || e));
-            }finally{
-              b.disabled = false;
-            }
-          };
-        });
-
-        // bind EXCLUIR
-        tb.querySelectorAll("button.sbtn.del").forEach(b=>{
-          b.onclick = async ()=>{
-            const id = b.getAttribute("data-id");
-            if (!id) return;
-            if (!confirm("Confirmar EXCLUIR esta operação?")) return;
-            try{
-              b.disabled = true;
-              await excluirOperacao(id);
-              await refresh();
-            }catch(e){
-              alert("ERRO NO EXCLUIR: " + (e?.message || e));
-            }finally{
-              b.disabled = false;
-            }
-          };
-        });
-
+        const j = await r.json().catch(()=>({}));
+        if(j && j.ok) return true;
+        last = j;
       }catch(e){
-        // não quebra o JS por erro de rede
-        console.error(e);
+        last = e;
       }
     }
+    throw new Error((last && last.msg) ? last.msg : "Falha ao excluir");
+  }
 
-    // eventos
-    $("btnLong").onclick = async ()=>{ side="LONG"; paintSide(); await fetchAlvo(); };
-    $("btnShort").onclick = async ()=>{ side="SHORT"; paintSide(); await fetchAlvo(); };
-    $("par").onchange = fetchAlvo;
-    $("btnAdd").onclick = addOperacao;
-    $("btnPdf").onclick = ()=> window.open("/api/saida/history.pdf","_blank");
+  function fmt3(x){
+    if(x===null || x===undefined || x==="") return "—";
+    const n = Number(x);
+    if(!Number.isFinite(n)) return "—";
+    return n.toFixed(3);
+  }
+  function fmt2(x){
+    if(x===null || x===undefined || x==="") return "—";
+    const n = Number(x);
+    if(!Number.isFinite(n)) return "—";
+    return n.toFixed(2);
+  }
+  function pctCell(x){
+    const n = Number(x);
+    if(!Number.isFinite(n)) return `<span class="num">—</span>`;
+    const cls = n>=0 ? "pos" : "neg";
+    return `<span class="num ${cls}">${fmt2(n)}</span>`;
+  }
 
-    // init
-    ensureMoedas();
-    paintSide();
-    fetchAlvo();
-    refresh();
-    setInterval(refresh, 15000);
-  </script>
+  async function refresh(){
+    try{
+      const monitor = await fetchJSON("/api/saida/monitor");
+      const ops = await fetchJSON("/api/saida/ops");
+
+      // topo atualizado
+      $("updated").textContent = monitor.updated_brt || "—";
+
+      // PRO info se vier do /ops
+      if(ops && ops.ops && ops.ops[0] && ops.ops[0].pro_updated_brt){
+        $("proInfo").textContent = "PRO atualizado: " + ops.ops[0].pro_updated_brt;
+      }
+
+      const updated = parseUpdatedBrt(monitor.updated_brt);
+
+      // mapas por id
+      const monMap = {};
+      (monitor.ops || []).forEach(o=> monMap[o.id] = o);
+
+      const opsList = (ops.ops || []);
+      const tb = $("tb");
+      tb.innerHTML = "";
+
+      $("total").textContent = String(opsList.length);
+
+      opsList.forEach(base=>{
+        const m = monMap[base.id] || {};
+        const reg = toBRTDateTime(base.created_ts); // <-- REG SEMPRE VEM DO OPS
+
+        const par = base.par || m.par || "—";
+        const s = (base.side || m.side || "").toUpperCase();
+        const sideTag = s==="LONG" ? `<span class="tag long">LONG</span>` : `<span class="tag short">SHORT</span>`;
+
+        const entrada = fmt3(base.entrada ?? m.entrada);
+        const alvo = fmt3(base.alvo ?? m.alvo);
+        const alav = String(base.alav ?? m.alav ?? "—");
+
+        const atual = fmt3(m.atual);
+        const gAlvo = pctCell(m.ganho_alvo_pct);
+        const gAtual = pctCell(m.ganho_atual_pct);
+
+        const situ = (m.situacao || "AGUARDANDO WORKER").toUpperCase();
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="nowrap"><b>${par}</b></td>
+          <td>${sideTag}</td>
+          <td class="num">${entrada}</td>
+          <td class="num">${alvo}</td>
+          <td class="num">${alav}</td>
+          <td class="num nowrap">${reg.d}</td>
+          <td class="num nowrap">${reg.t}</td>
+          <td class="num">${atual}</td>
+          <td>${gAlvo}</td>
+          <td>${gAtual}</td>
+          <td class="col-sit">${situ}</td>
+          <td class="col-dateA num nowrap">${updated.d}</td>
+          <td class="col-timeA num nowrap">${updated.t}</td>
+          <td><button class="btnMini btnSair" data-id="${base.id}">Sair</button></td>
+          <td><button class="btnMini btnEx" data-id="${base.id}">Excluir</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      // bind SAIR
+      tb.querySelectorAll("button.btnSair").forEach(b=>{
+        b.onclick = async ()=>{
+          const id = b.getAttribute("data-id");
+          if(!id) return;
+          if(!confirm("Confirmar SAIR desta operação?")) return;
+          try{
+            b.disabled = true;
+            await sairOperacao(id);
+            await refresh();
+          }catch(e){
+            alert("ERRO NO SAIR: " + (e?.message || e));
+          }finally{
+            b.disabled = false;
+          }
+        };
+      });
+
+      // bind EXCLUIR
+      tb.querySelectorAll("button.btnEx").forEach(b=>{
+        b.onclick = async ()=>{
+          const id = b.getAttribute("data-id");
+          if(!id) return;
+          if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+          try{
+            b.disabled = true;
+            await excluirOperacao(id);
+            await refresh();
+          }catch(e){
+            alert("ERRO NO EXCLUIR: " + (e?.message || e));
+          }finally{
+            b.disabled = false;
+          }
+        };
+      });
+
+      setMsg("");
+    }catch(e){
+      setMsg("Falha ao atualizar");
+    }
+  }
+
+  // PDF
+  $("btnPdf").onclick = ()=> window.open("/api/saida/history.pdf", "_blank");
+
+  // SIDE
+  $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); };
+  $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); };
+
+  // ADD
+  $("btnAdd").onclick = async ()=>{
+    const btn = $("btnAdd");
+    try{
+      btn.disabled = true;
+
+      const par = $("par").value;
+      const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
+      const entrada = Number(entrada_txt);
+      const alav = Number(String($("alav").value||"").trim());
+
+      if(!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
+      if(!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
+
+      const r = await fetch("/api/saida/add", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ par, side, entrada, alav })
+      });
+      const j = await r.json().catch(()=>({}));
+      if(!j.ok) throw new Error(j.msg || "Falha ao adicionar");
+
+      $("entrada").value = "";
+      await refresh();
+    }catch(e){
+      alert("ERRO NO ADD: " + (e?.message || e));
+    }finally{
+      btn.disabled = false;
+    }
+  };
+
+  // init
+  ensureMoedas();
+  paintSide();
+  fetchAlvo();
+  refresh();
+  setInterval(refresh, 15000);
+</script>
 </body>
 </html>
-HTML
