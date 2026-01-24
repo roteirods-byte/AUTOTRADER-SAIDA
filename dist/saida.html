@@ -1,604 +1,148 @@
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AUTOTRADER-SAÍDA</title>
-  <style>
-    :root{
-      --bg:#061a20;
-      --panel:#07232b;
-      --panel2:#062029;
-      --text:#d7e6ea;
-      --muted:#8fb1ba;
-      --orange:#ff8a1f;
-      --line:#0d3a44;
-      --green:#10b981;
-      --red:#ef4444;
-      --pink:#ff3b9a;
-      --btn:#0b2a33;
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background: radial-gradient(1200px 600px at 30% 0%, #0a2a33 0%, var(--bg) 55%);
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-    .wrap{
-      max-width: 1480px; /* MAIS LARGO */
-      margin: 28px auto;
-      padding: 0 18px 40px;
-    }
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:16px;
-    }
-    h1{
-      margin:0;
-      font-size:42px;
-      letter-spacing:1px;
-      font-weight:800;
-    }
-    .sub{
-      margin-top:4px;
-      color:var(--muted);
-      font-size:14px;
-    }
-    .pill{
-      padding:10px 14px;
-      border-radius:999px;
-      background: rgba(10,42,51,.55);
-      border:1px solid rgba(255,138,31,.35);
-      box-shadow: var(--shadow);
-      font-size:14px;
-      color:var(--text);
-      white-space:nowrap;
-    }
-    .pill b{color:var(--orange)}
-    .card{
-      background: linear-gradient(180deg, rgba(9,47,56,.85), rgba(6,32,41,.85));
-      border:1px solid rgba(16,185,129,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:18px 18px 16px;
-      margin-top:18px;
-    }
-    .h{
-      color:var(--orange);
-      font-weight:900;
-      letter-spacing:.6px;
-      font-size:18px;
-      margin-bottom:14px;
-    }
-    .row{
-      display:grid;
-      grid-template-columns: 160px 170px 220px 320px 120px 1fr;
-      gap:14px;
-      align-items:end;
-    }
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    select,input{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(143,177,186,.22);
-      background: rgba(7,35,43,.75);
-      color:var(--text);
-      outline:none;
-    }
-    input::placeholder{color:rgba(143,177,186,.55)}
-    .sidebox{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .btnSide{
-      flex:1;
-      padding:12px 10px;
-      border-radius:12px;
-      border:1px solid rgba(143,177,186,.22);
-      background: rgba(7,35,43,.75);
-      color:var(--text);
-      font-weight:800;
-      cursor:pointer;
-      transition:.15s;
-    }
-    .btnSide.on.long{border-color: rgba(16,185,129,.7); box-shadow:0 0 0 2px rgba(16,185,129,.12) inset;}
-    .btnSide.on.short{border-color: rgba(239,68,68,.7); box-shadow:0 0 0 2px rgba(239,68,68,.12) inset;}
-    .btnMain{
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid rgba(255,138,31,.5);
-      background: rgba(13,58,68,.7);
-      color:var(--orange);
-      font-weight:900;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .btnMain:disabled{opacity:.6; cursor:not-allowed}
-    .muteline{
-      margin-top:10px;
-      font-size:13px;
-      color:var(--muted);
-    }
-    .muteline b{color:var(--orange)}
-    .bar{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom:10px;
-    }
-    .bar .msg{color:var(--muted); font-size:14px;}
-    .bar .msg b{color:var(--text)}
-    .btnPdf{
-      padding:8px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,138,31,.5);
-      background: rgba(13,58,68,.7);
-      color:var(--orange);
-      font-weight:900;
-      cursor:pointer;
-    }
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border-radius:14px;
-      border:1px solid rgba(13,58,68,.75);
-      background: rgba(6,32,41,.6);
-    }
-    thead th{
-      text-align:left;
-      font-size:12px;
-      padding:12px 10px;
-      color:var(--orange);
-      border-bottom:1px solid rgba(13,58,68,.9);
-      white-space:nowrap;
-    }
-    tbody td{
-      padding:12px 10px;
-      font-size:13px;
-      border-bottom:1px solid rgba(13,58,68,.55);
-      vertical-align:middle;
-    }
-    tbody tr:last-child td{border-bottom:none}
-    .tag{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:12px;
-      letter-spacing:.3px;
-      white-space:nowrap;
-    }
-    .tag.long{color:var(--green); border:1px solid rgba(16,185,129,.6);}
-    .tag.short{color:var(--pink); border:1px solid rgba(255,59,154,.55);}
-    .num{font-variant-numeric: tabular-nums; white-space:nowrap;}
-    .pos{color:var(--green); font-weight:900;}
-    .neg{color:var(--red); font-weight:900;}
-    .nowrap{white-space:nowrap;}
-    /* LARGURAS (para não quebrar linha) */
-    .col-sit{min-width:180px; white-space:nowrap;}     /* SITUAÇÃO mais larga */
-    .col-dateA{min-width:140px; white-space:nowrap;}   /* DATA ATUAL mais larga */
-    .col-timeA{min-width:90px;  white-space:nowrap;}
-    .btnMini{
-      padding:7px 10px;
-      border-radius:10px;
-      font-weight:900;
-      cursor:pointer;
-      border:1px solid rgba(143,177,186,.25);
-      background: rgba(7,35,43,.65);
-      color:var(--text);
-      white-space:nowrap;
-    }
-    .btnSair{ /* SAIR VERDE */
-      border-color: rgba(16,185,129,.55);
-      background: rgba(16,185,129,.14);
-      color: #bff7e5;
-    }
-    .btnEx{
-      border-color: rgba(239,68,68,.55);
-      background: rgba(239,68,68,.12);
-      color:#ffd1d1;
-    }
-    .foot{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-      flex-wrap:wrap;
-    }
-    .chip{
-      font-size:12px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(13,58,68,.75);
-      background: rgba(7,35,43,.55);
-      color:var(--muted);
-      white-space:nowrap;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <h1>AUTOTRADER-SAÍDA</h1>
-        <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
-      </div>
-      <div class="pill">Atualizado: <b id="updated">—</b></div>
-    </div>
+cd /home/roteiro_ds/AUTOTRADER-SAIDA || exit 1
 
-    <div class="card">
-      <div class="h">DADOS DE ENTRADA NA OPERAÇÃO</div>
+echo "=== BACKUP ==="
+cp -a dist/saida.html "dist/saida.html.bak.$(date +%F_%H%M%S)"
 
-      <div class="row">
-        <div>
-          <label>PAR</label>
-          <select id="par"></select>
-        </div>
+echo "=== PATCH (front) ==="
+python3 - <<'PY'
+from pathlib import Path
+import re, sys
 
-        <div>
-          <label>SIDE</label>
-          <div class="sidebox">
-            <button id="btnLong" class="btnSide long on long" type="button">LONG</button>
-            <button id="btnShort" class="btnSide short" type="button">SHORT</button>
-          </div>
-        </div>
+p = Path("dist/saida.html")
+s = p.read_text(encoding="utf-8", errors="replace")
 
-        <div>
-          <label>ENTRADA</label>
-          <input id="entrada" placeholder="ex: 1.3371" />
-        </div>
+# 1) textos do header (remove "/")
+s = s.replace("GANHO / ALVO", "GANHO ALVO").replace("GANHO / ATUAL", "GANHO ATUAL")
 
-        <div>
-          <label>US ALVO (do PRO, congelado)</label>
-          <input id="alvo" disabled />
-        </div>
+# 2) CSS: botão SAIR verde + aumentar largura + colunas (DATA ATUAL / SITUAÇÃO)
+css_add = """
+/* --- FIX SAIDA (UI) --- */
+.wrap, .container, .main, .main-wrap { max-width: 1480px !important; }
+table { width: 100% !important; table-layout: fixed !important; }
+th, td { white-space: nowrap !important; }
+th:nth-child(11), td:nth-child(11) { width: 180px !important; } /* SITUAÇÃO */
+th:nth-child(12), td:nth-child(12) { width: 125px !important; } /* DATA ATUAL */
+th:nth-child(6),  td:nth-child(6)  { width: 115px !important; } /* DATA REG */
+th:nth-child(7),  td:nth-child(7)  { width: 80px !important; }  /* HORA REG */
+button.sbtn { background:#00b050 !important; border:1px solid #00b050 !important; color:#fff !important; }
+button.sbtn:disabled { opacity:.6; cursor:not-allowed; }
+"""
 
-        <div>
-          <label>ALAV</label>
-          <input id="alav" value="10" />
-        </div>
+if "</style>" in s and "FIX SAIDA (UI)" not in s:
+    s = s.replace("</style>", css_add + "\n</style>", 1)
 
-        <div style="display:flex;justify-content:flex-end">
-          <button id="btnAdd" class="btnMain" type="button">Adicionar Operação</button>
-        </div>
-      </div>
+# 3) Helpers: data/hora BR e split do updated_brt
+def ensure_helpers(text: str) -> str:
+    if "function fmtBrtFromIso" in text and "function fmtDateISO" in text:
+        return text
 
-      <div class="muteline">Alvo do PRO: <b id="proInfo">—</b></div>
-      <div class="muteline" id="msg" style="margin-top:6px;"></div>
-    </div>
+    insert_after = re.search(r"function\s+fmtPct\([^\)]*\)\s*\{.*?\}\s*", text, flags=re.S)
+    if not insert_after:
+        print("ERRO: não achei function fmtPct() no dist/saida.html")
+        sys.exit(2)
 
-    <div class="card">
-      <div class="h">MONITORAMENTO DAS OPERAÇÕES</div>
-
-      <div class="bar">
-        <div class="msg">Total: <b id="total">0</b></div>
-        <button id="btnPdf" class="btnPdf" type="button">Baixar PDF</button>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>PAR</th>
-            <th>SIDE</th>
-            <th>ENTRADA</th>
-            <th>ALVO</th>
-            <th>ALAV</th>
-            <th>DATA REG</th>
-            <th>HORA REG</th>
-            <th>ATUAL</th>
-            <th>GANHO ALVO</th>   <!-- sem "/" -->
-            <th>GANHO ATUAL</th>  <!-- sem "/" -->
-            <th class="col-sit">SITUAÇÃO</th>
-            <th class="col-dateA">DATA ATUAL</th>
-            <th class="col-timeA">HORA ATUAL</th>
-            <th>SAIR</th>
-            <th>EXCLUIR</th>
-          </tr>
-        </thead>
-        <tbody id="tb"></tbody>
-      </table>
-
-      <div class="foot">
-        <div class="chip">Auto-refresh: 15s</div>
-        <div class="chip">Worker: 5 min</div>
-        <div class="chip">ALVO fixo (congelado no ADD)</div>
-      </div>
-    </div>
-  </div>
-
-<script>
-  const $ = (id)=>document.getElementById(id);
-
-  const MOEDAS = [
-    "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
-    "LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"
-  ];
-
-  let side = "LONG";
-
-  function setMsg(t){
-    const el = $("msg");
-    el.textContent = t || "";
-    el.style.color = t ? "#ffb168" : "";
-  }
-
-  function toBRTDateTime(iso){
-    if(!iso) return {d:"—", t:"—"};
+    helpers = r"""
+  function fmtBrtFromIso(ts){
     try{
-      const dt = new Date(iso);
-      const s = dt.toLocaleString("pt-BR", { timeZone:"America/Sao_Paulo" });
-      // s: "24/01/2026 03:42:14"
-      const [d, tt] = s.split(" ");
-      return { d: d || "—", t: (tt||"").slice(0,5) || "—" };
+      if(!ts) return {date:"", time:""};
+      const d = new Date(ts);
+      const date = d.toLocaleDateString("pt-BR");
+      const time = d.toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+      return {date, time};
     }catch(e){
-      return {d:"—", t:"—"};
+      return {date:"", time:""};
     }
   }
 
-  function parseUpdatedBrt(s){
-    // "YYYY-MM-DD HH:MM"
-    if(!s) return {d:"—", t:"—"};
-    const [d, t] = String(s).split(" ");
-    if(!d) return {d:"—", t:"—"};
-    const parts = d.split("-");
-    if(parts.length===3){
-      const dd = parts[2]+"/"+parts[1]+"/"+parts[0];
-      return { d: dd, t: (t||"").slice(0,5) || "—" };
-    }
-    return { d, t:(t||"").slice(0,5) || "—" };
+  function fmtDateISO(ymd){
+    if(!ymd) return "";
+    const m = String(ymd).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m) return ymd;
+    return `${m[3]}/${m[2]}/${m[1]}`;
   }
+"""
+    i = insert_after.end()
+    return text[:i] + helpers + text[i:]
 
-  function paintSide(){
-    const bL = $("btnLong"), bS = $("btnShort");
-    bL.classList.remove("on"); bS.classList.remove("on");
-    if(side==="LONG"){ bL.classList.add("on"); bL.classList.add("long"); bS.classList.remove("short"); }
-    else { bS.classList.add("on"); bS.classList.add("short"); bL.classList.remove("long"); }
-  }
+s = ensure_helpers(s)
 
-  function ensureMoedas(){
-    const sel = $("par");
-    sel.innerHTML = "";
-    MOEDAS.forEach(m=>{
-      const o = document.createElement("option");
-      o.value = m; o.textContent = m;
-      sel.appendChild(o);
-    });
-  }
+# 4) Dentro do refresh(): criar upd_date_br / upd_time (sempre do updated_brt)
+if "const upd_date_br" not in s:
+    s = re.sub(
+        r'const u = elUpd\(\);\s*if\s*\(u\)\s*u\.textContent\s*=\s*\(mon\.updated_brt\s*\|\|\s*"—"\);',
+        'const u = elUpd();\n'
+        '      const updated_brt = (mon.updated_brt || "");\n'
+        '      if (u) u.textContent = (updated_brt || "—");\n'
+        '      const upd_parts = updated_brt.split(" ");\n'
+        '      const upd_date = upd_parts[0] || "";\n'
+        '      const upd_time = upd_parts[1] || "";\n'
+        '      const upd_date_br = fmtDateISO(upd_date);\n',
+        s,
+        count=1
+    )
 
-  async function fetchJSON(url){
-    const r = await fetch(url, { cache:"no-store" });
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    return await r.json();
-  }
+# 5) Trocar o bloco do TR para: (a) DATA/HORA REG vindo do created_ts (sempre), (b) DATA/HORA ATUAL do updated_brt,
+#    (c) incluir SAIR verde, (d) manter EXCLUIR.
+pattern = re.compile(
+    r'const tr\s*=\s*document\.createElement\("tr"\);\s*tr\.innerHTML\s*=\s*`.*?`;\s*tb\.appendChild\(tr\);',
+    re.S
+)
 
-  async function fetchAlvo(){
-    // se existir endpoint no server, ótimo; senão, só mantém o último valor
-    try{
-      const j = await fetchJSON("/api/saida/pro");
-      // esperado: { ok:true, alvo:..., updated_brt:"..." }
-      if(j && j.ok){
-        $("alvo").value = (j.alvo ?? "");
-        $("proInfo").textContent = j.updated_brt ? ("PRO atualizado: " + j.updated_brt) : "—";
-      }
-    }catch(e){
-      // silencioso (não trava a página)
-    }
-  }
+replacement = r'''const tr = document.createElement("tr");
 
-  async function sairOperacao(id){
-    const r = await fetch("/api/saida/exit", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ id })
-    });
-    const j = await r.json().catch(()=>({}));
-    if(!j.ok) throw new Error(j.msg || "Falha ao sair");
-  }
+        // REGISTRO: sempre do /ops (created_ts), mesmo se ainda estiver "AGUARDANDO WORKER"
+        const reg = fmtBrtFromIso(o.created_ts || o.created_at || o.created);
+        const dataReg = reg.date;
+        const horaReg = reg.time;
 
-  async function excluirOperacao(id){
-    // tenta vários endpoints para não quebrar
-    const tries = ["/api/saida/delete","/api/saida/remove","/api/saida/excluir"];
-    let last = null;
-    for(const u of tries){
-      try{
-        let r = await fetch(u, {
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ id })
-        });
-        const j = await r.json().catch(()=>({}));
-        if(j && j.ok) return true;
-        last = j;
-      }catch(e){
-        last = e;
-      }
-    }
-    throw new Error((last && last.msg) ? last.msg : "Falha ao excluir");
-  }
+        // ATUAL: sempre do updated_brt (evita ficar quebrado/fora de linha)
+        const dataAtual = upd_date_br;
+        const horaAtual = upd_time || "";
 
-  function fmt3(x){
-    if(x===null || x===undefined || x==="") return "—";
-    const n = Number(x);
-    if(!Number.isFinite(n)) return "—";
-    return n.toFixed(3);
-  }
-  function fmt2(x){
-    if(x===null || x===undefined || x==="") return "—";
-    const n = Number(x);
-    if(!Number.isFinite(n)) return "—";
-    return n.toFixed(2);
-  }
-  function pctCell(x){
-    const n = Number(x);
-    if(!Number.isFinite(n)) return `<span class="num">—</span>`;
-    const cls = n>=0 ? "pos" : "neg";
-    return `<span class="num ${cls}">${fmt2(n)}</span>`;
-  }
-
-  async function refresh(){
-    try{
-      const monitor = await fetchJSON("/api/saida/monitor");
-      const ops = await fetchJSON("/api/saida/ops");
-
-      // topo atualizado
-      $("updated").textContent = monitor.updated_brt || "—";
-
-      // PRO info se vier do /ops
-      if(ops && ops.ops && ops.ops[0] && ops.ops[0].pro_updated_brt){
-        $("proInfo").textContent = "PRO atualizado: " + ops.ops[0].pro_updated_brt;
-      }
-
-      const updated = parseUpdatedBrt(monitor.updated_brt);
-
-      // mapas por id
-      const monMap = {};
-      (monitor.ops || []).forEach(o=> monMap[o.id] = o);
-
-      const opsList = (ops.ops || []);
-      const tb = $("tb");
-      tb.innerHTML = "";
-
-      $("total").textContent = String(opsList.length);
-
-      opsList.forEach(base=>{
-        const m = monMap[base.id] || {};
-        const reg = toBRTDateTime(base.created_ts); // <-- REG SEMPRE VEM DO OPS
-
-        const par = base.par || m.par || "—";
-        const s = (base.side || m.side || "").toUpperCase();
-        const sideTag = s==="LONG" ? `<span class="tag long">LONG</span>` : `<span class="tag short">SHORT</span>`;
-
-        const entrada = fmt3(base.entrada ?? m.entrada);
-        const alvo = fmt3(base.alvo ?? m.alvo);
-        const alav = String(base.alav ?? m.alav ?? "—");
-
-        const atual = fmt3(m.atual);
-        const gAlvo = pctCell(m.ganho_alvo_pct);
-        const gAtual = pctCell(m.ganho_atual_pct);
-
-        const situ = (m.situacao || "AGUARDANDO WORKER").toUpperCase();
-
-        const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td class="nowrap"><b>${par}</b></td>
-          <td>${sideTag}</td>
-          <td class="num">${entrada}</td>
-          <td class="num">${alvo}</td>
-          <td class="num">${alav}</td>
-          <td class="num nowrap">${reg.d}</td>
-          <td class="num nowrap">${reg.t}</td>
-          <td class="num">${atual}</td>
-          <td>${gAlvo}</td>
-          <td>${gAtual}</td>
-          <td class="col-sit">${situ}</td>
-          <td class="col-dateA num nowrap">${updated.d}</td>
-          <td class="col-timeA num nowrap">${updated.t}</td>
-          <td><button class="btnMini btnSair" data-id="${base.id}">Sair</button></td>
-          <td><button class="btnMini btnEx" data-id="${base.id}">Excluir</button></td>
+          <td class="par">${o.par||""}</td>
+          <td><span class="tag ${String(o.side)==="SHORT" ? "short":"long"}">${o.side||""}</span></td>
+          <td>${fmtPx(o.entrada)}</td>
+          <td>${fmtPx(o.alvo)}</td>
+          <td>${o.alav ?? ""}</td>
+
+          <td>${dataReg}</td>
+          <td>${horaReg}</td>
+
+          <td>${fmtPx(o.atual)}</td>
+          <td class="${clsPct(gA)}">${fmtPct(gA)}</td>
+          <td class="${clsPct(gU)}">${fmtPct(gU)}</td>
+
+          <td>${o.situacao || (o.atual ? "" : "AGUARDANDO WORKER")}</td>
+          <td>${dataAtual}</td>
+          <td>${horaAtual}</td>
+
+          <td><button class="sbtn" data-id="${o.id}">Sair</button></td>
+          <td><button class="xbtn" data-id="${o.id}">Excluir</button></td>
         `;
-        tb.appendChild(tr);
-      });
+        tb.appendChild(tr);'''
 
-      // bind SAIR
-      tb.querySelectorAll("button.btnSair").forEach(b=>{
-        b.onclick = async ()=>{
-          const id = b.getAttribute("data-id");
-          if(!id) return;
-          if(!confirm("Confirmar SAIR desta operação?")) return;
-          try{
-            b.disabled = true;
-            await sairOperacao(id);
-            await refresh();
-          }catch(e){
-            alert("ERRO NO SAIR: " + (e?.message || e));
-          }finally{
-            b.disabled = false;
-          }
-        };
-      });
+s2, n = pattern.subn(replacement, s, count=1)
+if n != 1:
+    print("ERRO: não consegui localizar o bloco do TR (render da tabela) para substituir.")
+    sys.exit(3)
+s = s2
 
-      // bind EXCLUIR
-      tb.querySelectorAll("button.btnEx").forEach(b=>{
-        b.onclick = async ()=>{
-          const id = b.getAttribute("data-id");
-          if(!id) return;
-          if(!confirm("Confirmar EXCLUIR esta operação?")) return;
-          try{
-            b.disabled = true;
-            await excluirOperacao(id);
-            await refresh();
-          }catch(e){
-            alert("ERRO NO EXCLUIR: " + (e?.message || e));
-          }finally{
-            b.disabled = false;
-          }
-        };
-      });
+# 6) Garantir que o handler do SAIR existe (se já existe, ok)
+if "button.sbtn" not in s:
+    print("ERRO: não achei handler do SAIR no arquivo. (me mande o /tmp/saida.js)")
+    sys.exit(4)
 
-      setMsg("");
-    }catch(e){
-      setMsg("Falha ao atualizar");
-    }
-  }
+p.write_text(s, encoding="utf-8")
+print("OK: dist/saida.html atualizado")
+PY
 
-  // PDF
-  $("btnPdf").onclick = ()=> window.open("/api/saida/history.pdf", "_blank");
+echo "=== VALIDAR JS (sem rodar navegador) ==="
+awk 'BEGIN{f=0} /<script>/{f=1; next} /<\/script>/{f=0} f{print}' dist/saida.html > /tmp/saida.js
+node -c /tmp/saida.js || exit 1
 
-  // SIDE
-  $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); };
-  $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); };
+echo "=== RESTART API SAIDA ==="
+sudo systemctl restart autotrader-saida-v2-api.service
 
-  // ADD
-  $("btnAdd").onclick = async ()=>{
-    const btn = $("btnAdd");
-    try{
-      btn.disabled = true;
-
-      const par = $("par").value;
-      const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
-      const entrada = Number(entrada_txt);
-      const alav = Number(String($("alav").value||"").trim());
-
-      if(!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-      if(!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
-
-      const r = await fetch("/api/saida/add", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ par, side, entrada, alav })
-      });
-      const j = await r.json().catch(()=>({}));
-      if(!j.ok) throw new Error(j.msg || "Falha ao adicionar");
-
-      $("entrada").value = "";
-      await refresh();
-    }catch(e){
-      alert("ERRO NO ADD: " + (e?.message || e));
-    }finally{
-      btn.disabled = false;
-    }
-  };
-
-  // init
-  ensureMoedas();
-  paintSide();
-  fetchAlvo();
-  refresh();
-  setInterval(refresh, 15000);
-</script>
-</body>
-</html>
+echo "=== CHECAGEM RÁPIDA (texto novo) ==="
+curl -sS https://saida1jorge.duckdns.org/saida | grep -n "GANHO ALVO\|GANHO ATUAL\|class=\"sbtn\"" | head
