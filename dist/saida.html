@@ -5,287 +5,127 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AUTOTRADER-SAÍDA</title>
   <style>
-    :root{
-      --bg:#051b22;
-      --panel:#06242e;
-      --panel2:#05212a;
-      --line:#0c3a46;
-      --txt:#e9f3f6;
-      --muted:#9fb6bf;
-      --orange:#ff8a00;
-      --green:#00d084;
-      --red:#ff4d6d;
-      --btn:#0b2f3a;
-      --shadow: 0 12px 28px rgba(0,0,0,.35);
-      --radius: 18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    :root {
+      --bg0: #071a22;
+      --card: rgba(3, 44, 56, 0.55);
+      --line: rgba(255,255,255,0.08);
+      --text: #e9f4f7;
+      --muted: rgba(233,244,247,0.65);
+      --orange: #ff8a00;
+      --green: #21e6a5;
+      --red: #ff3b70;
+      --shadow: 0 14px 40px rgba(0,0,0,0.35);
+      --radius: 22px;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:var(--sans);
-      background: radial-gradient(1200px 600px at 15% 0%, #0b2f3a 0%, var(--bg) 55%);
-      color:var(--txt);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 20% 10%, #093241 0%, var(--bg0) 55%, #041017 100%);
     }
-    .container{
-      max-width: 1480px;
-      margin: 26px auto 60px;
-      padding: 0 18px;
+    .wrap { max-width: 1480px; margin: 28px auto 60px; padding: 0 18px; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px; }
+    h1 { margin:0; letter-spacing:1px; font-size:44px; font-weight:800; }
+    .sub { margin-top:2px; color:var(--muted); font-size:14px; }
+    .badge {
+      padding: 10px 14px; border:1px solid var(--line); background: rgba(0,0,0,0.15);
+      border-radius: 999px; min-width:220px; text-align:right; box-shadow: var(--shadow);
     }
-    .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:16px;
+    .badge b { color: var(--orange); font-weight: 800; }
+    .card {
+      margin-top:18px; border-radius: var(--radius); border:1px solid var(--line);
+      background: linear-gradient(180deg, var(--card) 0%, rgba(3, 44, 56, 0.18) 100%);
+      box-shadow: var(--shadow); padding: 18px 18px 16px;
     }
-    h1{
-      margin:0;
-      letter-spacing:1px;
-      font-size: 34px;
-      font-weight: 900;
+    .card h2 { margin:0 0 10px; color:var(--orange); font-size:18px; letter-spacing:1px; }
+    .row { display:grid; grid-template-columns: 160px 200px 1fr 1fr 120px 160px; gap:14px; align-items:end; }
+    label { display:block; font-size:11px; color:var(--muted); margin-bottom:6px; letter-spacing:.6px; text-transform:uppercase; }
+    select,input {
+      width:100%; background: rgba(0,0,0,0.18); color:var(--text);
+      border:1px solid rgba(255,255,255,0.10); border-radius:12px; padding:12px 12px; outline:none;
     }
-    .subtitle{
-      margin-top:6px;
-      color:var(--muted);
-      font-size: 14px;
+    input::placeholder { color: rgba(233,244,247,0.35); }
+    .sideBox { display:flex; gap:10px; }
+    .pill {
+      flex:1; border-radius:12px; padding:11px 12px; border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12); color:var(--text); cursor:pointer; font-weight:800; letter-spacing:.6px;
     }
-    .badge{
-      align-self:flex-start;
-      background: rgba(7,54,66,.65);
-      border:1px solid rgba(255,255,255,.08);
-      padding:10px 14px;
-      border-radius: 999px;
-      box-shadow: var(--shadow);
-      font-size: 13px;
-      color: var(--txt);
-      min-width: 180px;
-      text-align:center;
+    .pill.on.long { border-color: rgba(33,230,165,0.6); box-shadow: 0 0 0 2px rgba(33,230,165,0.18) inset; }
+    .pill.on.short { border-color: rgba(255,59,112,0.6); box-shadow: 0 0 0 2px rgba(255,59,112,0.18) inset; }
+    .btn {
+      width:100%; border-radius:12px; padding:12px 12px; border:1px solid rgba(255,138,0,0.55);
+      background: rgba(0,0,0,0.10); color:var(--orange); cursor:pointer; font-weight:900; letter-spacing:.4px;
     }
-    .badge b{ color: var(--orange); }
-
-    .panel{
-      background: linear-gradient(180deg, rgba(10,56,69,.55), rgba(6,36,46,.92));
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 18px;
-      margin-top: 16px;
+    .muteline { margin-top:10px; color:var(--muted); font-size:13px; }
+    .muteline b { color: var(--orange); }
+    .err { margin-top:10px; color: var(--red); font-weight:800; font-size:13px; letter-spacing:.4px; }
+    .tblTop { display:flex; gap:12px; align-items:center; margin:8px 0 12px; }
+    .btnSmall {
+      border-radius:12px; padding:10px 14px; border:1px solid rgba(255,138,0,0.55);
+      background: rgba(0,0,0,0.10); color:var(--orange); cursor:pointer; font-weight:900; letter-spacing:.4px;
     }
-    .panel h2{
-      margin:0 0 14px 0;
-      font-size: 18px;
-      letter-spacing:.8px;
-      color: var(--orange);
-      font-weight: 900;
+    table {
+      width:100%; border-collapse:collapse; overflow:hidden; border-radius:16px;
+      border:1px solid var(--line); background: rgba(0,0,0,0.12);
     }
-
-    .row{
-      display:grid;
-      grid-template-columns: 140px 190px 220px 360px 120px 200px;
-      gap: 14px;
-      align-items:end;
+    thead th {
+      color:var(--orange); font-size:12px; letter-spacing:.8px; text-transform:uppercase;
+      padding:12px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
     }
-    label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      letter-spacing:.3px;
+    tbody td { padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:13px; white-space:nowrap; }
+    tbody tr:last-child td { border-bottom:none; }
+    .sidePill {
+      display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; letter-spacing:.5px;
+      border:1px solid rgba(255,255,255,0.10);
     }
-    select, input{
-      width:100%;
-      background: rgba(2,18,23,.55);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--txt);
-      border-radius: 12px;
-      padding: 12px 12px;
-      outline:none;
+    .sidePill.long { color: var(--green); border-color: rgba(33,230,165,0.35); }
+    .sidePill.short { color: var(--red); border-color: rgba(255,59,112,0.35); }
+    .pos { color: var(--green); font-weight:900; }
+    .neg { color: var(--red); font-weight:900; }
+    .btnSair {
+      border-radius:12px; padding:10px 14px; border:1px solid rgba(33,230,165,0.55);
+      background: rgba(0,0,0,0.10); color: var(--orange); cursor:pointer; font-weight:900;
     }
-    input::placeholder{ color: rgba(233,243,246,.35); }
-
-    .sidebox{
-      display:flex; gap:10px;
+    .btnDel {
+      border-radius:12px; padding:10px 14px; border:1px solid rgba(255,59,112,0.55);
+      background: rgba(0,0,0,0.10); color: var(--red); cursor:pointer; font-weight:900; margin-left:10px;
     }
-    .pill{
-      flex:1;
-      padding: 10px 10px;
-      text-align:center;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(2,18,23,.35);
-      cursor:pointer;
-      user-select:none;
-      font-weight: 800;
-      font-size: 13px;
-    }
-    .pill.long.on{ border-color: rgba(0,208,132,.7); box-shadow: 0 0 0 2px rgba(0,208,132,.15) inset; }
-    .pill.short.on{ border-color: rgba(255,77,109,.7); box-shadow: 0 0 0 2px rgba(255,77,109,.15) inset; }
-    .pill.long.on{ color: var(--green); }
-    .pill.short.on{ color: var(--red); }
-
-    .btn{
-      background: rgba(255,138,0,.09);
-      border: 1px solid rgba(255,138,0,.55);
-      color: var(--orange);
-      border-radius: 14px;
-      padding: 12px 14px;
-      cursor:pointer;
-      font-weight: 900;
-      letter-spacing:.2px;
-      transition: .15s;
-      width: 100%;
-      white-space: nowrap;
-    }
-    .btn:hover{ transform: translateY(-1px); }
-
-    .help{
-      margin-top:10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .help b{ color: var(--orange); }
-    .msg{
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--red);
-      min-height: 18px;
-    }
-
-    .tableTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-    }
-    .meta{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .btnPdf{
-      width:auto;
-      padding: 10px 14px;
-      border-radius: 12px;
-    }
-
-    table{
-      width:100%;
-      border-collapse: separate;
-      border-spacing: 0 10px;
-      font-size: 13px;
-    }
-    thead th{
-      color: var(--orange);
-      font-weight: 900;
-      text-align:left;
-      font-size: 12px;
-      letter-spacing:.5px;
-      padding: 0 10px;
-      white-space: nowrap;
-    }
-    tbody tr{
-      background: rgba(2,18,23,.40);
-      border: 1px solid rgba(255,255,255,.06);
-    }
-    tbody td{
-      padding: 12px 10px;
-      border-top: 1px solid rgba(255,255,255,.06);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-    tbody td:first-child{
-      border-left: 1px solid rgba(255,255,255,.06);
-      border-top-left-radius: 12px;
-      border-bottom-left-radius: 12px;
-      font-weight: 900;
-    }
-    tbody td:last-child{
-      border-right: 1px solid rgba(255,255,255,.06);
-      border-top-right-radius: 12px;
-      border-bottom-right-radius: 12px;
-    }
-
-    .sideTag{
-      display:inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 12px;
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .sideTag.long{ color: var(--green); border-color: rgba(0,208,132,.45); }
-    .sideTag.short{ color: var(--red); border-color: rgba(255,77,109,.45); }
-
-    .pos{ color: var(--green); font-weight: 900; }
-    .neg{ color: var(--red); font-weight: 900; }
-    .muted{ color: var(--muted); }
-
-    .btnRow{
-      display:flex; gap:10px; justify-content:flex-end;
-    }
-    .btnSmall{
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-weight: 900;
-      cursor:pointer;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(2,18,23,.35);
-      color: var(--txt);
-      white-space: nowrap;
-    }
-    .btnExit{
-      border-color: rgba(0,208,132,.55);
-      color: var(--green);
-      background: rgba(0,208,132,.08);
-    }
-    .btnDel{
-      border-color: rgba(255,77,109,.55);
-      color: var(--red);
-      background: rgba(255,77,109,.08);
-    }
-
-    /* larguras das colunas (deixe em linha reta) */
-    th:nth-child(6),  td:nth-child(6)  { width: 120px; }  /* DATA REG */
-    th:nth-child(7),  td:nth-child(7)  { width: 90px; }   /* HORA REG */
-    th:nth-child(11), td:nth-child(11) { width: 210px; }  /* SITUAÇÃO (maior) */
-    th:nth-child(12), td:nth-child(12) { width: 140px; }  /* DATA ATUAL (maior) */
-    th:nth-child(13), td:nth-child(13) { width: 90px; }   /* HORA ATUAL */
-    th:nth-child(14), td:nth-child(14) { width: 90px; }   /* SAIR */
-    th:nth-child(15), td:nth-child(15) { width: 110px; }  /* EXCLUIR */
-
-    .footerHint{
-      margin-top: 10px;
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .chip{
-      border:1px solid rgba(255,255,255,.08);
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(2,18,23,.25);
+    th:nth-child(1), td:nth-child(1) { width: 70px; }
+    th:nth-child(2), td:nth-child(2) { width: 110px; }
+    th:nth-child(3), td:nth-child(3) { width: 95px; }
+    th:nth-child(4), td:nth-child(4) { width: 95px; }
+    th:nth-child(5), td:nth-child(5) { width: 70px; }
+    th:nth-child(6), td:nth-child(6) { width: 115px; }
+    th:nth-child(7), td:nth-child(7) { width: 95px; }
+    th:nth-child(8), td:nth-child(8) { width: 95px; }
+    th:nth-child(9), td:nth-child(9) { width: 110px; }
+    th:nth-child(10), td:nth-child(10) { width: 120px; }
+    th:nth-child(11), td:nth-child(11) { width: 150px; }
+    th:nth-child(12), td:nth-child(12) { width: 115px; }
+    th:nth-child(13), td:nth-child(13) { width: 95px; }
+    th:nth-child(14), td:nth-child(14) { width: 110px; }
+    th:nth-child(15), td:nth-child(15) { width: 120px; }
+    .footer { display:flex; gap:10px; margin-top:10px; color:var(--muted); font-size:12px; flex-wrap:wrap; }
+    .chip { border:1px solid rgba(255,255,255,0.10); background: rgba(0,0,0,0.12); padding:6px 10px; border-radius:999px; }
+    @media (max-width: 980px) {
+      .row { grid-template-columns: 1fr 1fr; }
+      .badge { min-width: 0; text-align: left; }
+      h1 { font-size: 34px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="wrap">
     <div class="top">
       <div>
         <h1>AUTOTRADER-SAÍDA</h1>
-        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
+        <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático</div>
       </div>
-      <div class="badge">Atualizado: <b id="lastUpd">—</b></div>
+      <div class="badge">Atualizado: <b id="updated">—</b></div>
     </div>
 
-    <div class="panel">
+    <div class="card">
       <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
 
       <div class="row">
@@ -296,71 +136,60 @@
 
         <div>
           <label>SIDE</label>
-          <div class="sidebox">
-            <div id="btnLong" class="pill long on">LONG</div>
-            <div id="btnShort" class="pill short">SHORT</div>
+          <div class="sideBox">
+            <button id="btnLong" class="pill long on long" type="button">LONG</button>
+            <button id="btnShort" class="pill short" type="button">SHORT</button>
           </div>
         </div>
 
         <div>
           <label>ENTRADA</label>
-          <input id="entrada" placeholder="ex: 1.234" />
+          <input id="entrada" inputmode="decimal" placeholder="ex: 1.234" />
         </div>
 
         <div>
           <label>US ALVO (do PRO, congelado)</label>
-          <input id="alvo" disabled />
+          <input id="alvoPro" readonly placeholder="—" />
         </div>
 
         <div>
           <label>ALAV</label>
-          <input id="alav" value="10" />
+          <input id="alav" inputmode="numeric" value="10" />
         </div>
 
         <div>
-          <button id="btnAdd" class="btn">Adicionar Operação</button>
+          <button id="btnAdd" class="btn" type="button">Adicionar Operação</button>
         </div>
       </div>
 
-      <div class="help">
-        Alvo do PRO: <b id="proUpd">—</b>
-      </div>
-      <div id="msg" class="msg"></div>
+      <div class="muteline">Alvo do PRO: <b id="proUpdated">—</b></div>
+      <div id="errAlvo" class="err" style="display:none;">ERRO: HTTP 400</div>
     </div>
 
-    <div class="panel">
-      <div class="tableTop">
-        <h2 style="margin:0">MONITORAMENTO DAS OPERAÇÕES</h2>
-        <div class="meta">
-          <div>Total: <b id="totalOps" style="color:var(--txt)">0</b></div>
-          <button id="btnPdf" class="btn btnPdf">Baixar PDF</button>
-        </div>
+    <div class="card">
+      <h2>MONITORAMENTO DAS OPERAÇÕES</h2>
+
+      <div class="tblTop">
+        <div style="color:var(--muted);font-size:13px;">Total: <b id="totalOps" style="color:var(--text);">0</b></div>
+        <button id="btnPdf" class="btnSmall" type="button">Baixar PDF</button>
       </div>
 
       <table>
         <thead>
           <tr>
-            <th>PAR</th>
-            <th>SIDE</th>
-            <th>ENTRADA</th>
-            <th>ALVO</th>
-            <th>ALAV</th>
-            <th>DATA REG</th>
-            <th>HORA REG</th>
-            <th>ATUAL</th>
-            <th>GANHO ALVO</th>
-            <th>GANHO ATUAL</th>
-            <th>SITUAÇÃO</th>
-            <th>DATA ATUAL</th>
-            <th>HORA ATUAL</th>
-            <th>SAIR</th>
-            <th>EXCLUIR</th>
+            <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+            <th>DATA REG</th><th>HORA REG</th>
+            <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
+            <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
+            <th>SAIR</th><th>EXCLUIR</th>
           </tr>
         </thead>
-        <tbody id="tb"></tbody>
+        <tbody id="tbody">
+          <tr><td colspan="15" style="color:var(--muted);padding:14px 10px;">Carregando...</td></tr>
+        </tbody>
       </table>
 
-      <div class="footerHint">
+      <div class="footer">
         <span class="chip">Auto-refresh: 15s</span>
         <span class="chip">Worker: 5 min</span>
         <span class="chip">ALVO fixo (congelado no ADD)</span>
@@ -368,335 +197,252 @@
     </div>
   </div>
 
-  <script>
-    // ===== helpers =====
-    const $ = (id)=>document.getElementById(id);
-    const tz = "America/Sao_Paulo";
+<script>
+(() => {
+  "use strict";
 
-    function setMsg(t){ $("msg").textContent = t || ""; }
+  const COINS = ["AAVE", "ADA", "APT", "ARB", "ATOM", "AVAX", "AXS", "BCH", "BNB", "BTC", "DOGE", "DOT", "ETH", "FET", "FIL", "FLUX", "ICP", "INJ", "LDO", "LINK", "LTC", "NEAR", "OP", "PEPE", "POL", "RATS", "RENDER", "RUNE", "SEI", "SHIB", "SOL", "SUI", "TIA", "TNSR", "TON", "TRX", "UNI", "WIF", "XRP"];
+  const $ = (id) => document.getElementById(id);
 
-    function fmt3(n){
-      if (n===null || n===undefined || !Number.isFinite(Number(n))) return "—";
-      return Number(n).toFixed(3);
+  let currentSide = "LONG";
+
+  function setSide(side) {
+    currentSide = side;
+    $("btnLong").classList.toggle("on", side === "LONG");
+    $("btnShort").classList.toggle("on", side === "SHORT");
+    $("btnLong").classList.toggle("long", true);
+    $("btnShort").classList.toggle("short", true);
+    fetchAlvo().catch(()=>{});
+  }
+
+  function fillCoins() {
+    const sel = $("par");
+    sel.innerHTML = "";
+    for (const c of COINS) {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      sel.appendChild(opt);
     }
-    function fmtPct(n){
-      if (n===null || n===undefined || !Number.isFinite(Number(n))) return "—";
-      const v = Number(n);
-      const sign = v>0 ? "+" : (v<0 ? "" : "");
-      return sign + v.toFixed(2) + "%";
+    sel.value = COINS[0] || "";
+  }
+
+  async function jget(url) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) {
+      let msg = "HTTP " + r.status;
+      try { const j = await r.json(); if (j && j.msg) msg = j.msg; } catch (e) {}
+      const err = new Error(msg); err.status = r.status; throw err;
     }
-    function pctClass(n){
-      if (!Number.isFinite(Number(n))) return "";
-      return Number(n) >= 0 ? "pos" : "neg";
+    return await r.json();
+  }
+
+  async function jpost(url, bodyObj) {
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyObj || {}),
+      cache: "no-store",
+    });
+    if (!r.ok) {
+      let msg = "HTTP " + r.status;
+      try { const j = await r.json(); if (j && j.msg) msg = j.msg; } catch (e) {}
+      const err = new Error(msg); err.status = r.status; throw err;
+    }
+    return await r.json();
+  }
+
+  function fmtNum(x, dec=3) {
+    if (x === null || x === undefined || x === "" || Number.isNaN(Number(x))) return "—";
+    return Number(x).toFixed(dec);
+  }
+  function fmtPct(x) {
+    if (x === null || x === undefined || x === "" || Number.isNaN(Number(x))) return "—";
+    const n = Number(x);
+    return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+  }
+  function splitDateTime(updated_brt) {
+    if (!updated_brt || typeof updated_brt !== "string") return ["—","—"];
+    const parts = updated_brt.split(" ");
+    if (parts.length < 2) return [updated_brt, "—"];
+    return [parts[0], parts[1]];
+  }
+  function regFromCreatedTs(created_ts) {
+    if (!created_ts) return ["—","—"];
+    const dt = new Date(created_ts);
+    if (isNaN(dt.getTime())) return ["—","—"];
+    const d = dt.toLocaleDateString("pt-BR");
+    const t = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return [d, t];
+  }
+
+  async function fetchAlvo() {
+    const parVal = $("par").value || "";
+    const sideVal = currentSide;
+    if (!parVal || (sideVal !== "LONG" && sideVal !== "SHORT")) {
+      $("alvoPro").value = "—";
+      $("proUpdated").textContent = "—";
+      $("errAlvo").style.display = "none";
+      return;
+    }
+    try {
+      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parVal)}&side=${encodeURIComponent(sideVal)}`);
+      $("alvoPro").value = (j && j.alvo !== undefined) ? String(j.alvo) : "—";
+      $("proUpdated").textContent = (j && j.updated_brt) ? j.updated_brt : "—";
+      $("errAlvo").style.display = "none";
+    } catch (e) {
+      $("alvoPro").value = "—";
+      $("proUpdated").textContent = "—";
+      $("errAlvo").style.display = "block";
+      console.error("fetchAlvo erro:", e);
+    }
+  }
+
+  async function loadAndRender() {
+    const opsResp = await jget("/api/saida/ops");
+    const opsList = (opsResp && Array.isArray(opsResp.ops)) ? opsResp.ops : [];
+
+    const monResp = await jget("/api/saida/monitor");
+    const monList = (monResp && Array.isArray(monResp.ops)) ? monResp.ops : [];
+
+    $("updated").textContent = (monResp && monResp.updated_brt) ? monResp.updated_brt : "—";
+
+    const monById = new Map();
+    for (const o of monList) if (o && o.id) monById.set(o.id, o);
+
+    $("totalOps").textContent = String(opsList.length || 0);
+    const [dAtual, hAtual] = splitDateTime(monResp && monResp.updated_brt);
+
+    const tb = $("tbody");
+    tb.innerHTML = "";
+    if (!opsList.length) {
+      tb.innerHTML = '<tr><td colspan="15" style="color:rgba(233,244,247,0.65);padding:14px 10px;">Sem operações.</td></tr>';
+      return;
     }
 
-    function brDateTimeFromISO(iso){
-      try{
-        const d = new Date(iso);
-        const date = new Intl.DateTimeFormat("pt-BR",{timeZone:tz, day:"2-digit", month:"2-digit", year:"numeric"}).format(d);
-        const time = new Intl.DateTimeFormat("pt-BR",{timeZone:tz, hour:"2-digit", minute:"2-digit", hour12:false}).format(d);
-        return {date, time};
-      }catch(e){
-        return {date:"—", time:"—"};
-      }
-    }
+    for (const baseOp of opsList) {
+      const mo = monById.get(baseOp.id) || {};
 
-    function brDateFromYMD(ymd){
-      // "YYYY-MM-DD" -> "DD/MM/YYYY"
-      if (!ymd || typeof ymd !== "string" || ymd.length < 10) return "—";
-      const y = ymd.slice(0,4), m = ymd.slice(5,7), d = ymd.slice(8,10);
-      return `${d}/${m}/${y}`;
-    }
+      const par = baseOp.par || "—";
+      const side = (baseOp.side || "").toUpperCase();
+      const [dReg, hReg] = regFromCreatedTs(baseOp.created_ts);
 
-    async function jget(url){
-      const r = await fetch(url, {cache:"no-store"});
-      const txt = await r.text();
-      let j = {};
-      try{ j = JSON.parse(txt); }catch(e){ j = {ok:false, msg:"JSON inválido"}; }
-      if (!r.ok){
-        const msg = j && j.msg ? j.msg : ("HTTP "+r.status);
-        throw new Error(msg);
-      }
-      return j;
-    }
+      const atual = (mo.atual !== undefined) ? mo.atual : null;
+      const ganhoAlvo = (mo.ganho_alvo_pct !== undefined) ? mo.ganho_alvo_pct : null;
+      const ganhoAtual = (mo.ganho_atual_pct !== undefined) ? mo.ganho_atual_pct : null;
 
-    async function jpost(url, body){
-      const r = await fetch(url,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify(body||{})
+      const situacao = (mo.situacao !== undefined && mo.situacao !== null && mo.situacao !== "")
+        ? mo.situacao
+        : (atual ? "" : "AGUARDANDO WORKER");
+
+      const tr = document.createElement("tr");
+
+      const tdPar = document.createElement("td");
+      tdPar.textContent = par; tdPar.style.color = "var(--orange)"; tdPar.style.fontWeight = "900";
+
+      const tdSide = document.createElement("td");
+      const sp = document.createElement("span");
+      sp.className = "sidePill " + (side === "LONG" ? "long" : "short");
+      sp.textContent = side || "—";
+      tdSide.appendChild(sp);
+
+      const tdEntrada = document.createElement("td"); tdEntrada.textContent = fmtNum(baseOp.entrada, 3);
+      const tdAlvo = document.createElement("td"); tdAlvo.textContent = fmtNum(baseOp.alvo, 3);
+      const tdAlav = document.createElement("td"); tdAlav.textContent = (baseOp.alav !== undefined && baseOp.alav !== null) ? String(baseOp.alav) : "—";
+      const tdDReg = document.createElement("td"); tdDReg.textContent = dReg;
+      const tdHReg = document.createElement("td"); tdHReg.textContent = hReg;
+      const tdAtual = document.createElement("td"); tdAtual.textContent = fmtNum(atual, 3);
+
+      const tdGAlvo = document.createElement("td");
+      tdGAlvo.textContent = fmtPct(ganhoAlvo);
+      if (ganhoAlvo !== null && ganhoAlvo !== undefined && !Number.isNaN(Number(ganhoAlvo))) tdGAlvo.className = (Number(ganhoAlvo) >= 0) ? "pos" : "neg";
+
+      const tdGAtual = document.createElement("td");
+      tdGAtual.textContent = fmtPct(ganhoAtual);
+      if (ganhoAtual !== null && ganhoAtual !== undefined && !Number.isNaN(Number(ganhoAtual))) tdGAtual.className = (Number(ganhoAtual) >= 0) ? "pos" : "neg";
+
+      const tdSit = document.createElement("td"); tdSit.textContent = situacao || "—";
+      const tdDA = document.createElement("td"); tdDA.textContent = dAtual;
+      const tdHA = document.createElement("td"); tdHA.textContent = hAtual;
+
+      const tdSair = document.createElement("td");
+      const btnSair = document.createElement("button");
+      btnSair.className = "btnSair"; btnSair.textContent = "SAIR";
+      btnSair.addEventListener("click", async () => {
+        if (!confirm("Confirmar SAIR desta operação?")) return;
+        try { await jpost("/api/saida/sair", { id: baseOp.id }); await refresh(); }
+        catch (e) { alert("ERRO NO SAIR: " + (e?.message || e)); }
       });
-      const txt = await r.text();
-      let j = {};
-      try{ j = JSON.parse(txt); }catch(e){ j = {ok:false, msg:"JSON inválido"}; }
-      if (!r.ok){
-        const msg = j && j.msg ? j.msg : ("HTTP "+r.status);
-        throw new Error(msg);
-      }
-      return j;
-    }
+      tdSair.appendChild(btnSair);
 
-    // ===== state =====
-    let side = "LONG";
-
-    const MOEDAS = [
-      "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
-      "LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON",
-      "TRX","UNI","WIF","XRP"
-    ];
-
-    function paintSide(){
-      $("btnLong").classList.toggle("on", side==="LONG");
-      $("btnShort").classList.toggle("on", side==="SHORT");
-    }
-
-    function ensureMoedas(){
-      const sel = $("par");
-      sel.innerHTML = "";
-      for (const m of MOEDAS){
-        const o = document.createElement("option");
-        o.value = m;
-        o.textContent = m;
-        sel.appendChild(o);
-      }
-      const saved = localStorage.getItem("saida_par");
-      sel.value = (saved && MOEDAS.includes(saved)) ? saved : "ADA";
-    }
-
-    function currentSide(){
-      return side;
-    }
-
-    // ===== API calls =====
-    async function fetchAlvo(){
-      // regra: /api/saida/alvo precisa par + side
-      const parSel = $("par").value;
-      const s = currentSide();
-      if (!parSel || !s){
-        $("alvo").value = "";
-        $("proUpd").textContent = "—";
-        return;
-      }
-      try{
-        const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parSel)}&side=${encodeURIComponent(s)}`);
-        if (j && j.ok){
-          $("alvo").value = (j.alvo!==undefined && j.alvo!==null) ? String(j.alvo) : "";
-          $("proUpd").textContent = j.updated_brt || "—";
-          setMsg("");
-        }else{
-          $("alvo").value = "";
-          $("proUpd").textContent = "—";
-          setMsg("Alvo indisponível.");
-        }
-      }catch(e){
-        $("alvo").value = "";
-        $("proUpd").textContent = "—";
-        setMsg("ERRO: " + (e?.message || e));
-      }
-    }
-
-    async function loadOpsBase(){
-      // ops base (registro) -> created_ts
-      try{
-        const j = await jget("/api/saida/ops");
-        return (j && Array.isArray(j.ops)) ? j.ops : [];
-      }catch(e){
-        return [];
-      }
-    }
-
-    async function loadMonitor(){
-      try{
-        const j = await jget("/api/saida/monitor");
-        return j || {};
-      }catch(e){
-        return {};
-      }
-    }
-
-    function buildIndexById(arr){
-      const m = new Map();
-      for (const x of (arr||[])){
-        if (x && x.id) m.set(x.id, x);
-      }
-      return m;
-    }
-
-    function setLastUpdated(updated_brt){
-      $("lastUpd").textContent = updated_brt || "—";
-    }
-
-    // ===== render =====
-    function renderRows(opsBase, mon){
-      const tb = $("tb");
-      tb.innerHTML = "";
-
-      const monitorOps = (mon && Array.isArray(mon.ops)) ? mon.ops : [];
-      const monById = buildIndexById(monitorOps);
-
-      // "updated_brt" vem tipo "YYYY-MM-DD HH:MM"
-      let dataAtual = "—", horaAtual = "—";
-      if (mon && typeof mon.updated_brt === "string" && mon.updated_brt.includes(" ")){
-        const parts = mon.updated_brt.split(" ");
-        const ymd = parts[0];
-        const hm = parts[1];
-        dataAtual = brDateFromYMD(ymd);
-        horaAtual = hm || "—";
-      }
-
-      $("totalOps").textContent = String((opsBase||[]).length);
-
-      for (const o of (opsBase||[])){
-        const mo = monById.get(o.id) || {};
-        const reg = brDateTimeFromISO(o.created_ts);
-
-        const atual = (mo.atual!==undefined) ? mo.atual : null;
-        const ganhoAlvo = (mo.ganho_alvo_pct!==undefined) ? mo.ganho_alvo_pct : null;
-        const ganhoAtual = (mo.ganho_atual_pct!==undefined) ? mo.ganho_atual_pct : null;
-
-        const situacao = mo.situacao || (Number.isFinite(Number(atual)) ? "EM ANDAMENTO" : "AGUARDANDO WORKER");
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${o.par || "—"}</td>
-          <td>${o.side ? `<span class="sideTag ${String(o.side).toUpperCase()==="LONG" ? "long":"short"}">${o.side}</span>` : "—"}</td>
-          <td>${fmt3(o.entrada)}</td>
-          <td>${fmt3(o.alvo)}</td>
-          <td>${(o.alav!==undefined && o.alav!==null) ? String(o.alav) : "—"}</td>
-
-          <td>${reg.date}</td>
-          <td>${reg.time}</td>
-
-          <td>${fmt3(atual)}</td>
-          <td class="${pctClass(ganhoAlvo)}">${fmtPct(ganhoAlvo)}</td>
-          <td class="${pctClass(ganhoAtual)}">${fmtPct(ganhoAtual)}</td>
-
-          <td style="white-space:nowrap;">${situacao}</td>
-          <td>${dataAtual}</td>
-          <td>${horaAtual}</td>
-
-          <td>
-            <button class="btnSmall btnExit" data-act="exit" data-id="${o.id}">Sair</button>
-          </td>
-          <td>
-            <button class="btnSmall btnDel" data-act="del" data-id="${o.id}">Excluir</button>
-          </td>
-        `;
-        tb.appendChild(tr);
-      }
-
-      // handlers
-      tb.querySelectorAll("button[data-act]").forEach(btn=>{
-        btn.onclick = async ()=>{
-          const id = btn.getAttribute("data-id");
-          const act = btn.getAttribute("data-act");
-          if (!id) return;
-
-          if (act==="exit"){
-            if (!confirm("Confirmar SAIR desta operação?")) return;
-            try{
-              btn.disabled = true;
-              await jpost("/api/saida/exit", {id});
-              await refresh();
-            }catch(e){
-              alert("ERRO NO SAIR: " + (e?.message || e));
-            }finally{
-              btn.disabled = false;
-            }
-          }
-
-          if (act==="del"){
-            if (!confirm("Confirmar EXCLUIR esta operação?")) return;
-            try{
-              btn.disabled = true;
-              try{
-                await jpost("/api/saida/remove", {id});
-              }catch(_e){
-                await jpost("/api/saida/delete", {id});
-              }
-              await refresh();
-            }catch(e){
-              alert("ERRO NO EXCLUIR: " + (e?.message || e));
-            }finally{
-              btn.disabled = false;
-            }
-          }
-        };
+      const tdDel = document.createElement("td");
+      const btnDel = document.createElement("button");
+      btnDel.className = "btnDel"; btnDel.textContent = "EXCLUIR";
+      btnDel.addEventListener("click", async () => {
+        if (!confirm("Confirmar EXCLUIR esta operação?")) return;
+        try { await jpost("/api/saida/excluir", { id: baseOp.id }); await refresh(); }
+        catch (e) { alert("ERRO NO EXCLUIR: " + (e?.message || e)); }
       });
+      tdDel.appendChild(btnDel);
+
+      for (const td of [tdPar, tdSide, tdEntrada, tdAlvo, tdAlav, tdDReg, tdHReg, tdAtual, tdGAlvo, tdGAtual, tdSit, tdDA, tdHA, tdSair, tdDel]) tr.appendChild(td);
+      tb.appendChild(tr);
+    }
+  }
+
+  async function addOp() {
+    const parVal = $("par").value || "";
+    const sideVal = currentSide;
+    const entradaVal = $("entrada").value || "";
+    const alavVal = $("alav").value || "";
+
+    if (!parVal) return alert("Selecione o PAR.");
+    if (sideVal !== "LONG" && sideVal !== "SHORT") return alert("Selecione LONG ou SHORT.");
+    const entradaNum = Number(String(entradaVal).replace(",", "."));
+    const alavNum = Number(String(alavVal).replace(",", "."));
+    if (!isFinite(entradaNum) || entradaNum <= 0) return alert("Entrada inválida.");
+    if (!isFinite(alavNum) || alavNum <= 0) return alert("Alav inválida.");
+
+    let alvoNum = null;
+    try {
+      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parVal)}&side=${encodeURIComponent(sideVal)}`);
+      alvoNum = (j && j.alvo !== undefined) ? Number(j.alvo) : null;
+    } catch (e) {
+      alvoNum = null;
     }
 
-    // ===== refresh =====
-    async function refresh(){
-      const [opsBase, mon] = await Promise.all([loadOpsBase(), loadMonitor()]);
-      setLastUpdated(mon.updated_brt || "—");
-      renderRows(opsBase, mon);
+    try {
+      await jpost("/api/saida/add", {
+        par: parVal, side: sideVal, entrada: entradaNum, alav: alavNum,
+        alvo: (isFinite(alvoNum) ? alvoNum : undefined),
+      });
+      $("entrada").value = "";
+      await refresh();
+    } catch (e) {
+      alert("ERRO NO ADD: " + (e?.message || e));
     }
-    window.refresh = refresh; // importante p/ debug e para garantir "refresh exists"
+  }
 
-    // ===== init =====
-    (function init(){
-      ensureMoedas();
-      paintSide();
+  async function refresh() {
+    try { await loadAndRender(); }
+    catch (e) {
+      console.error("refresh erro:", e);
+      $("tbody").innerHTML = '<tr><td colspan="15" style="color:rgba(233,244,247,0.65);padding:14px 10px;">ERRO ao carregar dados.</td></tr>';
+    }
+  }
+  window.refresh = refresh;
 
-      $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); fetchAlvo(); };
-      $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); fetchAlvo(); };
+  fillCoins();
+  $("btnLong").addEventListener("click", () => setSide("LONG"));
+  $("btnShort").addEventListener("click", () => setSide("SHORT"));
+  $("par").addEventListener("change", () => fetchAlvo().catch(()=>{}));
+  $("btnAdd").addEventListener("click", () => addOp().catch(()=>{}));
+  $("btnPdf").addEventListener("click", () => window.print());
 
-      $("par").onchange = ()=>{
-        localStorage.setItem("saida_par", $("par").value);
-        fetchAlvo();
-      };
-
-      $("btnAdd").onclick = async ()=>{
-        const btn = $("btnAdd");
-        try{
-          btn.disabled = true;
-
-          const parSel = $("par").value;
-          const s = currentSide();
-          const entradaTxt = String($("entrada").value||"").replace(",", ".").trim();
-          const entrada = Number(entradaTxt);
-          const alav = Number(String($("alav").value||"").trim());
-
-          if (!parSel) return alert("Selecione o PAR.");
-          if (!s) return alert("Selecione LONG ou SHORT.");
-          if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-          if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
-
-          await jpost("/api/saida/add", { par: parSel, side: s, entrada, alav });
-
-          $("entrada").value = "";
-          await refresh();
-        }catch(e){
-          alert("ERRO NO ADD: " + (e?.message || e));
-        }finally{
-          btn.disabled = false;
-        }
-      };
-
-      $("btnPdf").onclick = async ()=>{
-        try{
-          const r = await fetch("/api/saida/pdf", {cache:"no-store"});
-          if (!r.ok) throw new Error("PDF indisponível (HTTP " + r.status + ")");
-          const blob = await r.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "AUTOTRADER-SAIDA.pdf";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-        }catch(e){
-          alert("ERRO NO PDF: " + (e?.message || e));
-        }
-      };
-
-      // primeiro alvo e primeira tabela
-      fetchAlvo();
-      refresh();
-      setInterval(refresh, 15000);
-    })();
-  </script>
+  fetchAlvo().catch(()=>{});
+  refresh().catch(()=>{});
+  setInterval(() => refresh().catch(()=>{}), 15000);
+})();
+</script>
 </body>
 </html>
