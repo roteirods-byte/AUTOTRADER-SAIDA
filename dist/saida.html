@@ -6,145 +6,288 @@
   <title>AUTOTRADER-SAÍDA</title>
   <style>
     :root{
-      --bg:#061c22;
-      --panel:#07252d;
-      --panel2:#052029;
-      --txt:#e8f6ff;
-      --muted:#9fb4c2;
+      --bg:#051b22;
+      --panel:#06242e;
+      --panel2:#05212a;
+      --line:#0c3a46;
+      --txt:#e9f3f6;
+      --muted:#9fb6bf;
       --orange:#ff8a00;
-      --green:#22c55e;
-      --red:#ef4444;
+      --green:#00d084;
+      --red:#ff4d6d;
       --btn:#0b2f3a;
-      --line:rgba(255,255,255,.08);
+      --shadow: 0 12px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;}
-    .wrap{max-width:1480px;margin:24px auto;padding:0 18px;}
-    h1{margin:6px 0 2px;letter-spacing:.5px}
-    .sub{color:var(--muted);margin:0 0 14px;font-size:14px}
-    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 15% 0%, #0b2f3a 0%, var(--bg) 55%);
+      color:var(--txt);
+    }
+    .container{
+      max-width: 1480px;
+      margin: 26px auto 60px;
+      padding: 0 18px;
+    }
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    h1{
+      margin:0;
+      letter-spacing:1px;
+      font-size: 34px;
+      font-weight: 900;
+    }
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size: 14px;
+    }
     .badge{
-      background:#0a2b35;border:1px solid var(--line);
-      padding:10px 14px;border-radius:999px;color:var(--muted);
-      min-width:190px;text-align:center;font-weight:700
+      align-self:flex-start;
+      background: rgba(7,54,66,.65);
+      border:1px solid rgba(255,255,255,.08);
+      padding:10px 14px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--txt);
+      min-width: 180px;
+      text-align:center;
     }
-    .badge b{color:var(--orange)}
-    .msg{margin:10px 0 0;color:#ffb4b4;min-height:18px;font-size:13px}
-    .card{
-      background:linear-gradient(180deg,var(--panel),var(--panel2));
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:18px;
-      margin:16px 0;
-      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    .badge b{ color: var(--orange); }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(10,56,69,.55), rgba(6,36,46,.92));
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-top: 16px;
     }
-    .card h2{margin:0 0 12px;color:var(--orange);letter-spacing:1px;font-size:18px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
-    label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px}
-    select,input{
-      background:#061f26;color:var(--txt);
-      border:1px solid var(--line);border-radius:10px;
-      padding:10px 12px;outline:none;
-      height:40px;
+    .panel h2{
+      margin:0 0 14px 0;
+      font-size: 18px;
+      letter-spacing:.8px;
+      color: var(--orange);
+      font-weight: 900;
     }
-    select{min-width:120px}
-    input{min-width:160px}
-    .sidebox{display:flex;gap:10px}
+
+    .row{
+      display:grid;
+      grid-template-columns: 140px 190px 220px 360px 120px 200px;
+      gap: 14px;
+      align-items:end;
+    }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing:.3px;
+    }
+    select, input{
+      width:100%;
+      background: rgba(2,18,23,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--txt);
+      border-radius: 12px;
+      padding: 12px 12px;
+      outline:none;
+    }
+    input::placeholder{ color: rgba(233,243,246,.35); }
+
+    .sidebox{
+      display:flex; gap:10px;
+    }
     .pill{
-      border:1px solid var(--line);
-      background:#071f27;
-      border-radius:12px;
-      padding:9px 14px;
-      font-weight:800;
+      flex:1;
+      padding: 10px 10px;
+      text-align:center;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(2,18,23,.35);
       cursor:pointer;
       user-select:none;
-      height:40px;
-      display:flex;align-items:center;justify-content:center;
-      min-width:84px;
+      font-weight: 800;
+      font-size: 13px;
     }
-    .pill.on.long{border-color:rgba(34,197,94,.7); box-shadow:0 0 0 2px rgba(34,197,94,.18) inset;}
-    .pill.on.short{border-color:rgba(239,68,68,.7); box-shadow:0 0 0 2px rgba(239,68,68,.18) inset;}
+    .pill.long.on{ border-color: rgba(0,208,132,.7); box-shadow: 0 0 0 2px rgba(0,208,132,.15) inset; }
+    .pill.short.on{ border-color: rgba(255,77,109,.7); box-shadow: 0 0 0 2px rgba(255,77,109,.15) inset; }
+    .pill.long.on{ color: var(--green); }
+    .pill.short.on{ color: var(--red); }
+
     .btn{
-      background:#082a33;border:1px solid rgba(255,138,0,.35);
-      color:var(--orange);font-weight:900;
-      border-radius:12px;
-      padding:10px 14px;height:40px;
+      background: rgba(255,138,0,.09);
+      border: 1px solid rgba(255,138,0,.55);
+      color: var(--orange);
+      border-radius: 14px;
+      padding: 12px 14px;
       cursor:pointer;
+      font-weight: 900;
+      letter-spacing:.2px;
+      transition: .15s;
+      width: 100%;
+      white-space: nowrap;
     }
-    .btn:disabled{opacity:.55;cursor:not-allowed}
-    .btnpdf{margin-left:10px}
-    .meta{color:var(--muted);font-size:13px;margin-top:8px}
-    .meta b{color:var(--orange)}
-    table{width:100%;border-collapse:collapse;margin-top:12px;table-layout:fixed}
-    th,td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:center}
-    th{color:var(--orange);font-size:12px;letter-spacing:.8px}
-    td{font-size:13px}
+    .btn:hover{ transform: translateY(-1px); }
+
+    .help{
+      margin-top:10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .help b{ color: var(--orange); }
+    .msg{
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--red);
+      min-height: 18px;
+    }
+
+    .tableTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .meta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .btnPdf{
+      width:auto;
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+      font-size: 13px;
+    }
+    thead th{
+      color: var(--orange);
+      font-weight: 900;
+      text-align:left;
+      font-size: 12px;
+      letter-spacing:.5px;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+    tbody tr{
+      background: rgba(2,18,23,.40);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    tbody td{
+      padding: 12px 10px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    tbody td:first-child{
+      border-left: 1px solid rgba(255,255,255,.06);
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
+      font-weight: 900;
+    }
+    tbody td:last-child{
+      border-right: 1px solid rgba(255,255,255,.06);
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+
     .sideTag{
-      display:inline-block;padding:6px 10px;border-radius:999px;font-weight:900;
-      border:1px solid var(--line);min-width:72px
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      border:1px solid rgba(255,255,255,.10);
     }
-    .sideLong{color:var(--green);border-color:rgba(34,197,94,.35)}
-    .sideShort{color:var(--red);border-color:rgba(239,68,68,.35)}
-    .pctPos{color:var(--green);font-weight:800}
-    .pctNeg{color:var(--red);font-weight:800}
-    .nowrap{white-space:nowrap}
-    .sbtn{
-      border:1px solid rgba(34,197,94,.45);
-      background:rgba(34,197,94,.12);
-      color:#d9ffe6;
-      font-weight:900;
-      border-radius:10px;
-      padding:7px 12px;
-      cursor:pointer;
-    }
-    .sbtn:hover{background:rgba(34,197,94,.18)}
-    .xbtn{
-      border:1px solid rgba(239,68,68,.45);
-      background:rgba(239,68,68,.10);
-      color:#ffd6d6;
-      font-weight:900;
-      border-radius:10px;
-      padding:7px 12px;
-      cursor:pointer;
-    }
-    .xbtn:hover{background:rgba(239,68,68,.16)}
+    .sideTag.long{ color: var(--green); border-color: rgba(0,208,132,.45); }
+    .sideTag.short{ color: var(--red); border-color: rgba(255,77,109,.45); }
 
-    /* larguras (ajustadas) */
-    th:nth-child(1),  td:nth-child(1)  { width: 70px; }   /* PAR */
-    th:nth-child(2),  td:nth-child(2)  { width: 90px; }   /* SIDE */
-    th:nth-child(3),  td:nth-child(3)  { width: 90px; }   /* ENTRADA */
-    th:nth-child(4),  td:nth-child(4)  { width: 90px; }   /* ALVO */
-    th:nth-child(5),  td:nth-child(5)  { width: 70px; }   /* ALAV */
-    th:nth-child(6),  td:nth-child(6)  { width: 110px; }  /* DATA REG */
-    th:nth-child(7),  td:nth-child(7)  { width: 85px; }   /* HORA REG */
-    th:nth-child(8),  td:nth-child(8)  { width: 85px; }   /* ATUAL */
-    th:nth-child(9),  td:nth-child(9)  { width: 95px; }   /* GANHO ALVO */
-    th:nth-child(10), td:nth-child(10) { width: 95px; }   /* GANHO ATUAL */
-    th:nth-child(11), td:nth-child(11) { width: 160px; }  /* SITUAÇÃO */
-    th:nth-child(12), td:nth-child(12) { width: 120px; }  /* DATA ATUAL */
-    th:nth-child(13), td:nth-child(13) { width: 85px; }   /* HORA ATUAL */
-    th:nth-child(14), td:nth-child(14) { width: 80px; }   /* SAIR */
-    th:nth-child(15), td:nth-child(15) { width: 95px; }   /* EXCLUIR */
+    .pos{ color: var(--green); font-weight: 900; }
+    .neg{ color: var(--red); font-weight: 900; }
+    .muted{ color: var(--muted); }
 
-    @media (max-width: 980px){
-      .wrap{max-width:100%}
-      table{font-size:12px}
+    .btnRow{
+      display:flex; gap:10px; justify-content:flex-end;
+    }
+    .btnSmall{
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(2,18,23,.35);
+      color: var(--txt);
+      white-space: nowrap;
+    }
+    .btnExit{
+      border-color: rgba(0,208,132,.55);
+      color: var(--green);
+      background: rgba(0,208,132,.08);
+    }
+    .btnDel{
+      border-color: rgba(255,77,109,.55);
+      color: var(--red);
+      background: rgba(255,77,109,.08);
+    }
+
+    /* larguras das colunas (deixe em linha reta) */
+    th:nth-child(6),  td:nth-child(6)  { width: 120px; }  /* DATA REG */
+    th:nth-child(7),  td:nth-child(7)  { width: 90px; }   /* HORA REG */
+    th:nth-child(11), td:nth-child(11) { width: 210px; }  /* SITUAÇÃO (maior) */
+    th:nth-child(12), td:nth-child(12) { width: 140px; }  /* DATA ATUAL (maior) */
+    th:nth-child(13), td:nth-child(13) { width: 90px; }   /* HORA ATUAL */
+    th:nth-child(14), td:nth-child(14) { width: 90px; }   /* SAIR */
+    th:nth-child(15), td:nth-child(15) { width: 110px; }  /* EXCLUIR */
+
+    .footerHint{
+      margin-top: 10px;
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .chip{
+      border:1px solid rgba(255,255,255,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(2,18,23,.25);
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
+  <div class="container">
+    <div class="top">
       <div>
         <h1>AUTOTRADER-SAÍDA</h1>
-        <p class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</p>
+        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático (a cada 5 min no worker).</div>
       </div>
-      <div class="badge">Atualizado: <b id="updated">—</b></div>
+      <div class="badge">Atualizado: <b id="lastUpd">—</b></div>
     </div>
-    <div class="msg" id="msg"></div>
 
-    <div class="card">
+    <div class="panel">
       <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
+
       <div class="row">
         <div>
           <label>PAR</label>
@@ -154,19 +297,19 @@
         <div>
           <label>SIDE</label>
           <div class="sidebox">
-            <div class="pill long on" id="btnLong">LONG</div>
-            <div class="pill short" id="btnShort">SHORT</div>
+            <div id="btnLong" class="pill long on">LONG</div>
+            <div id="btnShort" class="pill short">SHORT</div>
           </div>
         </div>
 
         <div>
           <label>ENTRADA</label>
-          <input id="entrada" placeholder="ex: 1.3371" />
+          <input id="entrada" placeholder="ex: 1.234" />
         </div>
 
-        <div style="flex:1;min-width:240px">
+        <div>
           <label>US ALVO (do PRO, congelado)</label>
-          <input id="alvoPro" disabled />
+          <input id="alvo" disabled />
         </div>
 
         <div>
@@ -175,325 +318,385 @@
         </div>
 
         <div>
-          <button class="btn" id="btnAdd">Adicionar Operação</button>
+          <button id="btnAdd" class="btn">Adicionar Operação</button>
         </div>
       </div>
 
-      <div class="meta">Alvo do PRO: <b id="proInfo">—</b></div>
+      <div class="help">
+        Alvo do PRO: <b id="proUpd">—</b>
+      </div>
+      <div id="msg" class="msg"></div>
     </div>
 
-    <div class="card">
-      <h2>MONITORAMENTO DAS OPERAÇÕES</h2>
-      <div class="row" style="align-items:center">
-        <div style="color:var(--muted);font-weight:800">Total: <span id="total">0</span></div>
-        <button class="btn btnpdf" id="btnPdf">Baixar PDF</button>
+    <div class="panel">
+      <div class="tableTop">
+        <h2 style="margin:0">MONITORAMENTO DAS OPERAÇÕES</h2>
+        <div class="meta">
+          <div>Total: <b id="totalOps" style="color:var(--txt)">0</b></div>
+          <button id="btnPdf" class="btn btnPdf">Baixar PDF</button>
+        </div>
       </div>
 
       <table>
         <thead>
           <tr>
-            <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
-            <th>DATA REG</th><th>HORA REG</th>
-            <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
-            <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-            <th>SAIR</th><th>EXCLUIR</th>
+            <th>PAR</th>
+            <th>SIDE</th>
+            <th>ENTRADA</th>
+            <th>ALVO</th>
+            <th>ALAV</th>
+            <th>DATA REG</th>
+            <th>HORA REG</th>
+            <th>ATUAL</th>
+            <th>GANHO ALVO</th>
+            <th>GANHO ATUAL</th>
+            <th>SITUAÇÃO</th>
+            <th>DATA ATUAL</th>
+            <th>HORA ATUAL</th>
+            <th>SAIR</th>
+            <th>EXCLUIR</th>
           </tr>
         </thead>
         <tbody id="tb"></tbody>
       </table>
 
-      <div class="meta">
-        <span style="display:inline-block;background:#07222a;border:1px solid var(--line);padding:6px 10px;border-radius:999px">Auto-refresh: 15s</span>
-        <span style="display:inline-block;background:#07222a;border:1px solid var(--line);padding:6px 10px;border-radius:999px;margin-left:6px">Worker: 5 min</span>
-        <span style="display:inline-block;background:#07222a;border:1px solid var(--line);padding:6px 10px;border-radius:999px;margin-left:6px">ALVO fixo (congelado no ADD)</span>
+      <div class="footerHint">
+        <span class="chip">Auto-refresh: 15s</span>
+        <span class="chip">Worker: 5 min</span>
+        <span class="chip">ALVO fixo (congelado no ADD)</span>
       </div>
     </div>
   </div>
 
-<script>
-  const $ = (id)=>document.getElementById(id);
+  <script>
+    // ===== helpers =====
+    const $ = (id)=>document.getElementById(id);
+    const tz = "America/Sao_Paulo";
 
-  const MOEDAS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
+    function setMsg(t){ $("msg").textContent = t || ""; }
 
-  let side = "LONG";
-
-  function setMsg(t=""){ $("msg").textContent = t || ""; }
-
-  function fmt3(n){
-    const x = Number(n);
-    if (!Number.isFinite(x)) return "—";
-    return x.toFixed(3);
-  }
-  function fmt2(n){
-    const x = Number(n);
-    if (!Number.isFinite(x)) return "—";
-    return x.toFixed(2);
-  }
-  function pctCell(n){
-    const x = Number(n);
-    if (!Number.isFinite(x)) return "—";
-    const cls = x >= 0 ? "pctPos" : "pctNeg";
-    return `<span class="${cls}">${fmt2(x)}</span>`;
-  }
-  function toBRDate(yyyy_mm_dd){
-    if (!yyyy_mm_dd || typeof yyyy_mm_dd !== "string") return "—";
-    const m = yyyy_mm_dd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return yyyy_mm_dd;
-    return `${m[3]}/${m[2]}/${m[1]}`;
-  }
-  function toBRFromISO(iso){
-    if (!iso) return {d:"—", h:"—"};
-    try{
-      const dt = new Date(iso);
-      const s = dt.toLocaleString("pt-BR",{ timeZone:"America/Sao_Paulo" }); // dd/mm/aaaa hh:mm:ss
-      const [d, hhmm] = s.split(",").map(x=>x.trim());
-      const h = (hhmm||"").slice(0,5);
-      return { d: d||"—", h: h||"—" };
-    }catch(_){
-      return {d:"—", h:"—"};
+    function fmt3(n){
+      if (n===null || n===undefined || !Number.isFinite(Number(n))) return "—";
+      return Number(n).toFixed(3);
     }
-  }
+    function fmtPct(n){
+      if (n===null || n===undefined || !Number.isFinite(Number(n))) return "—";
+      const v = Number(n);
+      const sign = v>0 ? "+" : (v<0 ? "" : "");
+      return sign + v.toFixed(2) + "%";
+    }
+    function pctClass(n){
+      if (!Number.isFinite(Number(n))) return "";
+      return Number(n) >= 0 ? "pos" : "neg";
+    }
 
-  function ensureMoedas(){
-    const sel = $("par");
-    sel.innerHTML = "";
-    MOEDAS.forEach(m=>{
-      const o = document.createElement("option");
-      o.value = m; o.textContent = m;
-      sel.appendChild(o);
-    });
-    sel.value = MOEDAS[0];
-  }
-
-  function paintSide(){
-    $("btnLong").classList.toggle("on", side==="LONG");
-    $("btnShort").classList.toggle("on", side==="SHORT");
-    $("btnLong").classList.toggle("long", true);
-    $("btnShort").classList.toggle("short", true);
-    $("btnLong").classList.toggle("short", false);
-    $("btnShort").classList.toggle("long", false);
-    $("btnLong").classList.toggle("long", true);
-    $("btnShort").classList.toggle("short", true);
-    $("btnLong").classList.toggle("on", side==="LONG");
-    $("btnShort").classList.toggle("on", side==="SHORT");
-    $("btnLong").classList.toggle("long", true);
-    $("btnShort").classList.toggle("short", true);
-    $("btnLong").classList.remove("short");
-    $("btnShort").classList.remove("long");
-    $("btnLong").classList.add("long");
-    $("btnShort").classList.add("short");
-  }
-
-  $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); };
-  $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); };
-
-  async function fetchAlvo(){
-    // mantém compatibilidade: se existir endpoint do PRO, usa. Se não, só mostra —
-    try{
-      const r = await fetch("/api/pro/alvo", { cache:"no-store" });
-      if (!r.ok) throw new Error("no");
-      const j = await r.json().catch(()=>({}));
-      if (j && (j.alvo !== undefined)){
-        $("alvoPro").value = String(j.alvo);
-        $("proInfo").textContent = `PRO atualizado: ${j.updated_brt || "—"}`;
-      }else{
-        $("alvoPro").value = "";
-        $("proInfo").textContent = "—";
+    function brDateTimeFromISO(iso){
+      try{
+        const d = new Date(iso);
+        const date = new Intl.DateTimeFormat("pt-BR",{timeZone:tz, day:"2-digit", month:"2-digit", year:"numeric"}).format(d);
+        const time = new Intl.DateTimeFormat("pt-BR",{timeZone:tz, hour:"2-digit", minute:"2-digit", hour12:false}).format(d);
+        return {date, time};
+      }catch(e){
+        return {date:"—", time:"—"};
       }
-    }catch(_){
-      $("alvoPro").value = "";
-      $("proInfo").textContent = "—";
     }
-  }
 
-  async function getJSON(url){
-    const r = await fetch(url, { cache:"no-store" });
-    const t = await r.text();
-    let j = {};
-    try{ j = JSON.parse(t); }catch(_){ j = {}; }
-    if (!r.ok) throw new Error(`HTTP ${r.status} em ${url}`);
-    return j;
-  }
+    function brDateFromYMD(ymd){
+      // "YYYY-MM-DD" -> "DD/MM/YYYY"
+      if (!ymd || typeof ymd !== "string" || ymd.length < 10) return "—";
+      const y = ymd.slice(0,4), m = ymd.slice(5,7), d = ymd.slice(8,10);
+      return `${d}/${m}/${y}`;
+    }
 
-  async function sairOperacao(id){
-    // existe no server.js
-    const r = await fetch("/api/saida/exit", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ id })
-    });
-    const j = await r.json().catch(()=>({}));
-    if (!j.ok) throw new Error(j.msg || "Falha ao sair");
-  }
+    async function jget(url){
+      const r = await fetch(url, {cache:"no-store"});
+      const txt = await r.text();
+      let j = {};
+      try{ j = JSON.parse(txt); }catch(e){ j = {ok:false, msg:"JSON inválido"}; }
+      if (!r.ok){
+        const msg = j && j.msg ? j.msg : ("HTTP "+r.status);
+        throw new Error(msg);
+      }
+      return j;
+    }
 
-  async function excluirOperacao(id){
-    // tenta /del e depois /delete (compat)
-    let r = await fetch("/api/saida/del", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ id })
-    });
-    if (!r.ok){
-      r = await fetch("/api/saida/delete", {
+    async function jpost(url, body){
+      const r = await fetch(url,{
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ id })
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(body||{})
+      });
+      const txt = await r.text();
+      let j = {};
+      try{ j = JSON.parse(txt); }catch(e){ j = {ok:false, msg:"JSON inválido"}; }
+      if (!r.ok){
+        const msg = j && j.msg ? j.msg : ("HTTP "+r.status);
+        throw new Error(msg);
+      }
+      return j;
+    }
+
+    // ===== state =====
+    let side = "LONG";
+
+    const MOEDAS = [
+      "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
+      "LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON",
+      "TRX","UNI","WIF","XRP"
+    ];
+
+    function paintSide(){
+      $("btnLong").classList.toggle("on", side==="LONG");
+      $("btnShort").classList.toggle("on", side==="SHORT");
+    }
+
+    function ensureMoedas(){
+      const sel = $("par");
+      sel.innerHTML = "";
+      for (const m of MOEDAS){
+        const o = document.createElement("option");
+        o.value = m;
+        o.textContent = m;
+        sel.appendChild(o);
+      }
+      const saved = localStorage.getItem("saida_par");
+      sel.value = (saved && MOEDAS.includes(saved)) ? saved : "ADA";
+    }
+
+    function currentSide(){
+      return side;
+    }
+
+    // ===== API calls =====
+    async function fetchAlvo(){
+      // regra: /api/saida/alvo precisa par + side
+      const parSel = $("par").value;
+      const s = currentSide();
+      if (!parSel || !s){
+        $("alvo").value = "";
+        $("proUpd").textContent = "—";
+        return;
+      }
+      try{
+        const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parSel)}&side=${encodeURIComponent(s)}`);
+        if (j && j.ok){
+          $("alvo").value = (j.alvo!==undefined && j.alvo!==null) ? String(j.alvo) : "";
+          $("proUpd").textContent = j.updated_brt || "—";
+          setMsg("");
+        }else{
+          $("alvo").value = "";
+          $("proUpd").textContent = "—";
+          setMsg("Alvo indisponível.");
+        }
+      }catch(e){
+        $("alvo").value = "";
+        $("proUpd").textContent = "—";
+        setMsg("ERRO: " + (e?.message || e));
+      }
+    }
+
+    async function loadOpsBase(){
+      // ops base (registro) -> created_ts
+      try{
+        const j = await jget("/api/saida/ops");
+        return (j && Array.isArray(j.ops)) ? j.ops : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    async function loadMonitor(){
+      try{
+        const j = await jget("/api/saida/monitor");
+        return j || {};
+      }catch(e){
+        return {};
+      }
+    }
+
+    function buildIndexById(arr){
+      const m = new Map();
+      for (const x of (arr||[])){
+        if (x && x.id) m.set(x.id, x);
+      }
+      return m;
+    }
+
+    function setLastUpdated(updated_brt){
+      $("lastUpd").textContent = updated_brt || "—";
+    }
+
+    // ===== render =====
+    function renderRows(opsBase, mon){
+      const tb = $("tb");
+      tb.innerHTML = "";
+
+      const monitorOps = (mon && Array.isArray(mon.ops)) ? mon.ops : [];
+      const monById = buildIndexById(monitorOps);
+
+      // "updated_brt" vem tipo "YYYY-MM-DD HH:MM"
+      let dataAtual = "—", horaAtual = "—";
+      if (mon && typeof mon.updated_brt === "string" && mon.updated_brt.includes(" ")){
+        const parts = mon.updated_brt.split(" ");
+        const ymd = parts[0];
+        const hm = parts[1];
+        dataAtual = brDateFromYMD(ymd);
+        horaAtual = hm || "—";
+      }
+
+      $("totalOps").textContent = String((opsBase||[]).length);
+
+      for (const o of (opsBase||[])){
+        const mo = monById.get(o.id) || {};
+        const reg = brDateTimeFromISO(o.created_ts);
+
+        const atual = (mo.atual!==undefined) ? mo.atual : null;
+        const ganhoAlvo = (mo.ganho_alvo_pct!==undefined) ? mo.ganho_alvo_pct : null;
+        const ganhoAtual = (mo.ganho_atual_pct!==undefined) ? mo.ganho_atual_pct : null;
+
+        const situacao = mo.situacao || (Number.isFinite(Number(atual)) ? "EM ANDAMENTO" : "AGUARDANDO WORKER");
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${o.par || "—"}</td>
+          <td>${o.side ? `<span class="sideTag ${String(o.side).toUpperCase()==="LONG" ? "long":"short"}">${o.side}</span>` : "—"}</td>
+          <td>${fmt3(o.entrada)}</td>
+          <td>${fmt3(o.alvo)}</td>
+          <td>${(o.alav!==undefined && o.alav!==null) ? String(o.alav) : "—"}</td>
+
+          <td>${reg.date}</td>
+          <td>${reg.time}</td>
+
+          <td>${fmt3(atual)}</td>
+          <td class="${pctClass(ganhoAlvo)}">${fmtPct(ganhoAlvo)}</td>
+          <td class="${pctClass(ganhoAtual)}">${fmtPct(ganhoAtual)}</td>
+
+          <td style="white-space:nowrap;">${situacao}</td>
+          <td>${dataAtual}</td>
+          <td>${horaAtual}</td>
+
+          <td>
+            <button class="btnSmall btnExit" data-act="exit" data-id="${o.id}">Sair</button>
+          </td>
+          <td>
+            <button class="btnSmall btnDel" data-act="del" data-id="${o.id}">Excluir</button>
+          </td>
+        `;
+        tb.appendChild(tr);
+      }
+
+      // handlers
+      tb.querySelectorAll("button[data-act]").forEach(btn=>{
+        btn.onclick = async ()=>{
+          const id = btn.getAttribute("data-id");
+          const act = btn.getAttribute("data-act");
+          if (!id) return;
+
+          if (act==="exit"){
+            if (!confirm("Confirmar SAIR desta operação?")) return;
+            try{
+              btn.disabled = true;
+              await jpost("/api/saida/exit", {id});
+              await refresh();
+            }catch(e){
+              alert("ERRO NO SAIR: " + (e?.message || e));
+            }finally{
+              btn.disabled = false;
+            }
+          }
+
+          if (act==="del"){
+            if (!confirm("Confirmar EXCLUIR esta operação?")) return;
+            try{
+              btn.disabled = true;
+              try{
+                await jpost("/api/saida/remove", {id});
+              }catch(_e){
+                await jpost("/api/saida/delete", {id});
+              }
+              await refresh();
+            }catch(e){
+              alert("ERRO NO EXCLUIR: " + (e?.message || e));
+            }finally{
+              btn.disabled = false;
+            }
+          }
+        };
       });
     }
-    const j = await r.json().catch(()=>({}));
-    if (!j.ok) throw new Error(j.msg || "Falha ao excluir");
-  }
 
-  function renderTable(baseOps, monitor){
-    const tb = $("tb");
-    tb.innerHTML = "";
+    // ===== refresh =====
+    async function refresh(){
+      const [opsBase, mon] = await Promise.all([loadOpsBase(), loadMonitor()]);
+      setLastUpdated(mon.updated_brt || "—");
+      renderRows(opsBase, mon);
+    }
+    window.refresh = refresh; // importante p/ debug e para garantir "refresh exists"
 
-    const monList = Array.isArray(monitor?.ops) ? monitor.ops : [];
-    const monById = new Map(monList.map(o=>[o.id, o]));
+    // ===== init =====
+    (function init(){
+      ensureMoedas();
+      paintSide();
 
-    // union: baseOps + qualquer monitor que não esteja no ops
-    const baseList = Array.isArray(baseOps?.ops) ? baseOps.ops : [];
-    const ids = new Set(baseList.map(o=>o.id));
-    monList.forEach(o=>{ if (o?.id && !ids.has(o.id)) baseList.push({ id:o.id, par:o.par, side:o.side, entrada:o.entrada, alvo:o.alvo, alav:o.alav }); });
+      $("btnLong").onclick = ()=>{ side="LONG"; paintSide(); fetchAlvo(); };
+      $("btnShort").onclick = ()=>{ side="SHORT"; paintSide(); fetchAlvo(); };
 
-    $("total").textContent = String(baseList.length);
+      $("par").onchange = ()=>{
+        localStorage.setItem("saida_par", $("par").value);
+        fetchAlvo();
+      };
 
-    baseList.forEach(op=>{
-      const mon = monById.get(op.id);
-
-      // cadastro (DATA/HORA REG) = created_ts do /ops (imediato)
-      const reg = toBRFromISO(op.created_ts);
-
-      // atualizações do worker (DATA/HORA ATUAL)
-      const dataAtual = mon?.data ? toBRDate(mon.data) : "—";
-      const horaAtual = mon?.hora ? String(mon.hora).slice(0,5) : "—";
-
-      const atual = mon ? fmt3(mon.atual) : "—";
-      const ganhoAlvo = mon ? pctCell(mon.ganho_alvo_pct) : "—";
-      const ganhoAtual = mon ? pctCell(mon.ganho_atual_pct) : "—";
-
-      const situacao = mon?.situacao || "AGUARDANDO WORKER";
-
-      const sideTxt = (op.side || mon?.side || "—").toUpperCase();
-      const sideClass = sideTxt==="LONG" ? "sideLong" : "sideShort";
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="nowrap">${op.par || mon?.par || "—"}</td>
-        <td><span class="sideTag ${sideClass}">${sideTxt}</span></td>
-        <td>${fmt3(op.entrada ?? mon?.entrada)}</td>
-        <td>${fmt3(op.alvo ?? mon?.alvo)}</td>
-        <td>${op.alav ?? mon?.alav ?? "—"}</td>
-        <td class="nowrap">${reg.d}</td>
-        <td class="nowrap">${reg.h}</td>
-        <td>${atual}</td>
-        <td>${ganhoAlvo}</td>
-        <td>${ganhoAtual}</td>
-        <td>${situacao}</td>
-        <td class="nowrap">${dataAtual}</td>
-        <td class="nowrap">${horaAtual}</td>
-        <td><button class="sbtn" data-id="${op.id}">Sair</button></td>
-        <td><button class="xbtn" data-id="${op.id}">Excluir</button></td>
-      `;
-      tb.appendChild(tr);
-    });
-
-    // bind botões
-    tb.querySelectorAll("button.sbtn").forEach(b=>{
-      b.onclick = async ()=>{
-        const id = b.getAttribute("data-id");
-        if (!id) return;
-        if (!confirm("Confirmar SAIR desta operação?")) return;
+      $("btnAdd").onclick = async ()=>{
+        const btn = $("btnAdd");
         try{
-          b.disabled = true;
-          await sairOperacao(id);
+          btn.disabled = true;
+
+          const parSel = $("par").value;
+          const s = currentSide();
+          const entradaTxt = String($("entrada").value||"").replace(",", ".").trim();
+          const entrada = Number(entradaTxt);
+          const alav = Number(String($("alav").value||"").trim());
+
+          if (!parSel) return alert("Selecione o PAR.");
+          if (!s) return alert("Selecione LONG ou SHORT.");
+          if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
+          if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
+
+          await jpost("/api/saida/add", { par: parSel, side: s, entrada, alav });
+
+          $("entrada").value = "";
           await refresh();
         }catch(e){
-          alert("ERRO NO SAIR: " + (e?.message || e));
+          alert("ERRO NO ADD: " + (e?.message || e));
         }finally{
-          b.disabled = false;
+          btn.disabled = false;
         }
       };
-    });
 
-    tb.querySelectorAll("button.xbtn").forEach(b=>{
-      b.onclick = async ()=>{
-        const id = b.getAttribute("data-id");
-        if (!id) return;
-        if (!confirm("Confirmar EXCLUIR esta operação?")) return;
+      $("btnPdf").onclick = async ()=>{
         try{
-          b.disabled = true;
-          await excluirOperacao(id);
-          await refresh();
+          const r = await fetch("/api/saida/pdf", {cache:"no-store"});
+          if (!r.ok) throw new Error("PDF indisponível (HTTP " + r.status + ")");
+          const blob = await r.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "AUTOTRADER-SAIDA.pdf";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
         }catch(e){
-          alert("ERRO NO EXCLUIR: " + (e?.message || e));
-        }finally{
-          b.disabled = false;
+          alert("ERRO NO PDF: " + (e?.message || e));
         }
       };
-    });
-  }
 
-  async function refresh(){
-    try{
-      setMsg("");
-      const [ops, mon] = await Promise.all([
-        getJSON("/api/saida/ops"),
-        getJSON("/api/saida/monitor")
-      ]);
-
-      $("updated").textContent = (mon?.updated_brt || "—");
-
-      renderTable(ops, mon);
-    }catch(e){
-      $("updated").textContent = "—";
-      setMsg("Falha ao atualizar (verifique /api/saida/ops e /api/saida/monitor).");
-      console.error(e);
-      // mesmo com erro, não trava a página
-    }
-  }
-
-  // ---- ADD ----
-  $("btnAdd").onclick = async ()=>{
-    const btn = $("btnAdd");
-    try{
-      btn.disabled = true;
-
-      const par = $("par").value;
-      const entrada_txt = String($("entrada").value || "").replace(",", ".").trim();
-      const entrada = Number(entrada_txt);
-      const alav = Number(String($("alav").value||"").trim());
-
-      if (!par) return alert("Selecione a moeda (PAR).");
-      if (!Number.isFinite(entrada) || entrada<=0) return alert("Digite ENTRADA corretamente.");
-      if (!Number.isFinite(alav) || alav<1) return alert("Digite ALAV corretamente (>=1).");
-
-      const r = await fetch("/api/saida/add", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ par, side, entrada, alav })
-      });
-      const j = await r.json().catch(()=>({}));
-      if (!j.ok) throw new Error(j.msg || "Falha ao adicionar");
-
-      $("entrada").value = "";
-      await refresh(); // aparece NA HORA via /ops
-    }catch(e){
-      alert("ERRO NO ADD: " + (e?.message || e));
-    }finally{
-      btn.disabled = false;
-    }
-  };
-
-  // PDF
-  $("btnPdf").onclick = ()=>{ window.location.href = "/api/saida/history.pdf"; };
-
-  // init
-  ensureMoedas();
-  paintSide();
-  fetchAlvo();
-  refresh();
-  setInterval(refresh, 15000);
-</script>
+      // primeiro alvo e primeira tabela
+      fetchAlvo();
+      refresh();
+      setInterval(refresh, 15000);
+    })();
+  </script>
 </body>
 </html>
