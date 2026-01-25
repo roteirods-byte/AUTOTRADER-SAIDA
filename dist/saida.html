@@ -4,172 +4,100 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AUTOTRADER-SAÍDA</title>
+  <!-- BUILD:2026-01-25_AVP1 -->
+  <!-- PRAZO:OK -->
   <style>
     :root{
       --bg:#051b22;
-      --panel:#062a2e;
+      --panel:#06242e;
       --panel2:#05212a;
       --line:#0c3a46;
       --txt:#e9f3f6;
       --muted:#9fb6bf;
       --orange:#ff8a00;
-      --green:#00d084;
+      --green:#00d884;
       --red:#ff4d4d;
       --btn:#0b2f3a;
-      --shadow: 0 12px 28px rgba(0,0,0,.35);
-      --radius: 18px;
+      --shadow:0 12px 28px rgba(0,0,0,.35);
+      --radius:18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family:var(--sans);
+      margin:0; font-family:var(--sans);
       background: radial-gradient(1200px 600px at 15% 0%, #0b2f3a 0%, var(--bg) 55%);
       color:var(--txt);
     }
-    .container{ max-width:1480px; margin: 24px auto 60px; padding: 0 18px; }
-    .top{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
-    h1{ margin:0; letter-spacing:.5px; font-size:38px; font-weight:800; }
-    .subtitle{ margin-top:6px; color:var(--muted); font-size:14px; }
-    .pill{
-      background: rgba(6,42,46,.85);
-      border:1px solid rgba(12,58,70,.9);
-      box-shadow: var(--shadow);
-      padding:10px 14px;
-      border-radius: 999px;
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--txt);
-      display:flex;
-      align-items:center;
-      gap:10px;
+    .container{
+      max-width:1480px; margin:26px auto 60px; padding:0 18px;
     }
-    .pill b{ color: var(--orange); font-weight:800; }
-    .grid{ display:grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
-    .card{
-      background: linear-gradient(180deg, rgba(6,42,46,.92), rgba(5,33,42,.92));
-      border:1px solid rgba(12,58,70,.9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 16px 18px 14px;
-      overflow:hidden;
+    .top{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:14px;
     }
-    .card h2{ margin:0 0 12px; color: var(--orange); font-size: 18px; letter-spacing:.7px; font-weight:900; }
-    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
-    label{ display:block; font-size:12px; color: var(--muted); margin-bottom:6px; }
+    h1{ margin:0; font-size:36px; letter-spacing:.5px }
+    .subtitle{ margin:6px 0 0; color:var(--muted); font-size:14px }
+    .badge{
+      background:rgba(0,0,0,.25); border:1px solid var(--line); padding:10px 14px; border-radius:999px;
+      box-shadow:var(--shadow); min-width:180px; text-align:center;
+    }
+    .badge .label{ color:var(--muted); font-size:12px }
+    .badge .value{ font-family:var(--mono); font-size:14px; margin-top:3px }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,0));
+      border:1px solid var(--line); border-radius:var(--radius);
+      padding:18px 18px 16px; box-shadow:var(--shadow); margin-top:14px;
+    }
+    .panel h2{
+      margin:0 0 12px; color:var(--orange); letter-spacing:.6px; font-size:18px; font-weight:800;
+    }
+    .form-row{
+      display:grid;
+      grid-template-columns: 120px 140px 220px 280px 120px 200px;
+      gap:12px; align-items:end;
+    }
+    .field label{ display:block; font-size:12px; color:var(--muted); margin:0 0 6px }
     select, input{
-      background: rgba(3,18,22,.55);
-      border: 1px solid rgba(12,58,70,.95);
-      color: var(--txt);
-      border-radius: 12px;
-      padding: 10px 12px;
-      min-width: 160px;
+      width:100%; padding:10px 12px; border-radius:12px;
+      background:rgba(0,0,0,.18); border:1px solid var(--line); color:var(--txt);
       outline:none;
     }
-    input::placeholder{ color: rgba(233,243,246,.45); }
-    .small{ min-width: 110px; width: 110px; }
-    .wide{ min-width: 320px; width: 320px; }
+    input[readonly]{ color:#cfe2ea }
+    .sidebox{ display:flex; gap:10px }
     .btn{
-      background: rgba(11,47,58,.9);
-      border:1px solid rgba(255,138,0,.45);
-      color: var(--orange);
-      font-weight:800;
-      border-radius: 12px;
-      padding: 11px 14px;
-      cursor:pointer;
-      transition: transform .05s ease, filter .15s ease;
-      user-select:none;
+      cursor:pointer; user-select:none;
+      padding:10px 14px; border-radius:12px;
+      border:1px solid var(--line); background:var(--btn); color:var(--txt);
+      font-weight:800; letter-spacing:.2px;
     }
-    .btn:hover{ filter: brightness(1.08); }
-    .btn:active{ transform: translateY(1px); }
-    .btn-danger{ border-color: rgba(255,77,77,.55); color: var(--red); }
-    .btn-ghost{
-      border-color: rgba(12,58,70,.9);
-      color: var(--txt);
-      background: rgba(3,18,22,.25);
-      font-weight:700;
+    .btn:hover{ filter:brightness(1.08) }
+    .btn-orange{ border-color:rgba(255,138,0,.55); color:var(--orange) }
+    .btn-green.active{ border-color:rgba(0,216,132,.7); color:var(--green) }
+    .btn-red.active{ border-color:rgba(255,77,77,.7); color:var(--red) }
+    .btn-sm{ padding:7px 10px; font-size:13px; border-radius:10px }
+    .hint{ margin-top:10px; color:var(--muted); font-size:13px }
+    .error{ margin-top:8px; color:var(--red); font-weight:800; font-size:13px }
+    table{
+      width:100%; border-collapse:separate; border-spacing:0; overflow:hidden;
+      border:1px solid var(--line); border-radius:14px; background:rgba(0,0,0,.10);
     }
-    .seg{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      padding:4px;
-      border-radius: 14px;
-      background: rgba(3,18,22,.30);
-      border:1px solid rgba(12,58,70,.9);
-    }
-    .seg button{
-      min-width:88px;
-      padding:9px 10px;
-      border-radius: 12px;
-      border:1px solid transparent;
-      background: transparent;
-      color: var(--txt);
-      cursor:pointer;
-      font-weight:800;
-    }
-    .seg .on-long{ border-color: rgba(0,208,132,.65); color: var(--green); background: rgba(0,208,132,.08); }
-    .seg .on-short{ border-color: rgba(255,77,77,.65); color: var(--red); background: rgba(255,77,77,.08); }
-    .hint{ margin-top: 10px; color: var(--muted); font-size: 13px; }
-    .hint b{ color: var(--orange); }
-    .err{
-      margin-top: 8px;
-      color: var(--red);
-      font-weight:800;
-      font-family: var(--mono);
-      font-size: 13px;
-      min-height: 18px;
-    }
-    table{ width:100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
     thead th{
-      color: var(--orange);
-      text-align:left;
-      font-weight:900;
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(12,58,70,.95);
-      white-space: nowrap;
+      text-align:left; padding:12px 10px; color:var(--orange); font-size:12px; letter-spacing:.6px;
+      border-bottom:1px solid var(--line);
     }
-    tbody td{
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(12,58,70,.55);
-      white-space: nowrap;
-      vertical-align: middle;
-      color: var(--txt);
-    }
-    tbody tr:hover{ background: rgba(255,255,255,.02); }
-    .par{ color: var(--orange); font-weight:900; }
-    .side-long{ color: var(--green); font-weight:900; }
-    .side-short{ color: var(--red); font-weight:900; }
-    .pct-pos{ color: var(--green); font-weight:900; }
-    .pct-neg{ color: var(--red); font-weight:900; }
-    .status{ color: var(--muted); font-weight:800; }
-    .footerline{
-      margin-top: 12px;
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      color: var(--muted);
-      font-size: 12px;
-      align-items:center;
-    }
-    .badge{
-      border:1px solid rgba(12,58,70,.9);
-      background: rgba(3,18,22,.22);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-family: var(--mono);
-    }
-    .split{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-
-    @media print{
-      body{ background:#fff; color:#000; }
-      .top, .subtitle, .hint, .footerline, .btn, .seg, .err{ display:none !important; }
-      .card{ box-shadow:none; border:0; background:#fff; }
-      thead th{ color:#000 !important; }
-      tbody td{ color:#000 !important; }
-      .par, .side-long, .side-short, .pct-pos, .pct-neg{ color:#000 !important; }
-    }
+    tbody td{ padding:12px 10px; border-bottom:1px solid rgba(12,58,70,.45); font-size:13px; color:#d9eef5 }
+    tbody tr:last-child td{ border-bottom:none }
+    .par{ color:var(--orange); font-weight:900 }
+    .side-long{ color:var(--green); font-weight:900 }
+    .side-short{ color:var(--red); font-weight:900 }
+    .pct-pos{ color:var(--green); font-weight:900 }
+    .pct-neg{ color:var(--red); font-weight:900 }
+    .chips{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap }
+    .chip{ background:rgba(0,0,0,.25); border:1px solid var(--line); padding:6px 10px; border-radius:999px; color:var(--muted); font-size:12px }
+    .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px }
+    .total{ color:var(--muted); font-size:13px }
+    .grid-2{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px }
+    @media (max-width: 1100px){ .form-row{ grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -177,437 +105,495 @@
     <div class="top">
       <div>
         <h1>AUTOTRADER-SAÍDA</h1>
-        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático + Auditoria (operações realizadas).</div>
+        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático</div>
       </div>
-      <div class="pill">Atualizado: <b id="updatedPill">—</b></div>
+      <div class="badge">
+        <div class="label">Atualizado:</div>
+        <div class="value" id="updatedLabel">—</div>
+      </div>
     </div>
 
-    <div class="grid">
+    <section class="panel" id="panelEntrada">
+      <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
 
-      <!-- 1) DADOS DE ENTRADA -->
-      <div class="card">
-        <div class="split">
-          <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
-          <button class="btn btn-ghost" onclick="downloadPdf('tblMonitor','MONITORAMENTO DAS OPERAÇÕES')">Baixar PDF (Monitoramento)</button>
+      <div class="form-row">
+        <div class="field">
+          <label>PAR</label>
+          <select id="parSelect"></select>
         </div>
 
-        <div class="row" style="margin-top:8px">
-          <div>
-            <label>PAR</label>
-            <select id="par"></select>
-          </div>
-
-          <div>
-            <label>SIDE</label>
-            <div class="seg">
-              <button id="btnLong" type="button" onclick="setSide('LONG')">LONG</button>
-              <button id="btnShort" type="button" onclick="setSide('SHORT')">SHORT</button>
-            </div>
-          </div>
-
-          <div>
-            <label>ENTRADA</label>
-            <input id="entrada" class="small" placeholder="ex: 1.234" inputmode="decimal" />
-          </div>
-
-          <div>
-            <label>US ALVO (do PRO, congelado)</label>
-            <input id="alvo" class="wide" placeholder="—" readonly />
-          </div>
-
-          <div>
-            <label>ALAV</label>
-            <input id="alav" class="small" placeholder="10" inputmode="numeric" />
-          </div>
-
-          <div>
-            <button class="btn" type="button" onclick="addOperacao()">Adicionar Operação</button>
+        <div class="field">
+          <label>SIDE</label>
+          <div class="sidebox">
+            <button class="btn btn-green active" id="btnLong" data-side="LONG">LONG</button>
+            <button class="btn btn-red" id="btnShort" data-side="SHORT">SHORT</button>
           </div>
         </div>
 
-        <div class="hint">
-          Alvo do PRO: <b id="alvoMeta">—</b>
+        <div class="field">
+          <label>ENTRADA</label>
+          <input id="entradaInput" placeholder="ex: 1.234" inputmode="decimal" />
         </div>
-        <div class="err" id="errAdd"></div>
+
+        <div class="field">
+          <label>US ALVO (do PRO, congelado)</label>
+          <input id="alvoInput" placeholder="—" readonly />
+        </div>
+
+        <div class="field">
+          <label>ALAV</label>
+          <input id="alavInput" placeholder="10" inputmode="numeric" />
+        </div>
+
+        <div class="field">
+          <button class="btn btn-orange" id="btnAdd" style="width:100%; padding:12px 14px;">Adicionar Operação</button>
+        </div>
       </div>
 
-      <!-- 2) MONITORAMENTO -->
-      <div class="card">
-        <div class="split">
-          <h2>MONITORAMENTO DAS OPERAÇÕES</h2>
-          <button class="btn btn-ghost" onclick="downloadPdf('tblDone','OPERAÇÕES REALIZADAS')">Baixar PDF (Realizadas)</button>
-        </div>
+      <div class="hint">Alvo do PRO: <span id="alvoLabel">—</span></div>
+      <div class="error" id="addError" style="display:none;"></div>
+    </section>
 
-        <div class="footerline">
-          <span>Total: <b id="totalOps" style="color:var(--txt)">0</b></span>
-          <span class="badge">Auto-refresh: 15s</span>
-          <span class="badge">Worker: 5 min</span>
-          <span class="badge">ALVO fixo (congelado no ADD)</span>
+    <section class="panel" id="panelMonitor">
+      <div class="toolbar">
+        <h2 style="margin:0;">MONITORAMENTO DAS OPERAÇÕES</h2>
+        <div class="grid-2">
+          <div class="total">Total: <b id="totalMon">0</b></div>
+          <button class="btn btn-orange btn-sm" id="btnPdfMon">Baixar PDF</button>
         </div>
-
-        <div style="overflow:auto; padding-bottom:6px;">
-          <table id="tblMonitor">
-            <thead>
-              <tr>
-                <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
-                <th>DATA REG</th><th>HORA REG</th>
-                <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
-                <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-                <th>SAIR</th><th>EXCLUIR</th>
-              </tr>
-            </thead>
-            <tbody id="tbMonitor"></tbody>
-          </table>
-        </div>
-        <div class="err" id="errMonitor"></div>
       </div>
 
-      <!-- 3) REALIZADAS -->
-      <div class="card">
-        <h2>OPERAÇÕES REALIZADAS</h2>
-
-        <div class="footerline">
-          <span>Total: <b id="totalDone" style="color:var(--txt)">0</b></span>
-          <span class="badge">Sem atualização (cópia no clique SAIR)</span>
-        </div>
-
-        <div style="overflow:auto; padding-bottom:6px;">
-          <table id="tblDone">
-            <thead>
-              <tr>
-                <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
-                <th>DATA REG</th><th>HORA REG</th>
-                <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
-                <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-                <th>EXCLUIR</th>
-              </tr>
-            </thead>
-            <tbody id="tbDone"></tbody>
-          </table>
-        </div>
-        <div class="err" id="errDone"></div>
+      <div style="overflow:auto;">
+        <table id="tblMon">
+          <thead>
+            <tr>
+              <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+              <th>DATA REG</th><th>HORA REG</th><th>ATUAL</th>
+              <th>GANHO ALVO</th><th>GANHO ATUAL</th><th>SITUAÇÃO</th>
+              <th>DATA ATUAL</th><th>HORA ATUAL</th><th>SAIR</th><th>EXCLUIR</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyMon">
+            <tr><td colspan="15" style="color:var(--muted);">Carregando…</td></tr>
+          </tbody>
+        </table>
       </div>
 
-    </div>
+      <div class="chips">
+        <span class="chip">Auto-refresh: 15s</span>
+        <span class="chip">Worker: 5 min</span>
+        <span class="chip">ALVO fixo (congelado no ADD)</span>
+      </div>
+    </section>
+
+    <section class="panel" id="panelReal">
+      <div class="toolbar">
+        <h2 style="margin:0;">OPERAÇÕES REALIZADAS</h2>
+        <div class="grid-2">
+          <div class="total">Total: <b id="totalReal">0</b></div>
+          <button class="btn btn-orange btn-sm" id="btnPdfReal">Baixar PDF</button>
+        </div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table id="tblReal">
+          <thead>
+            <tr>
+              <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+              <th>DATA REG</th><th>HORA REG</th><th>ATUAL</th>
+              <th>GANHO ALVO</th><th>GANHO ATUAL</th><th>SITUAÇÃO</th>
+              <th>DATA ATUAL</th><th>HORA ATUAL</th><th>EXCLUIR</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyReal">
+            <tr><td colspan="14" style="color:var(--muted);">Sem operações realizadas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chips">
+        <span class="chip">Sem atualização automática</span>
+        <span class="chip">Cópia congelada no clique SAIR</span>
+      </div>
+    </section>
   </div>
 
 <script>
-function $(id){ return document.getElementById(id); }
+(() => {
+  "use strict";
 
-function safeNum(v){
-  if(v===null || v===undefined) return null;
-  if(typeof v === "number") return Number.isFinite(v) ? v : null;
-  const s = String(v).trim().replace(",", ".");
-  if(!s) return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
-function fmtPrice(n){
-  const x = safeNum(n);
-  if(x===null) return "—";
-  return x.toFixed(3);
-}
-function fmtPct(n){
-  const x = safeNum(n);
-  if(x===null) return "—";
-  const sign = x>=0 ? "+" : "";
-  return sign + x.toFixed(2) + "%";
-}
-function pctClass(n){
-  const x = safeNum(n);
-  if(x===null) return "";
-  return x>=0 ? "pct-pos" : "pct-neg";
-}
-function sideClass(s){
-  return (String(s||"").toUpperCase()==="LONG") ? "side-long" : "side-short";
-}
-function escapeHtml(s){
-  return String(s??"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+  const $ = (id) => document.getElementById(id);
 
-const COINS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
-
-let SIDE = "LONG";
-let OPS_CACHE = [];
-let DONE_CACHE = [];
-const LS_DONE_KEY = "autotrader_saida_done_v1";
-
-function setSide(s){
-  SIDE = (String(s||"").toUpperCase()==="SHORT") ? "SHORT" : "LONG";
-  $("btnLong").className = (SIDE==="LONG") ? "on-long" : "";
-  $("btnShort").className = (SIDE==="SHORT") ? "on-short" : "";
-  fetchAlvo().catch(()=>{});
-}
-
-function loadDoneLocal(){
-  try{
-    const raw = localStorage.getItem(LS_DONE_KEY);
-    DONE_CACHE = raw ? JSON.parse(raw) : [];
-    if(!Array.isArray(DONE_CACHE)) DONE_CACHE = [];
-  }catch(e){ DONE_CACHE = []; }
-}
-function saveDoneLocal(){
-  try{ localStorage.setItem(LS_DONE_KEY, JSON.stringify(DONE_CACHE)); }catch(e){}
-}
-
-async function fetchDoneServerOrLocal(){
-  loadDoneLocal();
-  try{
-    const r = await fetch("/api/saida/done", { cache:"no-store" });
-    if(r.ok){
-      const j = await r.json();
-      if(Array.isArray(j.ops)){
-        DONE_CACHE = j.ops;
-        saveDoneLocal();
-      }
+  function fmt3(x){
+    const n = Number(x);
+    if (!isFinite(n)) return "—";
+    return n.toFixed(3);
+  }
+  function fmt2pct(x){
+    const n = Number(x);
+    if (!isFinite(n)) return "—";
+    return (n>=0?"+":"") + n.toFixed(2) + "%";
+  }
+  function splitBrt(dt){
+    if (!dt) return ["—","—"];
+    const s = String(dt);
+    if (s.includes(" ")){
+      const parts = s.split(" ");
+      const d = parts[0] || "—";
+      const t = (parts[1] || "—").slice(0,5);
+      return [d, t];
     }
-  }catch(e){}
-}
-
-async function jget(url){
-  const r = await fetch(url, { cache:"no-store" });
-  let j=null;
-  try{ j = await r.json(); }catch(e){}
-  if(!r.ok){
-    const msg = (j && j.msg) ? j.msg : ("HTTP " + r.status);
-    throw new Error(msg);
+    const m = s.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+    if (m) return [m[1], m[2]];
+    return ["—","—"];
   }
-  return j;
-}
-async function jpost(url, body){
-  const r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body||{}) });
-  let j=null;
-  try{ j = await r.json(); }catch(e){}
-  if(!r.ok){
-    const msg = (j && j.msg) ? j.msg : ("HTTP " + r.status);
-    throw new Error(msg);
+
+  async function jget(url){
+    const r = await fetch(url, { cache: "no-store" });
+    let j = null;
+    try { j = await r.json(); } catch (_) {}
+    if (!r.ok){
+      const msg = (j && (j.msg || j.error)) ? (j.msg || j.error) : ("HTTP " + r.status);
+      throw new Error(msg);
+    }
+    return j;
   }
-  return j;
-}
-
-async function fetchAlvo(){
-  $("errAdd").textContent = "";
-  const par = $("par").value;
-  const side = SIDE;
-  if(!par){
-    $("alvo").value = "—";
-    $("alvoMeta").textContent = "—";
-    return;
-  }
-  try{
-    const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
-    $("alvo").value = (j && j.alvo!==undefined && j.alvo!==null) ? String(j.alvo) : "—";
-    $("alvoMeta").textContent = (j && j.updated_brt) ? (`${j.par} ${j.side} | atualizado: ${j.updated_brt}`) : `${par} ${side}`;
-  }catch(e){
-    $("alvo").value = "—";
-    $("alvoMeta").textContent = "—";
-    $("errAdd").textContent = "ERRO: " + (e?.message || e);
-  }
-}
-
-async function addOperacao(){
-  $("errAdd").textContent = "";
-  const par = $("par").value;
-  const side = SIDE;
-  const entrada = safeNum($("entrada").value);
-  const alvo = safeNum($("alvo").value);
-  const alav = Math.max(1, Math.floor(safeNum($("alav").value) || 10));
-
-  if(!par){ $("errAdd").textContent = "ERRO: selecione o PAR."; return; }
-  if(entrada===null){ $("errAdd").textContent = "ERRO: ENTRADA inválida."; return; }
-  if(alvo===null){ $("errAdd").textContent = "ERRO: ALVO do PRO não carregou."; return; }
-
-  try{
-    await jpost("/api/saida/add", { par, side, entrada, alvo, alav });
-    $("entrada").value = "";
-    await refresh();
-  }catch(e){
-    $("errAdd").textContent = "ERRO NO ADD: " + (e?.message || e);
-  }
-}
-
-async function sairOperacao(id){
-  const op = OPS_CACHE.find(x => x.id===id);
-  if(!op) return;
-  if(!confirm("Confirmar SAIR desta operação?")) return;
-
-  try{
-    await jpost("/api/saida/sair", { id });
-    DONE_CACHE.unshift({ ...op, done_ts: new Date().toISOString() });
-    saveDoneLocal();
-    OPS_CACHE = OPS_CACHE.filter(x => x.id!==id);
-    renderMonitor();
-    renderDone();
-  }catch(e){
-    $("errMonitor").textContent = "ERRO NO SAIR: " + (e?.message || e);
-  }
-}
-
-async function excluirOperacao(id){
-  if(!confirm("Confirmar EXCLUIR esta operação?")) return;
-  try{
-    await jpost("/api/saida/excluir", { id });
-    await refresh();
-  }catch(e){
-    $("errMonitor").textContent = "ERRO NO EXCLUIR: " + (e?.message || e);
-  }
-}
-
-function excluirDone(idx){
-  if(!confirm("Confirmar EXCLUIR do histórico (Realizadas)?")) return;
-  DONE_CACHE.splice(idx,1);
-  saveDoneLocal();
-  renderDone();
-}
-
-function brtFromIso(iso){
-  try{
-    const d = new Date(iso);
-    if(!isFinite(d.getTime())) return { date:"—", time:"—" };
-    const dd = String(d.getDate()).padStart(2,"0");
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const yyyy = d.getFullYear();
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mi = String(d.getMinutes()).padStart(2,"0");
-    return { date:`${dd}/${mm}/${yyyy}`, time:`${hh}:${mi}` };
-  }catch(e){ return { date:"—", time:"—" }; }
-}
-
-function splitUpdatedBrt(s){
-  const t = String(s||"").trim();
-  if(!t) return { date:"—", time:"—" };
-  const m = t.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
-  if(!m) return { date:"—", time:"—" };
-  return { date:m[1], time:m[2] };
-}
-
-function renderMonitor(){
-  const tb = $("tbMonitor");
-  tb.innerHTML = "";
-  $("totalOps").textContent = String(OPS_CACHE.length);
-
-  for(const o of OPS_CACHE){
-    const side = String(o.side||"").toUpperCase();
-    const reg = brtFromIso(o.created_ts || o.createdTs || "");
-    const upd = splitUpdatedBrt(o.updated_brt || o.updatedBrt || $("updatedPill").textContent);
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="par">${escapeHtml(o.par||"—")}</td>
-      <td class="${sideClass(side)}">${escapeHtml(side||"—")}</td>
-      <td>${fmtPrice(o.entrada)}</td>
-      <td>${fmtPrice(o.alvo)}</td>
-      <td>${escapeHtml(o.alav ?? "—")}</td>
-      <td>${escapeHtml(reg.date)}</td>
-      <td>${escapeHtml(reg.time)}</td>
-      <td>${fmtPrice(o.atual)}</td>
-      <td class="${pctClass(o.ganho_alvo_pct)}">${fmtPct(o.ganho_alvo_pct)}</td>
-      <td class="${pctClass(o.ganho_atual_pct)}">${fmtPct(o.ganho_atual_pct)}</td>
-      <td class="status">${escapeHtml(o.situacao || (o.atual ? "EM ANDAMENTO" : "AGUARDANDO WORKER"))}</td>
-      <td>${escapeHtml(upd.date)}</td>
-      <td>${escapeHtml(upd.time)}</td>
-      <td><button class="btn btn-ghost" onclick="sairOperacao('${escapeHtml(o.id)}')">SAIR</button></td>
-      <td><button class="btn btn-danger" onclick="excluirOperacao('${escapeHtml(o.id)}')">EXCLUIR</button></td>
-    `;
-    tb.appendChild(tr);
-  }
-}
-
-function renderDone(){
-  $("totalDone").textContent = String(DONE_CACHE.length);
-  const tb = $("tbDone");
-  tb.innerHTML = "";
-
-  DONE_CACHE.forEach((o, idx) => {
-    const side = String(o.side||"").toUpperCase();
-    const reg = brtFromIso(o.created_ts || o.createdTs || "");
-    const upd = splitUpdatedBrt(o.updated_brt || o.updatedBrt || "—");
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="par">${escapeHtml(o.par||"—")}</td>
-      <td class="${sideClass(side)}">${escapeHtml(side||"—")}</td>
-      <td>${fmtPrice(o.entrada)}</td>
-      <td>${fmtPrice(o.alvo)}</td>
-      <td>${escapeHtml(o.alav ?? "—")}</td>
-      <td>${escapeHtml(reg.date)}</td>
-      <td>${escapeHtml(reg.time)}</td>
-      <td>${fmtPrice(o.atual)}</td>
-      <td class="${pctClass(o.ganho_alvo_pct)}">${fmtPct(o.ganho_alvo_pct)}</td>
-      <td class="${pctClass(o.ganho_atual_pct)}">${fmtPct(o.ganho_atual_pct)}</td>
-      <td class="status">${escapeHtml(o.situacao || "REALIZADA")}</td>
-      <td>${escapeHtml(upd.date)}</td>
-      <td>${escapeHtml(upd.time)}</td>
-      <td><button class="btn btn-danger" onclick="excluirDone(${idx})">EXCLUIR</button></td>
-    `;
-    tb.appendChild(tr);
-  });
-}
-
-async function refresh(){
-  $("errMonitor").textContent = "";
-  try{
-    const [ops, monitor] = await Promise.all([ jget("/api/saida/ops"), jget("/api/saida/monitor") ]);
-    const updated = monitor?.updated_brt || monitor?.updatedBrt || "—";
-    $("updatedPill").textContent = updated;
-
-    const mById = new Map();
-    (monitor?.ops || []).forEach(x => mById.set(x.id, x));
-
-    OPS_CACHE = (ops?.ops || []).map(o => {
-      const m = mById.get(o.id) || {};
-      return { ...o, atual: m.atual, ganho_alvo_pct: m.ganho_alvo_pct, ganho_atual_pct: m.ganho_atual_pct, situacao: m.situacao };
+  async function jpost(url, body){
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {}),
+      cache: "no-store"
     });
-
-    renderMonitor();
-    await fetchDoneServerOrLocal();
-    renderDone();
-  }catch(e){
-    $("errMonitor").textContent = "ERRO: " + (e?.message || e);
+    let j = null;
+    try { j = await r.json(); } catch (_) {}
+    if (!r.ok){
+      const msg = (j && (j.msg || j.error)) ? (j.msg || j.error) : ("HTTP " + r.status);
+      throw new Error(msg);
+    }
+    return j;
   }
-}
-window.refresh = refresh;
 
-function downloadPdf(tableId, title){
-  const table = document.getElementById(tableId);
-  if(!table) return;
+  function setSide(side){
+    const isLong = (side === "LONG");
+    $("btnLong").classList.toggle("active", isLong);
+    $("btnShort").classList.toggle("active", !isLong);
+  }
+  function getSide(){
+    return $("btnLong").classList.contains("active") ? "LONG" : "SHORT";
+  }
+  function getPar(){
+    return ($("parSelect").value || "").trim();
+  }
 
-  const w = window.open("", "_blank");
-  if(!w) return;
+  const LS_KEY = "saida_realizadas_v1";
+  function loadReal(){
+    try {
+      const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      return Array.isArray(arr) ? arr : [];
+    } catch(_) {
+      return [];
+    }
+  }
+  function saveReal(arr){
+    localStorage.setItem(LS_KEY, JSON.stringify(arr || []));
+  }
 
-  const css = `
-    <style>
-      body{ font-family: Arial, sans-serif; padding: 18px; }
-      h1{ font-size: 18px; margin: 0 0 12px; }
-      table{ width:100%; border-collapse: collapse; font-size: 12px; }
-      th, td{ border: 1px solid #444; padding: 6px 8px; text-align:left; white-space: nowrap; }
-      th{ background:#eee; font-weight:700; }
-    </style>
-  `;
-  w.document.write(`<html><head><title>${escapeHtml(title)}</title>${css}</head><body>`);
-  w.document.write(`<h1>${escapeHtml(title)}</h1>`);
-  w.document.write(table.outerHTML);
-  w.document.write(`</body></html>`);
-  w.document.close();
+  const COINS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
+  function fillCoins(){
+    const sel = $("parSelect");
+    sel.innerHTML = '<option value="">—</option>' + COINS.map(c => `<option value="${c}">${c}</option>`).join("");
+  }
 
-  setTimeout(() => {
+  async function fetchAlvo(){
+    const par = getPar();
+    const side = getSide();
+    const alvoInput = $("alvoInput");
+    const alvoLabel = $("alvoLabel");
+    const err = $("addError");
+
+    err.style.display = "none";
+
+    if (!par){
+      alvoInput.value = "";
+      alvoInput.placeholder = "—";
+      alvoLabel.textContent = "—";
+      return;
+    }
+
+    const url = `/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`;
+    try {
+      const j = await jget(url);
+      const alvo = j && j.alvo;
+      alvoInput.value = (alvo===0 || alvo) ? fmt3(alvo) : "—";
+      alvoLabel.textContent = (alvo===0 || alvo) ? fmt3(alvo) : "—";
+    } catch(e) {
+      alvoInput.value = "";
+      alvoInput.placeholder = "—";
+      alvoLabel.textContent = "—";
+      err.textContent = "ERRO: " + (e && e.message ? e.message : e);
+      err.style.display = "block";
+    }
+  }
+
+  async function addOp(){
+    const par = getPar();
+    const side = getSide();
+    const entradaRaw = $("entradaInput").value.trim().replace(",", ".");
+    const alavRaw = $("alavInput").value.trim();
+    const alvoRaw = $("alvoInput").value.trim().replace(",", ".");
+
+    const err = $("addError");
+    err.style.display = "none";
+
+    if (!par){ err.textContent="ERRO: PAR vazio."; err.style.display="block"; return; }
+    if (!entradaRaw){ err.textContent="ERRO: ENTRADA vazia."; err.style.display="block"; return; }
+    if (!alavRaw){ err.textContent="ERRO: ALAV vazia."; err.style.display="block"; return; }
+
+    const entrada = Number(entradaRaw);
+    const alav = Number(alavRaw);
+    const alvo = Number(alvoRaw);
+
+    if (!isFinite(entrada)){ err.textContent="ERRO: ENTRADA inválida."; err.style.display="block"; return; }
+    if (!isFinite(alav) || alav<=0){ err.textContent="ERRO: ALAV inválida."; err.style.display="block"; return; }
+    if (!isFinite(alvo)){ err.textContent="ERRO: ALVO indisponível (aguarde)."; err.style.display="block"; return; }
+
+    try {
+      try {
+        await jpost("/api/saida/add", { par, side, entrada, alvo, alav });
+      } catch(_) {
+        await jpost("/api/saida/op", { par, side, entrada, alvo, alav });
+      }
+      $("entradaInput").value = "";
+      await refresh();
+    } catch(e) {
+      err.textContent = "ERRO: " + (e && e.message ? e.message : e);
+      err.style.display = "block";
+    }
+  }
+
+  function td(text, cls){
+    const el = document.createElement("td");
+    if (cls) el.className = cls;
+    el.textContent = text;
+    return el;
+  }
+
+  function renderMonitor(rows){
+    const tb = $("tbodyMon");
+    tb.innerHTML = "";
+    if (!rows.length){
+      const tr = document.createElement("tr");
+      const c = document.createElement("td");
+      c.colSpan = 15;
+      c.style.color = "var(--muted)";
+      c.textContent = "Sem operações no momento.";
+      tr.appendChild(c);
+      tb.appendChild(tr);
+      return;
+    }
+
+    for (const o of rows){
+      const tr = document.createElement("tr");
+
+      const sideCls = (String(o.side||"").toUpperCase()==="LONG") ? "side-long" : "side-short";
+      const [dreg, hreg] = splitBrt(o.created_brt || o.created_ts);
+      const [dat, hat] = splitBrt(o.updated_brt || o.updated_ts || o.pro_updated_brt);
+
+      tr.appendChild(td(o.par || "—", "par"));
+      tr.appendChild(td(String(o.side||"—").toUpperCase(), sideCls));
+      tr.appendChild(td(fmt3(o.entrada)));
+      tr.appendChild(td(fmt3(o.alvo)));
+      tr.appendChild(td(String(o.alav ?? "—")));
+      tr.appendChild(td(dreg));
+      tr.appendChild(td(hreg));
+      tr.appendChild(td(fmt3(o.atual)));
+
+      const ga = (o.ganho_alvo_pct ?? o.ganho_alvo ?? o.ganhoAlvo);
+      const gt = (o.ganho_atual_pct ?? o.ganho_atual ?? o.ganhoAtual);
+
+      tr.appendChild(td(fmt2pct(ga), (Number(ga)>=0) ? "pct-pos":"pct-neg"));
+      tr.appendChild(td(fmt2pct(gt), (Number(gt)>=0) ? "pct-pos":"pct-neg"));
+
+      tr.appendChild(td(o.situacao || (o.atual ? "EM ANDAMENTO" : "AGUARDANDO WORKER")));
+      tr.appendChild(td(dat));
+      tr.appendChild(td(hat));
+
+      const tdSair = document.createElement("td");
+      const bSair = document.createElement("button");
+      bSair.className = "btn btn-orange btn-sm";
+      bSair.textContent = "SAIR";
+      bSair.onclick = async () => {
+        if (!confirm("Confirmar SAIR desta operação?")) return;
+
+        const snap = {
+          id: o.id,
+          par: o.par,
+          side: o.side,
+          entrada: o.entrada,
+          alvo: o.alvo,
+          alav: o.alav,
+          created_ts: o.created_ts,
+          created_brt: o.created_brt,
+          atual: o.atual,
+          ganho_alvo_pct: ga,
+          ganho_atual_pct: gt,
+          situacao: o.situacao || "REALIZADA",
+          moved_brt: new Date().toLocaleString("sv-SE").replace("T"," ").slice(0,16)
+        };
+
+        try { await jpost("/api/saida/sair", { id: o.id }); } catch(_) {}
+
+        const arr = loadReal();
+        if (!arr.some(x => x && x.id === snap.id)) arr.unshift(snap);
+        saveReal(arr);
+        await refresh();
+      };
+      tdSair.appendChild(bSair);
+      tr.appendChild(tdSair);
+
+      const tdExc = document.createElement("td");
+      const bExc = document.createElement("button");
+      bExc.className = "btn btn-sm";
+      bExc.style.borderColor = "rgba(255,77,77,.55)";
+      bExc.style.color = "var(--red)";
+      bExc.textContent = "EXCLUIR";
+      bExc.onclick = async () => {
+        if (!confirm("Confirmar EXCLUIR esta operação?")) return;
+        try { await jpost("/api/saida/excluir", { id: o.id }); } catch(_) {}
+        const arr = loadReal().filter(x => x && x.id !== o.id);
+        saveReal(arr);
+        await refresh();
+      };
+      tdExc.appendChild(bExc);
+      tr.appendChild(tdExc);
+
+      tb.appendChild(tr);
+    }
+  }
+
+  function renderRealizadas(rows){
+    const tb = $("tbodyReal");
+    tb.innerHTML = "";
+    if (!rows.length){
+      const tr = document.createElement("tr");
+      const c = document.createElement("td");
+      c.colSpan = 14;
+      c.style.color = "var(--muted)";
+      c.textContent = "Sem operações realizadas.";
+      tr.appendChild(c);
+      tb.appendChild(tr);
+      return;
+    }
+
+    for (const o of rows){
+      const tr = document.createElement("tr");
+
+      const sideCls = (String(o.side||"").toUpperCase()==="LONG") ? "side-long" : "side-short";
+      const [dreg, hreg] = splitBrt(o.created_brt || o.created_ts);
+      const [dat, hat] = splitBrt(o.moved_brt);
+
+      tr.appendChild(td(o.par || "—", "par"));
+      tr.appendChild(td(String(o.side||"—").toUpperCase(), sideCls));
+      tr.appendChild(td(fmt3(o.entrada)));
+      tr.appendChild(td(fmt3(o.alvo)));
+      tr.appendChild(td(String(o.alav ?? "—")));
+      tr.appendChild(td(dreg));
+      tr.appendChild(td(hreg));
+      tr.appendChild(td(fmt3(o.atual)));
+
+      const ga = (o.ganho_alvo_pct ?? o.ganho_alvo);
+      const gt = (o.ganho_atual_pct ?? o.ganho_atual);
+
+      tr.appendChild(td(fmt2pct(ga), (Number(ga)>=0) ? "pct-pos":"pct-neg"));
+      tr.appendChild(td(fmt2pct(gt), (Number(gt)>=0) ? "pct-pos":"pct-neg"));
+
+      tr.appendChild(td(o.situacao || "REALIZADA"));
+      tr.appendChild(td(dat));
+      tr.appendChild(td(hat));
+
+      const tdExc = document.createElement("td");
+      const bExc = document.createElement("button");
+      bExc.className = "btn btn-sm";
+      bExc.style.borderColor = "rgba(255,77,77,.55)";
+      bExc.style.color = "var(--red)";
+      bExc.textContent = "EXCLUIR";
+      bExc.onclick = async () => {
+        if (!confirm("Excluir do histórico?")) return;
+        const arr = loadReal().filter(x => x && x.id !== o.id);
+        saveReal(arr);
+        await refresh();
+      };
+      tdExc.appendChild(bExc);
+      tr.appendChild(tdExc);
+
+      tb.appendChild(tr);
+    }
+  }
+
+  async function refresh(){
+    window.refresh = refresh; // garante typeof window.refresh !== undefined
+
+    await fetchAlvo();
+
+    let base = { ops: [] };
+    let mon = { ops: [] };
+
+    try { base = await jget("/api/saida/ops"); } catch(_) {}
+    try { mon = await jget("/api/saida/monitor"); } catch(_) {}
+
+    const updated = mon.updated_brt || base.updated_brt || "—";
+    $("updatedLabel").textContent = updated;
+
+    const baseMap = new Map((base.ops || []).map(o => [o.id, o]));
+    const merged = (mon.ops || []).map(m => Object.assign({}, baseMap.get(m.id) || {}, m));
+
+    const realIds = new Set(loadReal().map(x => x && x.id).filter(Boolean));
+    const monitorRows = merged.filter(o => o && o.id && !realIds.has(o.id));
+
+    renderMonitor(monitorRows);
+    $("totalMon").textContent = String(monitorRows.length);
+
+    const realRows = loadReal();
+    renderRealizadas(realRows);
+    $("totalReal").textContent = String(realRows.length);
+  }
+
+  function downloadPdfOf(panelId, filename){
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+
+    const w = window.open("", "_blank");
+    if (!w){
+      alert("Bloqueio de pop-up. Permita pop-ups para baixar PDF.");
+      return;
+    }
+    const css = document.querySelector("style") ? document.querySelector("style").innerHTML : "";
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"/><title>${filename}</title><style>${css}</style></head><body>${panel.outerHTML}</body></html>`);
+    w.document.close();
     w.focus();
     w.print();
-    w.close();
-  }, 250);
-}
+    setTimeout(() => w.close(), 300);
+  }
 
-function init(){
-  const sel = $("par");
-  sel.innerHTML = `<option value="">—</option>` + COINS.map(c => `<option value="${c}">${c}</option>`).join("");
-  sel.value = "";
-  $("alav").value = "10";
-  setSide("LONG");
-  sel.addEventListener("change", () => { fetchAlvo().catch(()=>{}); });
+  function init(){
+    fillCoins();
 
-  refresh().catch(()=>{});
-  setInterval(() => window.refresh(), 15000);
-}
-init();
+    $("btnLong").onclick = () => { setSide("LONG"); fetchAlvo(); };
+    $("btnShort").onclick = () => { setSide("SHORT"); fetchAlvo(); };
+    $("parSelect").onchange = () => fetchAlvo();
+
+    $("btnAdd").onclick = () => addOp();
+
+    $("btnPdfMon").onclick = () => downloadPdfOf("panelMonitor", "monitoramento.pdf");
+    $("btnPdfReal").onclick = () => downloadPdfOf("panelReal", "operacoes_realizadas.pdf");
+
+    refresh();
+    setInterval(() => { refresh().catch(() => {}); }, 15000);
+  }
+
+  init();
+})();
 </script>
 </body>
 </html>
