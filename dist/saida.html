@@ -5,444 +5,609 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AUTOTRADER-SAÍDA</title>
   <style>
-    :root {
-      --bg0: #071a22;
-      --card: rgba(3, 44, 56, 0.55);
-      --line: rgba(255,255,255,0.08);
-      --text: #e9f4f7;
-      --muted: rgba(233,244,247,0.65);
-      --orange: #ff8a00;
-      --green: #21e6a5;
-      --red: #ff3b70;
-      --shadow: 0 14px 40px rgba(0,0,0,0.35);
-      --radius: 22px;
+    :root{
+      --bg:#051b22;
+      --panel:#062a2e;
+      --panel2:#05212a;
+      --line:#0c3a46;
+      --txt:#e9f3f6;
+      --muted:#9fb6bf;
+      --orange:#ff8a00;
+      --green:#00d084;
+      --red:#ff4d4d;
+      --btn:#0b2f3a;
+      --shadow: 0 12px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--text);
-      background: radial-gradient(1200px 700px at 20% 10%, #093241 0%, var(--bg0) 55%, #041017 100%);
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 15% 0%, #0b2f3a 0%, var(--bg) 55%);
+      color:var(--txt);
     }
-    .wrap { max-width: 1480px; margin: 28px auto 60px; padding: 0 18px; }
-    .top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px; }
-    h1 { margin:0; letter-spacing:1px; font-size:44px; font-weight:800; }
-    .sub { margin-top:2px; color:var(--muted); font-size:14px; }
-    .badge {
-      padding: 10px 14px; border:1px solid var(--line); background: rgba(0,0,0,0.15);
-      border-radius: 999px; min-width:220px; text-align:right; box-shadow: var(--shadow);
+    .container{ max-width:1480px; margin: 24px auto 60px; padding: 0 18px; }
+    .top{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    h1{ margin:0; letter-spacing:.5px; font-size:38px; font-weight:800; }
+    .subtitle{ margin-top:6px; color:var(--muted); font-size:14px; }
+    .pill{
+      background: rgba(6,42,46,.85);
+      border:1px solid rgba(12,58,70,.9);
+      box-shadow: var(--shadow);
+      padding:10px 14px;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--txt);
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
-    .badge b { color: var(--orange); font-weight: 800; }
-    .card {
-      margin-top:18px; border-radius: var(--radius); border:1px solid var(--line);
-      background: linear-gradient(180deg, var(--card) 0%, rgba(3, 44, 56, 0.18) 100%);
-      box-shadow: var(--shadow); padding: 18px 18px 16px;
+    .pill b{ color: var(--orange); font-weight:800; }
+    .grid{ display:grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
+    .card{
+      background: linear-gradient(180deg, rgba(6,42,46,.92), rgba(5,33,42,.92));
+      border:1px solid rgba(12,58,70,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px 14px;
+      overflow:hidden;
     }
-    .card h2 { margin:0 0 10px; color:var(--orange); font-size:18px; letter-spacing:1px; }
-    .row { display:grid; grid-template-columns: 160px 200px 1fr 1fr 120px 160px; gap:14px; align-items:end; }
-    label { display:block; font-size:11px; color:var(--muted); margin-bottom:6px; letter-spacing:.6px; text-transform:uppercase; }
-    select,input {
-      width:100%; background: rgba(0,0,0,0.18); color:var(--text);
-      border:1px solid rgba(255,255,255,0.10); border-radius:12px; padding:12px 12px; outline:none;
+    .card h2{ margin:0 0 12px; color: var(--orange); font-size: 18px; letter-spacing:.7px; font-weight:900; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+    label{ display:block; font-size:12px; color: var(--muted); margin-bottom:6px; }
+    select, input{
+      background: rgba(3,18,22,.55);
+      border: 1px solid rgba(12,58,70,.95);
+      color: var(--txt);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 160px;
+      outline:none;
     }
-    input::placeholder { color: rgba(233,244,247,0.35); }
-    .sideBox { display:flex; gap:10px; }
-    .pill {
-      flex:1; border-radius:12px; padding:11px 12px; border:1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.12); color:var(--text); cursor:pointer; font-weight:800; letter-spacing:.6px;
+    input::placeholder{ color: rgba(233,243,246,.45); }
+    .small{ min-width: 110px; width: 110px; }
+    .wide{ min-width: 320px; width: 320px; }
+    .btn{
+      background: rgba(11,47,58,.9);
+      border:1px solid rgba(255,138,0,.45);
+      color: var(--orange);
+      font-weight:800;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor:pointer;
+      transition: transform .05s ease, filter .15s ease;
+      user-select:none;
     }
-    .pill.on.long { border-color: rgba(33,230,165,0.6); box-shadow: 0 0 0 2px rgba(33,230,165,0.18) inset; }
-    .pill.on.short { border-color: rgba(255,59,112,0.6); box-shadow: 0 0 0 2px rgba(255,59,112,0.18) inset; }
-    .btn {
-      width:100%; border-radius:12px; padding:12px 12px; border:1px solid rgba(255,138,0,0.55);
-      background: rgba(0,0,0,0.10); color:var(--orange); cursor:pointer; font-weight:900; letter-spacing:.4px;
+    .btn:hover{ filter: brightness(1.08); }
+    .btn:active{ transform: translateY(1px); }
+    .btn-danger{ border-color: rgba(255,77,77,.55); color: var(--red); }
+    .btn-ghost{
+      border-color: rgba(12,58,70,.9);
+      color: var(--txt);
+      background: rgba(3,18,22,.25);
+      font-weight:700;
     }
-    .muteline { margin-top:10px; color:var(--muted); font-size:13px; }
-    .muteline b { color: var(--orange); }
-    .err { margin-top:10px; color: var(--red); font-weight:800; font-size:13px; letter-spacing:.4px; }
-    .tblTop { display:flex; gap:12px; align-items:center; margin:8px 0 12px; }
-    .btnSmall {
-      border-radius:12px; padding:10px 14px; border:1px solid rgba(255,138,0,0.55);
-      background: rgba(0,0,0,0.10); color:var(--orange); cursor:pointer; font-weight:900; letter-spacing:.4px;
+    .seg{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:4px;
+      border-radius: 14px;
+      background: rgba(3,18,22,.30);
+      border:1px solid rgba(12,58,70,.9);
     }
-    table {
-      width:100%; border-collapse:collapse; overflow:hidden; border-radius:16px;
-      border:1px solid var(--line); background: rgba(0,0,0,0.12);
+    .seg button{
+      min-width:88px;
+      padding:9px 10px;
+      border-radius: 12px;
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--txt);
+      cursor:pointer;
+      font-weight:800;
     }
-    thead th {
-      color:var(--orange); font-size:12px; letter-spacing:.8px; text-transform:uppercase;
-      padding:12px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
+    .seg .on-long{ border-color: rgba(0,208,132,.65); color: var(--green); background: rgba(0,208,132,.08); }
+    .seg .on-short{ border-color: rgba(255,77,77,.65); color: var(--red); background: rgba(255,77,77,.08); }
+    .hint{ margin-top: 10px; color: var(--muted); font-size: 13px; }
+    .hint b{ color: var(--orange); }
+    .err{
+      margin-top: 8px;
+      color: var(--red);
+      font-weight:800;
+      font-family: var(--mono);
+      font-size: 13px;
+      min-height: 18px;
     }
-    tbody td { padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:13px; white-space:nowrap; }
-    tbody tr:last-child td { border-bottom:none; }
-    .sidePill {
-      display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; letter-spacing:.5px;
-      border:1px solid rgba(255,255,255,0.10);
+    table{ width:100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    thead th{
+      color: var(--orange);
+      text-align:left;
+      font-weight:900;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(12,58,70,.95);
+      white-space: nowrap;
     }
-    .sidePill.long { color: var(--green); border-color: rgba(33,230,165,0.35); }
-    .sidePill.short { color: var(--red); border-color: rgba(255,59,112,0.35); }
-    .pos { color: var(--green); font-weight:900; }
-    .neg { color: var(--red); font-weight:900; }
-    .btnSair {
-      border-radius:12px; padding:10px 14px; border:1px solid rgba(33,230,165,0.55);
-      background: rgba(0,0,0,0.10); color: var(--orange); cursor:pointer; font-weight:900;
+    tbody td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(12,58,70,.55);
+      white-space: nowrap;
+      vertical-align: middle;
+      color: var(--txt);
     }
-    .btnDel {
-      border-radius:12px; padding:10px 14px; border:1px solid rgba(255,59,112,0.55);
-      background: rgba(0,0,0,0.10); color: var(--red); cursor:pointer; font-weight:900; margin-left:10px;
+    tbody tr:hover{ background: rgba(255,255,255,.02); }
+    .par{ color: var(--orange); font-weight:900; }
+    .side-long{ color: var(--green); font-weight:900; }
+    .side-short{ color: var(--red); font-weight:900; }
+    .pct-pos{ color: var(--green); font-weight:900; }
+    .pct-neg{ color: var(--red); font-weight:900; }
+    .status{ color: var(--muted); font-weight:800; }
+    .footerline{
+      margin-top: 12px;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 12px;
+      align-items:center;
     }
-    th:nth-child(1), td:nth-child(1) { width: 70px; }
-    th:nth-child(2), td:nth-child(2) { width: 110px; }
-    th:nth-child(3), td:nth-child(3) { width: 95px; }
-    th:nth-child(4), td:nth-child(4) { width: 95px; }
-    th:nth-child(5), td:nth-child(5) { width: 70px; }
-    th:nth-child(6), td:nth-child(6) { width: 115px; }
-    th:nth-child(7), td:nth-child(7) { width: 95px; }
-    th:nth-child(8), td:nth-child(8) { width: 95px; }
-    th:nth-child(9), td:nth-child(9) { width: 110px; }
-    th:nth-child(10), td:nth-child(10) { width: 120px; }
-    th:nth-child(11), td:nth-child(11) { width: 150px; }
-    th:nth-child(12), td:nth-child(12) { width: 115px; }
-    th:nth-child(13), td:nth-child(13) { width: 95px; }
-    th:nth-child(14), td:nth-child(14) { width: 110px; }
-    th:nth-child(15), td:nth-child(15) { width: 120px; }
-    .footer { display:flex; gap:10px; margin-top:10px; color:var(--muted); font-size:12px; flex-wrap:wrap; }
-    .chip { border:1px solid rgba(255,255,255,0.10); background: rgba(0,0,0,0.12); padding:6px 10px; border-radius:999px; }
-    @media (max-width: 980px) {
-      .row { grid-template-columns: 1fr 1fr; }
-      .badge { min-width: 0; text-align: left; }
-      h1 { font-size: 34px; }
+    .badge{
+      border:1px solid rgba(12,58,70,.9);
+      background: rgba(3,18,22,.22);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-family: var(--mono);
+    }
+    .split{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+
+    @media print{
+      body{ background:#fff; color:#000; }
+      .top, .subtitle, .hint, .footerline, .btn, .seg, .err{ display:none !important; }
+      .card{ box-shadow:none; border:0; background:#fff; }
+      thead th{ color:#000 !important; }
+      tbody td{ color:#000 !important; }
+      .par, .side-long, .side-short, .pct-pos, .pct-neg{ color:#000 !important; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="container">
     <div class="top">
       <div>
         <h1>AUTOTRADER-SAÍDA</h1>
-        <div class="sub">Página única (SAÍDA): Entrada da operação + Monitoramento automático</div>
+        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático + Auditoria (operações realizadas).</div>
       </div>
-      <div class="badge">Atualizado: <b id="updated">—</b></div>
+      <div class="pill">Atualizado: <b id="updatedPill">—</b></div>
     </div>
 
-    <div class="card">
-      <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
+    <div class="grid">
 
-      <div class="row">
-        <div>
-          <label>PAR</label>
-          <select id="par"></select>
+      <!-- 1) DADOS DE ENTRADA -->
+      <div class="card">
+        <div class="split">
+          <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
+          <button class="btn btn-ghost" onclick="downloadPdf('tblMonitor','MONITORAMENTO DAS OPERAÇÕES')">Baixar PDF (Monitoramento)</button>
         </div>
 
-        <div>
-          <label>SIDE</label>
-          <div class="sideBox">
-            <button id="btnLong" class="pill long on long" type="button">LONG</button>
-            <button id="btnShort" class="pill short" type="button">SHORT</button>
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>PAR</label>
+            <select id="par"></select>
+          </div>
+
+          <div>
+            <label>SIDE</label>
+            <div class="seg">
+              <button id="btnLong" type="button" onclick="setSide('LONG')">LONG</button>
+              <button id="btnShort" type="button" onclick="setSide('SHORT')">SHORT</button>
+            </div>
+          </div>
+
+          <div>
+            <label>ENTRADA</label>
+            <input id="entrada" class="small" placeholder="ex: 1.234" inputmode="decimal" />
+          </div>
+
+          <div>
+            <label>US ALVO (do PRO, congelado)</label>
+            <input id="alvo" class="wide" placeholder="—" readonly />
+          </div>
+
+          <div>
+            <label>ALAV</label>
+            <input id="alav" class="small" placeholder="10" inputmode="numeric" />
+          </div>
+
+          <div>
+            <button class="btn" type="button" onclick="addOperacao()">Adicionar Operação</button>
           </div>
         </div>
 
-        <div>
-          <label>ENTRADA</label>
-          <input id="entrada" inputmode="decimal" placeholder="ex: 1.234" />
+        <div class="hint">
+          Alvo do PRO: <b id="alvoMeta">—</b>
         </div>
-
-        <div>
-          <label>US ALVO (do PRO, congelado)</label>
-          <input id="alvoPro" readonly placeholder="—" />
-        </div>
-
-        <div>
-          <label>ALAV</label>
-          <input id="alav" inputmode="numeric" value="10" />
-        </div>
-
-        <div>
-          <button id="btnAdd" class="btn" type="button">Adicionar Operação</button>
-        </div>
+        <div class="err" id="errAdd"></div>
       </div>
 
-      <div class="muteline">Alvo do PRO: <b id="proUpdated">—</b></div>
-      <div id="errAlvo" class="err" style="display:none;">ERRO: HTTP 400</div>
-    </div>
+      <!-- 2) MONITORAMENTO -->
+      <div class="card">
+        <div class="split">
+          <h2>MONITORAMENTO DAS OPERAÇÕES</h2>
+          <button class="btn btn-ghost" onclick="downloadPdf('tblDone','OPERAÇÕES REALIZADAS')">Baixar PDF (Realizadas)</button>
+        </div>
 
-    <div class="card">
-      <h2>MONITORAMENTO DAS OPERAÇÕES</h2>
+        <div class="footerline">
+          <span>Total: <b id="totalOps" style="color:var(--txt)">0</b></span>
+          <span class="badge">Auto-refresh: 15s</span>
+          <span class="badge">Worker: 5 min</span>
+          <span class="badge">ALVO fixo (congelado no ADD)</span>
+        </div>
 
-      <div class="tblTop">
-        <div style="color:var(--muted);font-size:13px;">Total: <b id="totalOps" style="color:var(--text);">0</b></div>
-        <button id="btnPdf" class="btnSmall" type="button">Baixar PDF</button>
+        <div style="overflow:auto; padding-bottom:6px;">
+          <table id="tblMonitor">
+            <thead>
+              <tr>
+                <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+                <th>DATA REG</th><th>HORA REG</th>
+                <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
+                <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
+                <th>SAIR</th><th>EXCLUIR</th>
+              </tr>
+            </thead>
+            <tbody id="tbMonitor"></tbody>
+          </table>
+        </div>
+        <div class="err" id="errMonitor"></div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
-            <th>DATA REG</th><th>HORA REG</th>
-            <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
-            <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-            <th>SAIR</th><th>EXCLUIR</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr><td colspan="15" style="color:var(--muted);padding:14px 10px;">Carregando...</td></tr>
-        </tbody>
-      </table>
+      <!-- 3) REALIZADAS -->
+      <div class="card">
+        <h2>OPERAÇÕES REALIZADAS</h2>
 
-      <div class="footer">
-        <span class="chip">Auto-refresh: 15s</span>
-        <span class="chip">Worker: 5 min</span>
-        <span class="chip">ALVO fixo (congelado no ADD)</span>
+        <div class="footerline">
+          <span>Total: <b id="totalDone" style="color:var(--txt)">0</b></span>
+          <span class="badge">Sem atualização (cópia no clique SAIR)</span>
+        </div>
+
+        <div style="overflow:auto; padding-bottom:6px;">
+          <table id="tblDone">
+            <thead>
+              <tr>
+                <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+                <th>DATA REG</th><th>HORA REG</th>
+                <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
+                <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
+                <th>EXCLUIR</th>
+              </tr>
+            </thead>
+            <tbody id="tbDone"></tbody>
+          </table>
+        </div>
+        <div class="err" id="errDone"></div>
       </div>
+
     </div>
   </div>
 
 <script>
-(() => {
-  "use strict";
+function $(id){ return document.getElementById(id); }
 
-  const COINS = ["AAVE", "ADA", "APT", "ARB", "ATOM", "AVAX", "AXS", "BCH", "BNB", "BTC", "DOGE", "DOT", "ETH", "FET", "FIL", "FLUX", "ICP", "INJ", "LDO", "LINK", "LTC", "NEAR", "OP", "PEPE", "POL", "RATS", "RENDER", "RUNE", "SEI", "SHIB", "SOL", "SUI", "TIA", "TNSR", "TON", "TRX", "UNI", "WIF", "XRP"];
-  const $ = (id) => document.getElementById(id);
+function safeNum(v){
+  if(v===null || v===undefined) return null;
+  if(typeof v === "number") return Number.isFinite(v) ? v : null;
+  const s = String(v).trim().replace(",", ".");
+  if(!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+function fmtPrice(n){
+  const x = safeNum(n);
+  if(x===null) return "—";
+  return x.toFixed(3);
+}
+function fmtPct(n){
+  const x = safeNum(n);
+  if(x===null) return "—";
+  const sign = x>=0 ? "+" : "";
+  return sign + x.toFixed(2) + "%";
+}
+function pctClass(n){
+  const x = safeNum(n);
+  if(x===null) return "";
+  return x>=0 ? "pct-pos" : "pct-neg";
+}
+function sideClass(s){
+  return (String(s||"").toUpperCase()==="LONG") ? "side-long" : "side-short";
+}
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-  let currentSide = "LONG";
+const COINS = ["AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ","LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON","TRX","UNI","WIF","XRP"];
 
-  function setSide(side) {
-    currentSide = side;
-    $("btnLong").classList.toggle("on", side === "LONG");
-    $("btnShort").classList.toggle("on", side === "SHORT");
-    $("btnLong").classList.toggle("long", true);
-    $("btnShort").classList.toggle("short", true);
-    fetchAlvo().catch(()=>{});
-  }
+let SIDE = "LONG";
+let OPS_CACHE = [];
+let DONE_CACHE = [];
+const LS_DONE_KEY = "autotrader_saida_done_v1";
 
-  function fillCoins() {
-    const sel = $("par");
-    sel.innerHTML = "";
-    for (const c of COINS) {
-      const opt = document.createElement("option");
-      opt.value = c;
-      opt.textContent = c;
-      sel.appendChild(opt);
-    }
-    sel.value = COINS[0] || "";
-  }
-
-  async function jget(url) {
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) {
-      let msg = "HTTP " + r.status;
-      try { const j = await r.json(); if (j && j.msg) msg = j.msg; } catch (e) {}
-      const err = new Error(msg); err.status = r.status; throw err;
-    }
-    return await r.json();
-  }
-
-  async function jpost(url, bodyObj) {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bodyObj || {}),
-      cache: "no-store",
-    });
-    if (!r.ok) {
-      let msg = "HTTP " + r.status;
-      try { const j = await r.json(); if (j && j.msg) msg = j.msg; } catch (e) {}
-      const err = new Error(msg); err.status = r.status; throw err;
-    }
-    return await r.json();
-  }
-
-  function fmtNum(x, dec=3) {
-    if (x === null || x === undefined || x === "" || Number.isNaN(Number(x))) return "—";
-    return Number(x).toFixed(dec);
-  }
-  function fmtPct(x) {
-    if (x === null || x === undefined || x === "" || Number.isNaN(Number(x))) return "—";
-    const n = Number(x);
-    return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
-  }
-  function splitDateTime(updated_brt) {
-    if (!updated_brt || typeof updated_brt !== "string") return ["—","—"];
-    const parts = updated_brt.split(" ");
-    if (parts.length < 2) return [updated_brt, "—"];
-    return [parts[0], parts[1]];
-  }
-  function regFromCreatedTs(created_ts) {
-    if (!created_ts) return ["—","—"];
-    const dt = new Date(created_ts);
-    if (isNaN(dt.getTime())) return ["—","—"];
-    const d = dt.toLocaleDateString("pt-BR");
-    const t = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    return [d, t];
-  }
-
-  async function fetchAlvo() {
-    const parVal = $("par").value || "";
-    const sideVal = currentSide;
-    if (!parVal || (sideVal !== "LONG" && sideVal !== "SHORT")) {
-      $("alvoPro").value = "—";
-      $("proUpdated").textContent = "—";
-      $("errAlvo").style.display = "none";
-      return;
-    }
-    try {
-      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parVal)}&side=${encodeURIComponent(sideVal)}`);
-      $("alvoPro").value = (j && j.alvo !== undefined) ? String(j.alvo) : "—";
-      $("proUpdated").textContent = (j && j.updated_brt) ? j.updated_brt : "—";
-      $("errAlvo").style.display = "none";
-    } catch (e) {
-      $("alvoPro").value = "—";
-      $("proUpdated").textContent = "—";
-      $("errAlvo").style.display = "block";
-      console.error("fetchAlvo erro:", e);
-    }
-  }
-
-  async function loadAndRender() {
-    const opsResp = await jget("/api/saida/ops");
-    const opsList = (opsResp && Array.isArray(opsResp.ops)) ? opsResp.ops : [];
-
-    const monResp = await jget("/api/saida/monitor");
-    const monList = (monResp && Array.isArray(monResp.ops)) ? monResp.ops : [];
-
-    $("updated").textContent = (monResp && monResp.updated_brt) ? monResp.updated_brt : "—";
-
-    const monById = new Map();
-    for (const o of monList) if (o && o.id) monById.set(o.id, o);
-
-    $("totalOps").textContent = String(opsList.length || 0);
-    const [dAtual, hAtual] = splitDateTime(monResp && monResp.updated_brt);
-
-    const tb = $("tbody");
-    tb.innerHTML = "";
-    if (!opsList.length) {
-      tb.innerHTML = '<tr><td colspan="15" style="color:rgba(233,244,247,0.65);padding:14px 10px;">Sem operações.</td></tr>';
-      return;
-    }
-
-    for (const baseOp of opsList) {
-      const mo = monById.get(baseOp.id) || {};
-
-      const par = baseOp.par || "—";
-      const side = (baseOp.side || "").toUpperCase();
-      const [dReg, hReg] = regFromCreatedTs(baseOp.created_ts);
-
-      const atual = (mo.atual !== undefined) ? mo.atual : null;
-      const ganhoAlvo = (mo.ganho_alvo_pct !== undefined) ? mo.ganho_alvo_pct : null;
-      const ganhoAtual = (mo.ganho_atual_pct !== undefined) ? mo.ganho_atual_pct : null;
-
-      const situacao = (mo.situacao !== undefined && mo.situacao !== null && mo.situacao !== "")
-        ? mo.situacao
-        : (atual ? "" : "AGUARDANDO WORKER");
-
-      const tr = document.createElement("tr");
-
-      const tdPar = document.createElement("td");
-      tdPar.textContent = par; tdPar.style.color = "var(--orange)"; tdPar.style.fontWeight = "900";
-
-      const tdSide = document.createElement("td");
-      const sp = document.createElement("span");
-      sp.className = "sidePill " + (side === "LONG" ? "long" : "short");
-      sp.textContent = side || "—";
-      tdSide.appendChild(sp);
-
-      const tdEntrada = document.createElement("td"); tdEntrada.textContent = fmtNum(baseOp.entrada, 3);
-      const tdAlvo = document.createElement("td"); tdAlvo.textContent = fmtNum(baseOp.alvo, 3);
-      const tdAlav = document.createElement("td"); tdAlav.textContent = (baseOp.alav !== undefined && baseOp.alav !== null) ? String(baseOp.alav) : "—";
-      const tdDReg = document.createElement("td"); tdDReg.textContent = dReg;
-      const tdHReg = document.createElement("td"); tdHReg.textContent = hReg;
-      const tdAtual = document.createElement("td"); tdAtual.textContent = fmtNum(atual, 3);
-
-      const tdGAlvo = document.createElement("td");
-      tdGAlvo.textContent = fmtPct(ganhoAlvo);
-      if (ganhoAlvo !== null && ganhoAlvo !== undefined && !Number.isNaN(Number(ganhoAlvo))) tdGAlvo.className = (Number(ganhoAlvo) >= 0) ? "pos" : "neg";
-
-      const tdGAtual = document.createElement("td");
-      tdGAtual.textContent = fmtPct(ganhoAtual);
-      if (ganhoAtual !== null && ganhoAtual !== undefined && !Number.isNaN(Number(ganhoAtual))) tdGAtual.className = (Number(ganhoAtual) >= 0) ? "pos" : "neg";
-
-      const tdSit = document.createElement("td"); tdSit.textContent = situacao || "—";
-      const tdDA = document.createElement("td"); tdDA.textContent = dAtual;
-      const tdHA = document.createElement("td"); tdHA.textContent = hAtual;
-
-      const tdSair = document.createElement("td");
-      const btnSair = document.createElement("button");
-      btnSair.className = "btnSair"; btnSair.textContent = "SAIR";
-      btnSair.addEventListener("click", async () => {
-        if (!confirm("Confirmar SAIR desta operação?")) return;
-        try { await jpost("/api/saida/sair", { id: baseOp.id }); await refresh(); }
-        catch (e) { alert("ERRO NO SAIR: " + (e?.message || e)); }
-      });
-      tdSair.appendChild(btnSair);
-
-      const tdDel = document.createElement("td");
-      const btnDel = document.createElement("button");
-      btnDel.className = "btnDel"; btnDel.textContent = "EXCLUIR";
-      btnDel.addEventListener("click", async () => {
-        if (!confirm("Confirmar EXCLUIR esta operação?")) return;
-        try { await jpost("/api/saida/excluir", { id: baseOp.id }); await refresh(); }
-        catch (e) { alert("ERRO NO EXCLUIR: " + (e?.message || e)); }
-      });
-      tdDel.appendChild(btnDel);
-
-      for (const td of [tdPar, tdSide, tdEntrada, tdAlvo, tdAlav, tdDReg, tdHReg, tdAtual, tdGAlvo, tdGAtual, tdSit, tdDA, tdHA, tdSair, tdDel]) tr.appendChild(td);
-      tb.appendChild(tr);
-    }
-  }
-
-  async function addOp() {
-    const parVal = $("par").value || "";
-    const sideVal = currentSide;
-    const entradaVal = $("entrada").value || "";
-    const alavVal = $("alav").value || "";
-
-    if (!parVal) return alert("Selecione o PAR.");
-    if (sideVal !== "LONG" && sideVal !== "SHORT") return alert("Selecione LONG ou SHORT.");
-    const entradaNum = Number(String(entradaVal).replace(",", "."));
-    const alavNum = Number(String(alavVal).replace(",", "."));
-    if (!isFinite(entradaNum) || entradaNum <= 0) return alert("Entrada inválida.");
-    if (!isFinite(alavNum) || alavNum <= 0) return alert("Alav inválida.");
-
-    let alvoNum = null;
-    try {
-      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(parVal)}&side=${encodeURIComponent(sideVal)}`);
-      alvoNum = (j && j.alvo !== undefined) ? Number(j.alvo) : null;
-    } catch (e) {
-      alvoNum = null;
-    }
-
-    try {
-      await jpost("/api/saida/add", {
-        par: parVal, side: sideVal, entrada: entradaNum, alav: alavNum,
-        alvo: (isFinite(alvoNum) ? alvoNum : undefined),
-      });
-      $("entrada").value = "";
-      await refresh();
-    } catch (e) {
-      alert("ERRO NO ADD: " + (e?.message || e));
-    }
-  }
-
-  async function refresh() {
-    try { await loadAndRender(); }
-    catch (e) {
-      console.error("refresh erro:", e);
-      $("tbody").innerHTML = '<tr><td colspan="15" style="color:rgba(233,244,247,0.65);padding:14px 10px;">ERRO ao carregar dados.</td></tr>';
-    }
-  }
-  window.refresh = refresh;
-
-  fillCoins();
-  $("btnLong").addEventListener("click", () => setSide("LONG"));
-  $("btnShort").addEventListener("click", () => setSide("SHORT"));
-  $("par").addEventListener("change", () => fetchAlvo().catch(()=>{}));
-  $("btnAdd").addEventListener("click", () => addOp().catch(()=>{}));
-  $("btnPdf").addEventListener("click", () => window.print());
-
+function setSide(s){
+  SIDE = (String(s||"").toUpperCase()==="SHORT") ? "SHORT" : "LONG";
+  $("btnLong").className = (SIDE==="LONG") ? "on-long" : "";
+  $("btnShort").className = (SIDE==="SHORT") ? "on-short" : "";
   fetchAlvo().catch(()=>{});
+}
+
+function loadDoneLocal(){
+  try{
+    const raw = localStorage.getItem(LS_DONE_KEY);
+    DONE_CACHE = raw ? JSON.parse(raw) : [];
+    if(!Array.isArray(DONE_CACHE)) DONE_CACHE = [];
+  }catch(e){ DONE_CACHE = []; }
+}
+function saveDoneLocal(){
+  try{ localStorage.setItem(LS_DONE_KEY, JSON.stringify(DONE_CACHE)); }catch(e){}
+}
+
+async function fetchDoneServerOrLocal(){
+  loadDoneLocal();
+  try{
+    const r = await fetch("/api/saida/done", { cache:"no-store" });
+    if(r.ok){
+      const j = await r.json();
+      if(Array.isArray(j.ops)){
+        DONE_CACHE = j.ops;
+        saveDoneLocal();
+      }
+    }
+  }catch(e){}
+}
+
+async function jget(url){
+  const r = await fetch(url, { cache:"no-store" });
+  let j=null;
+  try{ j = await r.json(); }catch(e){}
+  if(!r.ok){
+    const msg = (j && j.msg) ? j.msg : ("HTTP " + r.status);
+    throw new Error(msg);
+  }
+  return j;
+}
+async function jpost(url, body){
+  const r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body||{}) });
+  let j=null;
+  try{ j = await r.json(); }catch(e){}
+  if(!r.ok){
+    const msg = (j && j.msg) ? j.msg : ("HTTP " + r.status);
+    throw new Error(msg);
+  }
+  return j;
+}
+
+async function fetchAlvo(){
+  $("errAdd").textContent = "";
+  const par = $("par").value;
+  const side = SIDE;
+  if(!par){
+    $("alvo").value = "—";
+    $("alvoMeta").textContent = "—";
+    return;
+  }
+  try{
+    const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
+    $("alvo").value = (j && j.alvo!==undefined && j.alvo!==null) ? String(j.alvo) : "—";
+    $("alvoMeta").textContent = (j && j.updated_brt) ? (`${j.par} ${j.side} | atualizado: ${j.updated_brt}`) : `${par} ${side}`;
+  }catch(e){
+    $("alvo").value = "—";
+    $("alvoMeta").textContent = "—";
+    $("errAdd").textContent = "ERRO: " + (e?.message || e);
+  }
+}
+
+async function addOperacao(){
+  $("errAdd").textContent = "";
+  const par = $("par").value;
+  const side = SIDE;
+  const entrada = safeNum($("entrada").value);
+  const alvo = safeNum($("alvo").value);
+  const alav = Math.max(1, Math.floor(safeNum($("alav").value) || 10));
+
+  if(!par){ $("errAdd").textContent = "ERRO: selecione o PAR."; return; }
+  if(entrada===null){ $("errAdd").textContent = "ERRO: ENTRADA inválida."; return; }
+  if(alvo===null){ $("errAdd").textContent = "ERRO: ALVO do PRO não carregou."; return; }
+
+  try{
+    await jpost("/api/saida/add", { par, side, entrada, alvo, alav });
+    $("entrada").value = "";
+    await refresh();
+  }catch(e){
+    $("errAdd").textContent = "ERRO NO ADD: " + (e?.message || e);
+  }
+}
+
+async function sairOperacao(id){
+  const op = OPS_CACHE.find(x => x.id===id);
+  if(!op) return;
+  if(!confirm("Confirmar SAIR desta operação?")) return;
+
+  try{
+    await jpost("/api/saida/sair", { id });
+    DONE_CACHE.unshift({ ...op, done_ts: new Date().toISOString() });
+    saveDoneLocal();
+    OPS_CACHE = OPS_CACHE.filter(x => x.id!==id);
+    renderMonitor();
+    renderDone();
+  }catch(e){
+    $("errMonitor").textContent = "ERRO NO SAIR: " + (e?.message || e);
+  }
+}
+
+async function excluirOperacao(id){
+  if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+  try{
+    await jpost("/api/saida/excluir", { id });
+    await refresh();
+  }catch(e){
+    $("errMonitor").textContent = "ERRO NO EXCLUIR: " + (e?.message || e);
+  }
+}
+
+function excluirDone(idx){
+  if(!confirm("Confirmar EXCLUIR do histórico (Realizadas)?")) return;
+  DONE_CACHE.splice(idx,1);
+  saveDoneLocal();
+  renderDone();
+}
+
+function brtFromIso(iso){
+  try{
+    const d = new Date(iso);
+    if(!isFinite(d.getTime())) return { date:"—", time:"—" };
+    const dd = String(d.getDate()).padStart(2,"0");
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return { date:`${dd}/${mm}/${yyyy}`, time:`${hh}:${mi}` };
+  }catch(e){ return { date:"—", time:"—" }; }
+}
+
+function splitUpdatedBrt(s){
+  const t = String(s||"").trim();
+  if(!t) return { date:"—", time:"—" };
+  const m = t.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/);
+  if(!m) return { date:"—", time:"—" };
+  return { date:m[1], time:m[2] };
+}
+
+function renderMonitor(){
+  const tb = $("tbMonitor");
+  tb.innerHTML = "";
+  $("totalOps").textContent = String(OPS_CACHE.length);
+
+  for(const o of OPS_CACHE){
+    const side = String(o.side||"").toUpperCase();
+    const reg = brtFromIso(o.created_ts || o.createdTs || "");
+    const upd = splitUpdatedBrt(o.updated_brt || o.updatedBrt || $("updatedPill").textContent);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="par">${escapeHtml(o.par||"—")}</td>
+      <td class="${sideClass(side)}">${escapeHtml(side||"—")}</td>
+      <td>${fmtPrice(o.entrada)}</td>
+      <td>${fmtPrice(o.alvo)}</td>
+      <td>${escapeHtml(o.alav ?? "—")}</td>
+      <td>${escapeHtml(reg.date)}</td>
+      <td>${escapeHtml(reg.time)}</td>
+      <td>${fmtPrice(o.atual)}</td>
+      <td class="${pctClass(o.ganho_alvo_pct)}">${fmtPct(o.ganho_alvo_pct)}</td>
+      <td class="${pctClass(o.ganho_atual_pct)}">${fmtPct(o.ganho_atual_pct)}</td>
+      <td class="status">${escapeHtml(o.situacao || (o.atual ? "EM ANDAMENTO" : "AGUARDANDO WORKER"))}</td>
+      <td>${escapeHtml(upd.date)}</td>
+      <td>${escapeHtml(upd.time)}</td>
+      <td><button class="btn btn-ghost" onclick="sairOperacao('${escapeHtml(o.id)}')">SAIR</button></td>
+      <td><button class="btn btn-danger" onclick="excluirOperacao('${escapeHtml(o.id)}')">EXCLUIR</button></td>
+    `;
+    tb.appendChild(tr);
+  }
+}
+
+function renderDone(){
+  $("totalDone").textContent = String(DONE_CACHE.length);
+  const tb = $("tbDone");
+  tb.innerHTML = "";
+
+  DONE_CACHE.forEach((o, idx) => {
+    const side = String(o.side||"").toUpperCase();
+    const reg = brtFromIso(o.created_ts || o.createdTs || "");
+    const upd = splitUpdatedBrt(o.updated_brt || o.updatedBrt || "—");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="par">${escapeHtml(o.par||"—")}</td>
+      <td class="${sideClass(side)}">${escapeHtml(side||"—")}</td>
+      <td>${fmtPrice(o.entrada)}</td>
+      <td>${fmtPrice(o.alvo)}</td>
+      <td>${escapeHtml(o.alav ?? "—")}</td>
+      <td>${escapeHtml(reg.date)}</td>
+      <td>${escapeHtml(reg.time)}</td>
+      <td>${fmtPrice(o.atual)}</td>
+      <td class="${pctClass(o.ganho_alvo_pct)}">${fmtPct(o.ganho_alvo_pct)}</td>
+      <td class="${pctClass(o.ganho_atual_pct)}">${fmtPct(o.ganho_atual_pct)}</td>
+      <td class="status">${escapeHtml(o.situacao || "REALIZADA")}</td>
+      <td>${escapeHtml(upd.date)}</td>
+      <td>${escapeHtml(upd.time)}</td>
+      <td><button class="btn btn-danger" onclick="excluirDone(${idx})">EXCLUIR</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+async function refresh(){
+  $("errMonitor").textContent = "";
+  try{
+    const [ops, monitor] = await Promise.all([ jget("/api/saida/ops"), jget("/api/saida/monitor") ]);
+    const updated = monitor?.updated_brt || monitor?.updatedBrt || "—";
+    $("updatedPill").textContent = updated;
+
+    const mById = new Map();
+    (monitor?.ops || []).forEach(x => mById.set(x.id, x));
+
+    OPS_CACHE = (ops?.ops || []).map(o => {
+      const m = mById.get(o.id) || {};
+      return { ...o, atual: m.atual, ganho_alvo_pct: m.ganho_alvo_pct, ganho_atual_pct: m.ganho_atual_pct, situacao: m.situacao };
+    });
+
+    renderMonitor();
+    await fetchDoneServerOrLocal();
+    renderDone();
+  }catch(e){
+    $("errMonitor").textContent = "ERRO: " + (e?.message || e);
+  }
+}
+window.refresh = refresh;
+
+function downloadPdf(tableId, title){
+  const table = document.getElementById(tableId);
+  if(!table) return;
+
+  const w = window.open("", "_blank");
+  if(!w) return;
+
+  const css = `
+    <style>
+      body{ font-family: Arial, sans-serif; padding: 18px; }
+      h1{ font-size: 18px; margin: 0 0 12px; }
+      table{ width:100%; border-collapse: collapse; font-size: 12px; }
+      th, td{ border: 1px solid #444; padding: 6px 8px; text-align:left; white-space: nowrap; }
+      th{ background:#eee; font-weight:700; }
+    </style>
+  `;
+  w.document.write(`<html><head><title>${escapeHtml(title)}</title>${css}</head><body>`);
+  w.document.write(`<h1>${escapeHtml(title)}</h1>`);
+  w.document.write(table.outerHTML);
+  w.document.write(`</body></html>`);
+  w.document.close();
+
+  setTimeout(() => {
+    w.focus();
+    w.print();
+    w.close();
+  }, 250);
+}
+
+function init(){
+  const sel = $("par");
+  sel.innerHTML = `<option value="">—</option>` + COINS.map(c => `<option value="${c}">${c}</option>`).join("");
+  sel.value = "";
+  $("alav").value = "10";
+  setSide("LONG");
+  sel.addEventListener("change", () => { fetchAlvo().catch(()=>{}); });
+
   refresh().catch(()=>{});
-  setInterval(() => refresh().catch(()=>{}), 15000);
-})();
+  setInterval(() => window.refresh(), 15000);
+}
+init();
 </script>
 </body>
 </html>
