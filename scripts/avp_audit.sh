@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-HTML="$ROOT/dist/saida.html"
+echo "=== AVP AUDIT (Correção Definitiva) ==="
 
-echo "== AVP AUDIT START =="
-echo "FILE: $HTML"
+fail(){ echo "FALHA: $1" >&2; exit 1; }
 
-if [[ ! -f "$HTML" ]]; then
-  echo "ERRO: dist/saida.html não existe."
-  exit 1
-fi
+# 1) arquivos mínimos
+[ -f "dist/saida.html" ] || fail "dist/saida.html não existe"
+[ -f "server.js" ] || fail "server.js não existe"
+[ -f "worker_saida_v2.py" ] || fail "worker_saida_v2.py não existe"
+[ -d "data" ] || fail "pasta data não existe"
 
-# Regra PRAZO: deploy falha se quebrado
-grep -q "PRAZO:OK" "$HTML" || { echo "ERRO: PRAZO quebrado (PRAZO:OK ausente)."; exit 1; }
+# 2) checagens do HTML (pontos que já quebraram)
+grep -q "function renderTable" dist/saida.html || fail "HTML sem renderTable"
+grep -q "window.refresh" dist/saida.html || fail "HTML sem window.refresh (evita 'refresh is not defined')"
+grep -q "/api/saida/alvo" dist/saida.html || fail "HTML não chama /api/saida/alvo"
+grep -q "MONITORAMENTO DAS OPERAÇÕES" dist/saida.html || fail "HTML sem painel de monitoramento"
+grep -q "OPERAÇÕES REALIZADAS" dist/saida.html || fail "HTML sem painel de realizadas"
+grep -q "DADOS DE ENTRADA NA OPERAÇÃO" dist/saida.html || fail "HTML sem painel de entrada"
 
-# Build stamp (garante que o arquivo novo está aqui)
-grep -q "BUILD:2026-01-25_AVP1" "$HTML" || { echo "ERRO: BUILD stamp esperado não encontrado."; exit 1; }
+# 3) checagens da API (endpoints obrigatórios)
+grep -q "app.get('/api/saida/alvo'" server.js || fail "server.js sem /api/saida/alvo"
+grep -q "app.post('/api/saida/add'" server.js || fail "server.js sem /api/saida/add"
+grep -q "app.post('/api/saida/sair'" server.js || fail "server.js sem /api/saida/sair"
+grep -q "app.post('/api/saida/delete'" server.js || fail "server.js sem /api/saida/delete"
+grep -q "app.get('/api/saida/monitor'" server.js || fail "server.js sem /api/saida/monitor"
+grep -q "app.get('/api/saida/realizadas'" server.js || fail "server.js sem /api/saida/realizadas"
 
-# Erros do console que estavam no print
-! grep -q "reFresh is not defined" "$HTML" || { echo "ERRO: string 'reFresh is not defined' encontrada."; exit 1; }
-! grep -q "reFresh" "$HTML" || { echo "ERRO: 'reFresh' encontrado (deve ser refresh)."; exit 1; }
-grep -q "window.refresh" "$HTML" || { echo "ERRO: window.refresh não está definido."; exit 1; }
+# 4) sintaxe do node (não executa o servidor)
+node --check server.js >/dev/null
 
-# Painéis obrigatórios
-grep -q "DADOS DE ENTRADA NA OPERAÇÃO" "$HTML" || { echo "ERRO: painel 1 não encontrado."; exit 1; }
-grep -q "MONITORAMENTO DAS OPERAÇÕES" "$HTML" || { echo "ERRO: painel 2 não encontrado."; exit 1; }
-grep -q "OPERAÇÕES REALIZADAS" "$HTML" || { echo "ERRO: painel 3 não encontrado."; exit 1; }
+# 5) sintaxe do python
+python3 -m py_compile worker_saida_v2.py >/dev/null
 
-# Colunas oficiais (monitor)
-grep -q "<th>DATA REG</th>" "$HTML" || { echo "ERRO: coluna DATA REG ausente."; exit 1; }
-grep -q "<th>HORA REG</th>" "$HTML" || { echo "ERRO: coluna HORA REG ausente."; exit 1; }
-grep -q "<th>DATA ATUAL</th>" "$HTML" || { echo "ERRO: coluna DATA ATUAL ausente."; exit 1; }
-grep -q "<th>HORA ATUAL</th>" "$HTML" || { echo "ERRO: coluna HORA ATUAL ausente."; exit 1; }
-grep -q "<th>SAIR</th>" "$HTML" || { echo "ERRO: coluna SAIR ausente."; exit 1; }
-grep -q "<th>EXCLUIR</th>" "$HTML" || { echo "ERRO: coluna EXCLUIR ausente."; exit 1; }
-
-echo "OK: auditoria interna passou."
+echo "OK: auditoria passou."

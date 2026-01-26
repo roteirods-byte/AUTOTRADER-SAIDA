@@ -1,202 +1,118 @@
 #!/usr/bin/env python3
-import json, os, time
-from datetime import datetime, timedelta
+# -*- coding: utf-8 -*-
+"""
+AUTOTRADER-SAIDA — Worker de monitoramento (SAÍDA V2)
 
-try:
-    from zoneinfo import ZoneInfo
-except Exception:
-    ZoneInfo = None
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
+- Lê data/ops_active.json (operações ativas)
+- Busca preço atual (Binance Spot como fallback)
+- Calcula GANHO/ALVO e GANHO ATUAL
+- Escreve data/monitor.json (consumido pelo painel)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+Observação: se você já tem um worker mais avançado (2 corretoras etc.),
+mantenha a mesma saída/colunas e substitua apenas a parte de preço.
+"""
 
-P_OPS = os.path.join(DATA_DIR, "saida_ops.json")
-P_MON = os.path.join(DATA_DIR, "saida_monitor.json")
-P_ERR = os.path.join(DATA_DIR, "saida_worker_err.log")
+import os, json, math
+from datetime import datetime
+import requests
 
-os.makedirs(DATA_DIR, exist_ok=True)
+DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "data"))
+OPS_ACTIVE_FILE = os.path.join(DATA_DIR, "ops_active.json")
+MONITOR_FILE = os.path.join(DATA_DIR, "monitor.json")
 
-# build/version (para confirmar que a revisão entrou no ar)
-VERSION_FILE = os.path.join(BASE_DIR, 'VERSION')
-def read_version():
+BINANCE_BASE = os.environ.get("BINANCE_BASE", "https://api.binance.com")
+TIMEOUT = float(os.environ.get("HTTP_TIMEOUT", "6"))
+
+def brt_now_parts():
+    # Se a VM já está em BRT, fica perfeito.
+    now = datetime.now()
+    return now.strftime("%d/%m/%Y"), now.strftime("%H:%M"), now.strftime("%Y-%m-%d %H:%M")
+
+def safe_read_json(path, fallback):
     try:
-        return open(VERSION_FILE,'r',encoding='utf-8').read().strip() or 'unknown'
-    except Exception:
-        return 'unknown'
-
-# BRT fixo (sem depender do sistema)
-# Brasil (SP): UTC-3
-def brt_dt():
-    """Data/hora em BRT (America/Sao_Paulo)."""
-    if ZoneInfo is not None:
-        try:
-            return datetime.now(ZoneInfo("America/Sao_Paulo"))
-        except Exception:
-            pass
-    # fallback simples (UTC-3) se ZoneInfo falhar
-    return datetime.utcnow() - timedelta(hours=3)
-
-def http_json(url: str, timeout=10):
-    req = Request(url, headers={
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json"
-    })
-    with urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode("utf-8", errors="ignore"))
-
-def log_err(op_id: str, e: Exception):
-    try:
-        ts = datetime.utcnow().isoformat()
-        with open(P_ERR, "a", encoding="utf-8") as f:
-            f.write(f"\n=== {ts} | {op_id} ===\n{repr(e)}\n")
-    except:
-        pass
-
-def safe_read_json(p, fallback):
-    try:
-        if not os.path.exists(p):
+        if not os.path.exists(path):
             return fallback
-        s = open(p, "r", encoding="utf-8").read().strip()
+        s = open(path, "r", encoding="utf-8").read().strip()
         if not s:
             return fallback
         return json.loads(s)
-    except:
+    except Exception:
         return fallback
 
-def safe_write_json(p, obj):
-    tmp = p + ".tmp"
+def safe_write_json(path, obj):
+    tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, p)
+    os.replace(tmp, path)
 
-def num(v):
+def binance_price(symbol: str):
     try:
-        return float(v)
-    except:
-        return 0.0
-
-def up(v):
-    return str(v or "").strip().upper()
-
-# --- PREÇO ATUAL: OKX (prioridade) / Binance (fallback) ---
-def fetch_okx_last(inst_id: str) -> float:
-    url = f"https://www.okx.com/api/v5/market/ticker?instId={inst_id}"
-    d = http_json(url, timeout=10)
-    data = d.get("data") or []
-    if not data:
-        return 0.0
-    return num(data[0].get("last"))
-
-def fetch_binance_last(symbol: str) -> float:
-    url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
-    d = http_json(url, timeout=10)
-    return num(d.get("price"))
-
-def fetch_price(par: str) -> float:
-    P = up(par)
-    # OKX SWAP
-    try:
-        px = fetch_okx_last(f"{P}-USDT-SWAP")
-        if px > 0:
-            return px
+        url = f"{BINANCE_BASE}/api/v3/ticker/price"
+        r = requests.get(url, params={"symbol": symbol}, timeout=TIMEOUT)
+        if r.status_code != 200:
+            return None
+        j = r.json()
+        return float(j.get("price"))
     except Exception:
-        pass
-    # OKX SPOT
-    try:
-        px = fetch_okx_last(f"{P}-USDT")
-        if px > 0:
-            return px
-    except Exception:
-        pass
-    # Binance SPOT
-    try:
-        px = fetch_binance_last(f"{P}USDT")
-        if px > 0:
-            return px
-    except Exception:
-        pass
-    return 0.0
+        return None
 
-def ganho_pct(side: str, entrada: float, x: float, alav: float) -> float:
-    # retorno em % já com alavancagem
-    if entrada <= 0 or x <= 0 or alav <= 0:
-        return 0.0
-    if side == "LONG":
-        return ((x / entrada) - 1.0) * 100.0 * alav
-    else:
-        # SHORT
-        return ((entrada / x) - 1.0) * 100.0 * alav
+def gain_percent(side: str, entrada: float, price: float):
+    if not entrada or entrada <= 0 or not price or price <= 0:
+        return None
+    if side == "SHORT":
+        return (entrada / price - 1.0) * 100.0
+    return (price / entrada - 1.0) * 100.0
 
-def situacao(side: str, atual: float, alvo: float) -> str:
-    if atual <= 0 or alvo <= 0:
-        return "ERRO — sem preço"
-    if side == "LONG" and atual >= alvo:
-        return "ALVO ATINGIDO"
-    if side == "SHORT" and atual <= alvo:
-        return "ALVO ATINGIDO"
-    return "EM ANDAMENTO"
+def fmt_pct(v):
+    if v is None or not math.isfinite(v):
+        return None
+    return round(v, 2)
+
+def fmt_price(v):
+    if v is None or not math.isfinite(v):
+        return None
+    return round(v, 3)
 
 def main():
-    ops_doc = safe_read_json(P_OPS, {"ops": []})
-    ops = ops_doc.get("ops") if isinstance(ops_doc, dict) else []
-    if not isinstance(ops, list):
-        ops = []
+    os.makedirs(DATA_DIR, exist_ok=True)
 
-    dt = brt_dt()
-    data = dt.strftime("%Y-%m-%d")
-    hora = dt.strftime("%H:%M")
-    updated_brt = dt.strftime("%Y-%m-%d %H:%M")
+    active = safe_read_json(OPS_ACTIVE_FILE, {"ops": []})
+    ops = active.get("ops") or []
+
+    data_atual, hora_atual, updated_brt = brt_now_parts()
 
     out_ops = []
-
     for op in ops:
-        try:
-            op_id = str(op.get("id") or "")
-            par = up(op.get("par"))
-            side = up(op.get("side"))
-            entrada = num(op.get("entrada"))
-            alvo = num(op.get("alvo"))
-            alav = num(op.get("alav"))
+        par = str(op.get("par","")).upper().strip()
+        side = str(op.get("side","")).upper().strip()
+        entrada = float(op.get("entrada") or 0)
+        alvo = float(op.get("alvo") or 0)
 
-            px = fetch_price(par)
-            ga = ganho_pct(side, entrada, alvo, alav) if alvo > 0 else 0.0
-            gu = ganho_pct(side, entrada, px, alav) if px > 0 else 0.0
+        symbol = f"{par}USDT"
+        atual = binance_price(symbol)
 
-            out_ops.append({
-                "id": op_id,
-                "par": par,
-                "side": side,
-                "entrada": entrada,
-                "alvo": alvo,
-                "alav": int(alav) if alav > 0 else 1,
-                "atual": px,
-                "ganho_alvo_pct": ga,
-                "ganho_atual_pct": gu,
-                "situacao": situacao(side, px, alvo),
-                "data": data,
-                "hora": hora
-            })
-        except Exception as e:
-            log_err(op.get("id","?"), e)
-            out_ops.append({
-                "id": str(op.get("id") or ""),
-                "par": up(op.get("par")),
-                "side": up(op.get("side")),
-                "entrada": num(op.get("entrada")),
-                "alvo": num(op.get("alvo")),
-                "alav": int(num(op.get("alav")) or 1),
-                "atual": 0.0,
-                "ganho_alvo_pct": 0.0,
-                "ganho_atual_pct": 0.0,
-                "situacao": "ERRO — ver log",
-                "data": data,
-                "hora": hora
-            })
+        g_alvo = gain_percent(side, entrada, alvo) if alvo else None
+        g_atual = gain_percent(side, entrada, atual) if atual else None
 
-    payload = {"updated_brt": updated_brt, "worker_build": read_version(), "worker_src": os.path.basename(__file__), "ops": out_ops}
-    safe_write_json(P_MON, payload)
+        situacao = "EM ANDAMENTO"
+        if g_atual is not None and g_alvo is not None and g_atual >= g_alvo:
+            situacao = "ALVO ATINGIDO"
+
+        out = dict(op)
+        out["data_atual"] = data_atual
+        out["hora_atual"] = hora_atual
+        out["atual"] = fmt_price(atual)
+        out["ganho_alvo"] = fmt_pct(g_alvo)
+        out["ganho_atual"] = fmt_pct(g_atual)
+        out["situacao"] = situacao
+        out_ops.append(out)
+
+    safe_write_json(MONITOR_FILE, {
+        "updated_brt": updated_brt,
+        "worker_build": os.environ.get("WORKER_BUILD","rebuild_avp_v1"),
+        "worker_src": os.path.basename(__file__),
+        "ops": out_ops
+    })
 
 if __name__ == "__main__":
     main()

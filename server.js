@@ -1,211 +1,314 @@
-"use strict";
+/**
+ * AUTOTRADER-SAIDA (SAÍDA V2) — API + Static
+ * Objetivo: painéis /saida + API para:
+ * - ALVO do PRO (congelado) via /api/saida/alvo?par=XXX&side=LONG|SHORT
+ * - Operações ativas (monitoradas) em /api/saida/ops e /api/saida/monitor
+ * - Operações realizadas (histórico) em /api/saida/realizadas
+ * - ADD, SAIR (move para realizadas), EXCLUIR
+ *
+ * Regras:
+ * - Sem cache (no-store)
+ * - Campos e colunas alinhados ao projeto (JORGE)
+ */
 
-const fs = require("fs");
-const path = require("path");
-const express = require("express");
+'use strict';
 
-const app = express();
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
 
-const PORT = process.env.PORT || 8096;
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
-const DIST_DIR = process.env.DIST_DIR || path.join(__dirname, "dist");
+const PORT = parseInt(process.env.PORT || '8096', 10);
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const DIST_DIR = path.join(__dirname, 'dist');
 
-fs.mkdirSync(DATA_DIR, { recursive: true });
+const OPS_ACTIVE_FILE = path.join(DATA_DIR, 'ops_active.json');
+const OPS_REAL_FILE   = path.join(DATA_DIR, 'ops_realizadas.json');
+const MONITOR_FILE    = path.join(DATA_DIR, 'monitor.json');
 
-app.use(express.json({ limit: "200kb" }));
-app.use((req, res, next) => {
-  res.setHeader("Cache-Control", "no-store");
-  next();
-});
+// Integração do PRO (alvo congelado):
+// 1) se existir ENTRADA_PRO_JSON, tenta ler dele
+// 2) senão, usa data/alvo_pro.json (local)
+const ENTRADA_PRO_JSON = process.env.ENTRADA_PRO_JSON || ''; // ex: /home/roteiro_ds/autotrader-planilhas-python/data/entrada.json
+const ALVO_PRO_FALLBACK = path.join(DATA_DIR, 'alvo_pro.json');
 
-function up(v){ return String(v || "").trim().toUpperCase(); }
-function num(v){
-  const n = Number(v);
-  return Number.isFinite(n) ? n : NaN;
+function ensureDir(p) {
+  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
+ensureDir(DATA_DIR);
 
-function safeReadJson(p, fallback){
-  try{
-    if (!fs.existsSync(p)) return fallback;
-    const s = fs.readFileSync(p, "utf-8");
-    if (!s || !String(s).trim()) return fallback;
+function safeReadJson(file, fallback) {
+  try {
+    if (!fs.existsSync(file)) return fallback;
+    const s = fs.readFileSync(file, 'utf8');
+    if (!s.trim()) return fallback;
     return JSON.parse(s);
-  }catch{
+  } catch (e) {
     return fallback;
   }
 }
 
-function safeWriteJson(p, obj){
-  const tmp = p + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(obj, null, 2), "utf-8");
-  fs.renameSync(tmp, p);
+function safeWriteJson(file, obj) {
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(obj, null, 2));
+  fs.renameSync(tmp, file);
 }
 
-function pickExisting(paths){
-  for (const p of paths){
-    try{
-      if (p && fs.existsSync(p)) return p;
-    }catch{}
-  }
-  return null;
+function nowBRTParts() {
+  // BRT: America/Sao_Paulo
+  const dt = new Date();
+  const fmtDate = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric' });
+  const fmtTime = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour:'2-digit', minute:'2-digit', hour12:false });
+  return { data: fmtDate.format(dt), hora: fmtTime.format(dt) };
 }
 
-function collectEntries(node, out, depth){
-  if (depth > 6) return;
-  if (Array.isArray(node)){
-    for (const x of node) collectEntries(x, out, depth+1);
-    return;
-  }
-  if (!node || typeof node !== "object") return;
-
-  const par = up(node.par || node.symbol || node.moeda || node.ticker);
-  const side = up(node.side || node.sinal || node.tipo || node.position || node.direction);
-  const alvo = node.alvo ?? node.target ?? node.tp ?? node.take_profit ?? node.takeProfit;
-
-  if (par && alvo !== undefined){
-    out.push({ par, side, alvo });
-  }
-
-  for (const k of Object.keys(node)){
-    const v = node[k];
-    if (typeof v === "object" && v !== null) collectEntries(v, out, depth+1);
-  }
+function okNoStore(res) {
+  res.setHeader('Cache-Control', 'no-store');
 }
 
-function readProAndFindAlvo(par, side){
-  const candidates = [
-    process.env.PRO_JSON,
-    "/home/roteiro_ds/AUTOTRADER-PRO/data/pro.json",
-    "/home/roteiro_ds/AUTOTRADER-PRO/data/pro_api.json",
-    "/home/roteiro_ds/AUTOTRADER-PRO/data/top10.json",
-    "/home/roteiro_ds/AUTOTRADER-PRO/data/pro_top10.json"
-  ];
-  const proFile = pickExisting(candidates);
-  if (!proFile){
-    return { ok:false, msg:"Não achei o arquivo do PRO no servidor.", updated_brt:null };
+function normalizeSide(sideRaw) {
+  const s = String(sideRaw || '').toUpperCase().trim();
+  if (s === 'LONG' || s === 'SHORT') return s;
+  return '';
+}
+
+function normalizePar(parRaw) {
+  const p = String(parRaw || '').toUpperCase().trim();
+  // aceita apenas letras/números/underscore/hífen (segurança)
+  if (!p || !/^[A-Z0-9_\\-]{2,20}$/.test(p)) return '';
+  return p;
+}
+
+function loadActive() {
+  return safeReadJson(OPS_ACTIVE_FILE, { updated_brt: null, ops: [] });
+}
+function saveActive(obj) {
+  safeWriteJson(OPS_ACTIVE_FILE, obj);
+}
+function loadReal() {
+  return safeReadJson(OPS_REAL_FILE, { updated_brt: null, ops: [] });
+}
+function saveReal(obj) {
+  safeWriteJson(OPS_REAL_FILE, obj);
+}
+function loadMonitor() {
+  return safeReadJson(MONITOR_FILE, { updated_brt: null, ops: [] });
+}
+
+function findOpById(list, id) {
+  return (list || []).find(o => String(o.id) === String(id));
+}
+
+function computeGains(op) {
+  const side = normalizeSide(op.side);
+  const entrada = Number(op.entrada);
+  const alvo = Number(op.alvo);
+  const atual = Number(op.atual);
+  const okNums = Number.isFinite(entrada) && entrada > 0;
+  let ganhoAlvo = null;
+  let ganhoAtual = null;
+
+  if (okNums && Number.isFinite(alvo) && alvo > 0) {
+    ganhoAlvo = side === 'SHORT' ? ((entrada / alvo) - 1) * 100 : ((alvo / entrada) - 1) * 100;
+  }
+  if (okNums && Number.isFinite(atual) && atual > 0) {
+    ganhoAtual = side === 'SHORT' ? ((entrada / atual) - 1) * 100 : ((atual / entrada) - 1) * 100;
   }
 
-  const d = safeReadJson(proFile, null);
-  if (!d) return { ok:false, msg:"Arquivo do PRO está vazio ou inválido.", updated_brt:null };
+  return { ganho_alvo: ganhoAlvo, ganho_atual: ganhoAtual };
+}
 
-  const updated_brt = d.updated_brt || d.updated || d.updatedAt || d.pro_updated_brt || null;
+const app = express();
+app.use(express.json({ limit: '256kb' }));
 
-  const items = [];
-  collectEntries(d, items, 0);
+// Sem cache em tudo
+app.use((req, res, next) => { okNoStore(res); next(); });
 
-  const wantPar = up(par);
-  const wantSide = up(side);
+// Static
+app.get(['/','/saida'], (req, res) => {
+  res.sendFile(path.join(DIST_DIR, 'saida.html'));
+});
+app.use('/dist', express.static(DIST_DIR, { etag: true, immutable: false, maxAge: 0 }));
 
-  for (const it of items){
-    if (it.par === wantPar && (it.side === wantSide)){
-      const a = Number(it.alvo);
-      if (Number.isFinite(a) && a > 0) return { ok:true, alvo:a, updated_brt };
+// Health
+app.get('/api/health', (req, res) => res.json({ ok:true, service:'autotrader-saida', ts: new Date().toISOString() }));
+
+/**
+ * GET /api/saida/alvo?par=ADA&side=LONG
+ * Retorna alvo congelado do PRO.
+ */
+app.get('/api/saida/alvo', (req, res) => {
+  const par = normalizePar(req.query.par);
+  const side = normalizeSide(req.query.side);
+  if (!par) return res.status(400).json({ ok:false, msg:'Par inválido.' });
+  if (!side) return res.status(400).json({ ok:false, msg:'Side inválido.' });
+
+  // tenta ENTRADA_PRO_JSON
+  let alvo = null;
+  let updated_brt = null;
+
+  if (ENTRADA_PRO_JSON && fs.existsSync(ENTRADA_PRO_JSON)) {
+    const pro = safeReadJson(ENTRADA_PRO_JSON, null);
+    // formatos possíveis:
+    // A) { updated_brt, alvos: [{par, side, alvo}, ...] }
+    // B) { updated_brt, alvo_por_par: { ADA: { LONG: 0.123, SHORT: 0.456 } } }
+    if (pro) {
+      updated_brt = pro.updated_brt || pro.updated || null;
+
+      if (Array.isArray(pro.alvos)) {
+        const hit = pro.alvos.find(x => normalizePar(x.par) === par && normalizeSide(x.side) === side);
+        if (hit && Number.isFinite(Number(hit.alvo))) alvo = Number(hit.alvo);
+      } else if (pro.alvo_por_par && pro.alvo_por_par[par] && pro.alvo_por_par[par][side] != null) {
+        const v = Number(pro.alvo_por_par[par][side]);
+        if (Number.isFinite(v)) alvo = v;
+      }
     }
   }
-  for (const it of items){
-    if (it.par === wantPar){
-      const a = Number(it.alvo);
-      if (Number.isFinite(a) && a > 0) return { ok:true, alvo:a, updated_brt };
-    }
+
+  // fallback local
+  if (alvo == null) {
+    const fb = safeReadJson(ALVO_PRO_FALLBACK, {});
+    const v = fb?.[par]?.[side];
+    if (v != null && Number.isFinite(Number(v))) alvo = Number(v);
+    updated_brt = updated_brt || fb.updated_brt || null;
   }
 
-  return { ok:false, msg:"Sem alvo do PRO para essa moeda.", updated_brt };
-}
+  if (alvo == null) return res.status(404).json({ ok:false, msg:'Alvo não encontrado.' });
 
-const OPS_FILE = path.join(DATA_DIR, "saida_ops.json");
-const MON_FILE = path.join(DATA_DIR, "saida_monitor.json");
-
-function readOps(){
-  const d = safeReadJson(OPS_FILE, { ops: [] });
-  if (!d.ops || !Array.isArray(d.ops)) d.ops = [];
-  return d;
-}
-
-function writeOps(d){
-  safeWriteJson(OPS_FILE, d);
-}
-
-app.use("/dist", express.static(DIST_DIR));
-app.get("/", (req,res)=>res.redirect("/saida"));
-app.get("/saida", (req,res)=>res.sendFile(path.join(DIST_DIR, "saida.html")));
-
-app.get("/api/saida/version", (req,res)=>{
-  let v = "unknown";
-  try {
-    v = fs.readFileSync(path.join(__dirname, "VERSION"), "utf-8").trim();
-  } catch (e) {}
-  res.json({ ok:true, version: v, now_utc: new Date().toISOString() });
+  return res.json({ ok:true, par, side, alvo, updated_brt });
 });
 
-
-app.get("/api/saida/monitor", (req,res)=>{
-  const d = safeReadJson(MON_FILE, { updated_brt: null, ops: [] });
-  res.json(d);
+/**
+ * GET /api/saida/ops  -> operações ativas (cadastro)
+ */
+app.get('/api/saida/ops', (req, res) => {
+  const active = loadActive();
+  res.json(active);
 });
 
-app.get("/api/saida/ops", (req,res)=>{
-  res.json(readOps());
+/**
+ * GET /api/saida/monitor -> operações ativas + calculadas (worker)
+ */
+app.get('/api/saida/monitor', (req, res) => {
+  const m = loadMonitor();
+  res.json(m);
 });
 
-app.get("/api/saida/alvo", (req,res)=>{
-  const par = up(req.query.par);
-  const side = up(req.query.side);
-  if (!par) return res.status(400).json({ ok:false, msg:"Moeda inválida." });
-  if (!(side==="LONG" || side==="SHORT")) return res.status(400).json({ ok:false, msg:"Side inválido." });
-
-  const r = readProAndFindAlvo(par, side);
-  if (!r.ok) return res.status(404).json({ ok:false, msg:r.msg, updated_brt:r.updated_brt });
-  res.json({ ok:true, par, side, alvo:r.alvo, updated_brt:r.updated_brt });
+/**
+ * GET /api/saida/realizadas -> histórico (não atualiza)
+ */
+app.get('/api/saida/realizadas', (req, res) => {
+  res.json(loadReal());
 });
 
-app.post("/api/saida/add", (req,res)=>{
-  const par = up(req.body?.par);
-  const side = up(req.body?.side);
-  const entrada = num(req.body?.entrada);
-  const alav = Math.max(1, Math.floor(num(req.body?.alav)));
+/**
+ * POST /api/saida/add
+ * body: { par, side, entrada, alvo, alav }
+ */
+app.post('/api/saida/add', (req, res) => {
+  const par = normalizePar(req.body?.par ?? req.query.par);
+  const side = normalizeSide(req.body?.side ?? req.query.side);
+  const entrada = Number(req.body?.entrada ?? req.query.entrada);
+  const alvo = Number(req.body?.alvo ?? req.query.alvo);
+  const alav = Number(req.body?.alav ?? req.query.alav);
 
-  if (!par) return res.status(400).json({ ok:false, msg:"Moeda inválida." });
-  if (!(side==="LONG" || side==="SHORT")) return res.status(400).json({ ok:false, msg:"Side inválido." });
-  if (!Number.isFinite(entrada) || entrada<=0) return res.status(400).json({ ok:false, msg:"Entrada inválida." });
-  if (!Number.isFinite(alav) || alav<1) return res.status(400).json({ ok:false, msg:"Alavancagem inválida." });
+  if (!par) return res.status(400).json({ ok:false, msg:'Par inválido.' });
+  if (!side) return res.status(400).json({ ok:false, msg:'Side inválido.' });
+  if (!Number.isFinite(entrada) || entrada <= 0) return res.status(400).json({ ok:false, msg:'Entrada inválida.' });
+  if (!Number.isFinite(alvo) || alvo <= 0) return res.status(400).json({ ok:false, msg:'Alvo inválido.' });
+  if (!Number.isFinite(alav) || alav <= 0) return res.status(400).json({ ok:false, msg:'Alavancagem inválida.' });
 
-  const r = readProAndFindAlvo(par, side);
-  if (!r.ok) return res.status(400).json({ ok:false, msg:"Sem alvo do PRO para adicionar.", updated_brt:r.updated_brt || null });
-
+  const active = loadActive();
+  const { data, hora } = nowBRTParts();
   const id = `${par}-${Date.now()}`;
-  const d = readOps();
-  d.ops.push({
+
+  const op = {
     id,
     par,
     side,
-    entrada,
-    alvo: r.alvo,
-    alav,
-    created_ts: new Date().toISOString(),
-    pro_updated_brt: r.updated_brt || null
-  });
-  writeOps(d);
+    entrada: Number(entrada),
+    alvo: Number(alvo),
+    alav: Number(alav),
+    data_reg: data,
+    hora_reg: hora,
+    created_ts_utc: new Date().toISOString()
+  };
+
+  active.ops = Array.isArray(active.ops) ? active.ops : [];
+  active.ops.push(op);
+  active.updated_brt = `${data} ${hora}`;
+  saveActive(active);
+
   res.json({ ok:true, id });
 });
 
-app.post("/api/saida/del", (req,res)=>{
-  const id = String(req.body?.id || "").trim();
-  if (!id) return res.status(400).json({ ok:false, msg:"ID inválido." });
+/**
+ * POST /api/saida/sair
+ * body: { id }
+ * Move de ATIVAS -> REALIZADAS usando o snapshot do MONITOR (se existir).
+ */
+app.post('/api/saida/sair', (req, res) => {
+  const id = String(req.body?.id ?? req.query.id ?? '').trim();
+  if (!id) return res.status(400).json({ ok:false, msg:'ID inválido.' });
 
-  const d = readOps();
-  const before = d.ops.length;
-  d.ops = d.ops.filter(x => String(x.id) !== id);
-  writeOps(d);
+  const active = loadActive();
+  const idx = (active.ops || []).findIndex(o => String(o.id) === id);
+  if (idx < 0) return res.status(404).json({ ok:false, msg:'Operação não encontrada.' });
 
-  res.json({ ok:true, removed: before - d.ops.length });
+  const monitor = loadMonitor();
+  const snap = findOpById(monitor.ops || [], id);
+  const base = active.ops[idx];
+
+  // snapshot final com todas colunas do MONITOR, se disponível
+  const moved = Object.assign({}, base, snap || {});
+  const { data, hora } = nowBRTParts();
+  moved.data_sair = data;
+  moved.hora_sair = hora;
+
+  // remove de ativas
+  active.ops.splice(idx, 1);
+  active.updated_brt = `${data} ${hora}`;
+  saveActive(active);
+
+  // adiciona em realizadas
+  const real = loadReal();
+  real.ops = Array.isArray(real.ops) ? real.ops : [];
+  real.ops.push(moved);
+  real.updated_brt = `${data} ${hora}`;
+  saveReal(real);
+
+  res.json({ ok:true });
 });
 
-// rota antiga (compatível com página velha)
-app.post("/api/saida/delete", (req,res)=> {
-  req.url = "/api/saida/del";
-  app._router.handle(req, res);
+/**
+ * POST /api/saida/delete
+ * body: { id, scope: 'active'|'real' }
+ */
+app.post('/api/saida/delete', (req, res) => {
+  const id = String(req.body?.id ?? req.query.id ?? '').trim();
+  const scope = String(req.body?.scope ?? req.query.scope ?? 'active').toLowerCase();
+  if (!id) return res.status(400).json({ ok:false, msg:'ID inválido.' });
+
+  const { data, hora } = nowBRTParts();
+
+  if (scope === 'real') {
+    const real = loadReal();
+    const before = (real.ops || []).length;
+    real.ops = (real.ops || []).filter(o => String(o.id) !== id);
+    if (real.ops.length === before) return res.status(404).json({ ok:false, msg:'Operação não encontrada.' });
+    real.updated_brt = `${data} ${hora}`;
+    saveReal(real);
+    return res.json({ ok:true });
+  }
+
+  const active = loadActive();
+  const before = (active.ops || []).length;
+  active.ops = (active.ops || []).filter(o => String(o.id) !== id);
+  if (active.ops.length === before) return res.status(404).json({ ok:false, msg:'Operação não encontrada.' });
+  active.updated_brt = `${data} ${hora}`;
+  saveActive(active);
+  return res.json({ ok:true });
 });
 
-app.listen(PORT, "0.0.0.0", ()=> {
-  console.log("AUTOTRADER-SAIDA rodando na porta", PORT);
+app.listen(PORT, () => {
+  console.log(`[SAIDA] server up on :${PORT} | DATA_DIR=${DATA_DIR}`);
 });

@@ -1,0 +1,6 @@
+{
+  "updated_brt": null,
+  "worker_build": "rebuild_avp_v1",
+  "worker_src": "worker_saida_v2.py",
+  "ops": []
+}

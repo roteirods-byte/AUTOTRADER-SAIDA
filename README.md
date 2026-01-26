@@ -1,28 +1,29 @@
-# AUTOTRADER-SAIDA – AVP FIX (Correção Definitiva)
+# AUTOTRADER-SAIDA — Rebuild AVP (GitHub-first)
 
-## O que foi corrigido (com base nos prints)
-- Erro no console: `refresh is not defined` (agora existe `window.refresh` e o loop não quebra).
-- Erro HTTP 400 em `/api/saida/alvo` quando PAR vazio (agora só chama a API quando PAR existe e sempre manda `par` + `side`).
-- Colunas do MONITORAMENTO voltaram para o padrão oficial do projeto.
-- Criado o 3º painel: **OPERAÇÕES REALIZADAS**.
-  - Clique em **SAIR** move a operação do Monitoramento para Realizadas (snapshot congelado).
-  - Realizadas não atualiza automaticamente.
-  - Realizadas tem botão **EXCLUIR** (apaga do histórico local).
+Este pacote entrega uma versão **nova e limpa** do painel **/saida** + API, com:
 
-## Regra do projeto – auditoria interna antes de liberar
-Rode no repo (raiz):
+- **Entrada da operação (ADD)** usando **ALVO do PRO congelado**
+- **Monitoramento** (tabela automática)
+- **Operações Realizadas** (histórico): ao clicar **SAIR**, copia a linha completa e para de monitorar
+- **Auditoria AVP** no GitHub Actions (bloqueia deploy se quebrar)
 
-```bash
-./scripts/avp_audit.sh
-```
+## Arquivos principais
+- `dist/saida.html` (frontend)
+- `server.js` (API + /saida)
+- `worker_saida_v2.py` (atualiza `data/monitor.json`)
+- `scripts/avp_audit.sh` + `.github/workflows/avp_audit.yml`
 
-Se falhar, NÃO faça deploy.
+## Variáveis de ambiente (opcionais)
+- `PORT` (padrão: 8096)
+- `DATA_DIR` (padrão: ./data)
+- `ENTRADA_PRO_JSON` (caminho do JSON do PRO com alvos, se existir)
 
-## Verificar se o deploy aplicou
-Depois do deploy, rode:
+## Rotas
+- `GET /saida`
+- `GET /api/saida/alvo?par=ADA&side=LONG`
+- `POST /api/saida/add`
+- `GET /api/saida/monitor`
+- `POST /api/saida/sair`
+- `GET /api/saida/realizadas`
+- `POST /api/saida/delete`
 
-```bash
-./scripts/validate_site.sh "https://saida1jorge.duckdns.org/saida"
-```
-
-Se falhar, significa que o `dist/saida.html` não foi publicado no site (pipeline/cache/rota).
