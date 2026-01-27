@@ -35,7 +35,7 @@ jobs:
   deploy_vm:
     name: Deploy on VM via Self-hosted Runner
     needs: avp_audit
-    runs-on: [self-hosted, autotrader-vm]
+    runs-on: [self-hosted, autotrader-vm, saida]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
