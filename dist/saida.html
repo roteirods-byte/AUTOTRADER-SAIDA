@@ -155,7 +155,27 @@
       .badge{min-width:180px}
       table{min-width:1100px;}
     }
-  </style>
+  
+/* === AVP: UX fixes === */
+#par{ color: var(--orange); font-weight:800; }
+#par option{ color:#0b1420; }
+.coin{ color: var(--orange); font-weight:800; }
+
+/* remove number spinners (looks like scrollbar) */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
+
+/* alvo manual row */
+.subrow{ display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.chk{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+.pct{ width:90px; }
+.btnSmall{ padding:8px 10px; border-radius:12px; border:1px solid rgba(255,136,0,.6); background:rgba(255,136,0,.10); color:var(--orange); font-weight:800; cursor:pointer; }
+.btnSmall:hover{ background:rgba(255,136,0,.16); }
+/* make inputs not show inner scroll */
+.inp{ overflow:hidden; }
+
+</style>
 </head>
 
 <body>
@@ -197,8 +217,14 @@
         </div>
 
         <div>
-          <label>US ALVO (do PRO, congelado)</label>
+          <label>ALVO (AUTO do PRO / MANUAL)</label>
           <input id="alvo" type="number" step="0.000001" placeholder="—" readonly />
+          <div class="subrow">
+            <label class="chk"><input type="checkbox" id="alvoManual" /> ALVO manual (se PRO cair)</label>
+            <span class="chk">GANHO %</span>
+            <input id="alvoPct" class="inp pct" type="number" step="0.01" value="3.00" />
+            <button id="btnCalcAlvo" class="btnSmall" type="button">Calcular ALVO</button>
+          </div>
         </div>
 
         <div>
@@ -517,6 +543,19 @@
     $("#par").onchange = fetchAlvoSafe;
     $("#btnAdd").onclick = addOp;
 
+    // AVP: modo manual do ALVO
+    $("#alvoManual").onchange = () => {
+      const manual = $("#alvoManual").checked;
+      $("#alvo").readOnly = !manual;
+      if(!manual){
+        $("#alvoInfo").textContent = "ALVO automático (PRO).";
+        fetchAlvoSafe();
+      }else{
+        $("#alvoInfo").textContent = "ALVO manual habilitado. Não será atualizado pelo PRO.";
+      }
+    };
+    $("#btnCalcAlvo").onclick = calcAlvoLocal;
+
     $("#pdfMonitor").onclick = () => pdfFromTable("MONITORAMENTO_DAS_OPERACOES", "tblMonitor");
     $("#pdfReal").onclick = () => pdfFromTable("OPERACOES_REALIZADAS", "tblReal");
 
@@ -530,3 +569,20 @@
   </script>
 </body>
 </html>
+  // AVP: cálculo local de ALVO (contingência quando PRO estiver fora)
+  function calcAlvoLocal(){
+    const entrada = Number($("#entrada").value);
+    if(!isFinite(entrada) || entrada<=0){
+      $("#alvoInfo").textContent = "Digite ENTRADA válida para calcular o ALVO.";
+      return;
+    }
+    const side = getSide();
+    const pct = Number($("#alvoPct").value);
+    const p = (isFinite(pct) && pct>0) ? pct : 3.0;
+    const alvo = side==="SHORT" ? entrada*(1 - p/100) : entrada*(1 + p/100);
+    $("#alvoManual").checked = true;
+    $("#alvo").readOnly = false;
+    $("#alvo").value = fmtPrice(alvo);
+    $("#alvoInfo").textContent = "ALVO manual (calculado local). Não será atualizado pelo PRO.";
+  }
+
