@@ -1,0 +1,78 @@
+name: Deploy SAIDA (AVP Gate)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  avp_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Basic sanity checks (PRAZO gate)
+        run: |
+          set -euo pipefail
+          echo "=== Repo sanity ==="
+          test -f dist/saida.html
+          test -f server.js
+          test -f worker_saida_v2.py
+
+          echo "=== PRAZO gate: must NOT be broken ==="
+          # Regra: se tiver "PRAZO" quebrado (placeholder/erro), falha.
+          # IMPORTANTE: exclui a pasta .github para evitar falso positivo no próprio workflow.
+          if grep -RIn --exclude-dir=.git --exclude-dir=.github --exclude=*.zip -E "PRAZO QUEBRADO|PRAZO_BROKEN|TODO_PRAZO" . ; then
+            echo "ERRO: PRAZO quebrado detectado. Deploy bloqueado."
+            exit 1
+          fi
+
+      - name: AVP audit script (if exists)
+        run: |
+          if [ -f scripts/avp_audit.sh ]; then
+            chmod +x scripts/avp_audit.sh || true
+            bash scripts/avp_audit.sh
+          else
+            echo "ERRO: scripts/avp_audit.sh não encontrado."
+            exit 1
+          fi
+
+  deploy_to_vm:
+    needs: avp_audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy files to VM
+        run: |
+          set -euo pipefail
+          PORT="${{ secrets.VM_PORT }}"
+          if [ -z "$PORT" ]; then PORT="22"; fi
+
+          DEST_PATH="${{ secrets.VM_PATH }}"
+          if [ -z "$DEST_PATH" ]; then DEST_PATH="/home/roteiro_ds/AUTOTRADER-SAIDA"; fi
+
+          DEST="${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:${DEST_PATH}/"
+
+          rsync -az --delete             --exclude ".git/" --exclude "*.zip"             -e "ssh -i ~/.ssh/id_rsa -p ${PORT}"             ./ "${DEST}"
+
+      - name: Restart services (optional)
+        run: |
+          set -euo pipefail
+          PORT="${{ secrets.VM_PORT }}"
+          if [ -z "$PORT" ]; then PORT="22"; fi
+
+          ssh -i ~/.ssh/id_rsa -p "${PORT}" "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" << 'SSH'
+          set -euo pipefail
+          # Reinícios são "best effort" (não quebra o deploy se algum serviço não existir)
+          sudo systemctl restart autotrader-saida-v2.service 2>/dev/null || true
+          sudo systemctl restart autotrader-saida-v2.timer 2>/dev/null || true
+          sudo systemctl restart autotrader-saida-v2-worker.service 2>/dev/null || true
+          sudo nginx -t 2>/dev/null && sudo systemctl reload nginx 2>/dev/null || true
+          SSH
