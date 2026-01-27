@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const PDFDocument = require('pdfkit');
 
 const PORT = parseInt(process.env.PORT || '8096', 10);
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
@@ -51,6 +52,62 @@ function safeWriteJson(file, obj) {
   const tmp = file + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(obj, null, 2));
   fs.renameSync(tmp, file);
+}
+
+function fmtPrice3(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '—';
+  return n.toFixed(3);
+}
+
+function fmtPct2(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '—';
+  return n.toFixed(2) + '%';
+}
+
+function pdfTable(res, title, columns, rows) {
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${title.replace(/\s+/g,'_')}.pdf"`);
+
+  const doc = new PDFDocument({ margin: 28, size: 'A4' });
+  doc.pipe(res);
+
+  const { data, hora } = nowBRTParts();
+
+  doc.fontSize(16).text('AUTOTRADER-SAÍDA', { align: 'left' });
+  doc.moveDown(0.2);
+  doc.fontSize(11).text(`${title}  |  Gerado em: ${data} ${hora}`, { align: 'left' });
+  doc.moveDown(0.8);
+
+  // Layout simples (tabela em texto):
+  doc.fontSize(8);
+  const colGap = 8;
+  const pageW = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const colW = Math.max(60, Math.floor((pageW - (columns.length - 1) * colGap) / columns.length));
+
+  const drawRow = (cells, isHeader=false) => {
+    const y0 = doc.y;
+    let x = doc.page.margins.left;
+    doc.font(isHeader ? 'Helvetica-Bold' : 'Helvetica');
+    for (let i = 0; i < columns.length; i++) {
+      doc.text(String(cells[i] ?? ''), x, y0, { width: colW, continued: false, lineBreak: false, ellipsis: true });
+      x += colW + colGap;
+    }
+    doc.y = y0 + 12;
+    if (doc.y > doc.page.height - doc.page.margins.bottom - 20) {
+      doc.addPage();
+    }
+  };
+
+  drawRow(columns, true);
+  doc.moveDown(0.2);
+
+  for (const r of rows) {
+    drawRow(r, false);
+  }
+
+  doc.end();
 }
 
 function nowBRTParts() {
@@ -92,10 +149,6 @@ function saveReal(obj) {
 }
 function loadMonitor() {
   return safeReadJson(MONITOR_FILE, { updated_brt: null, ops: [] });
-}
-
-function saveMonitor(obj){
-  safeWriteJson(MONITOR_PATH, obj);
 }
 
 function findOpById(list, id) {
@@ -204,6 +257,42 @@ app.get('/api/saida/realizadas', (req, res) => {
   res.json(loadReal());
 });
 
+// PDF (arquivo real) - sem colunas de ação (SAIR/EXCLUIR)
+app.get('/api/saida/pdf', (req, res) => {
+  const scope = String(req.query.scope || 'monitor').toLowerCase();
+  const src = (scope === 'real' || scope === 'realizadas') ? loadReal() : loadMonitor();
+  const ops = Array.isArray(src.real) ? src.real : (Array.isArray(src.ops) ? src.ops : []);
+
+  const columns = [
+    'PAR','SIDE','ENTRADA','ALVO','ALAV','DATA REG','HORA REG',
+    'ATUAL','GANHO ALVO','GANHO ATUAL','SITUACAO','DATA ATUAL','HORA ATUAL'
+  ];
+
+  const rows = ops.map(op => ([
+    String(op.par || '').toUpperCase(),
+    String(op.side || '').toUpperCase(),
+    fmtPrice3(op.entrada),
+    fmtPrice3(op.alvo),
+    (Number.isFinite(Number(op.alav)) ? String(Number(op.alav)) : '—'),
+    String(op.data_reg || op.data || '—'),
+    String(op.hora_reg || op.hora || '—'),
+    fmtPrice3(op.atual),
+    fmtPct2(op.ganho_alvo),
+    fmtPct2(op.ganho_atual),
+    String(op.situacao || '').toUpperCase() || '—',
+    String(op.data_atual || '—'),
+    String(op.hora_atual || '—'),
+  ]));
+
+  const name = (scope === 'real' || scope === 'realizadas') ? 'OPERACOES_REALIZADAS' : 'MONITORAMENTO';
+  const { data, hora } = nowBRTParts();
+  const filename = `AUTOTRADER_SAIDA_${name}_${data.replaceAll('/','-')}_${hora.replaceAll(':','-')}.pdf`;
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  pdfTable(res, { title: `AUTOTRADER-SAIDA - ${name}`, columns, rows });
+});
+
 /**
  * POST /api/saida/add
  * body: { par, side, entrada, alvo, alav }
@@ -310,17 +399,6 @@ app.post('/api/saida/delete', (req, res) => {
   if (active.ops.length === before) return res.status(404).json({ ok:false, msg:'Operação não encontrada.' });
   active.updated_brt = `${data} ${hora}`;
   saveActive(active);
-
-// Remove também do MONITOR (para sumir imediatamente da tela)
-try{
-  const mon = loadMonitor();
-  if(Array.isArray(mon.ops)){
-    mon.ops = mon.ops.filter(o => String(o.id) !== String(id));
-    mon.updated_brt = nowBrtDateTime().join(" ");
-    saveMonitor(mon);
-  }
-}catch(e){}
-
   return res.json({ ok:true });
 });
 

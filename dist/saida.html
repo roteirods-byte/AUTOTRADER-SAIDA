@@ -279,7 +279,7 @@
   </div>
 
   <!-- PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- PDF agora é gerado no servidor (arquivo real) -->
 
   <script>
     // ==== CONFIG ====
@@ -288,6 +288,7 @@
       add:  () => `/api/saida/add`,
       monitor: () => `/api/saida/monitor`,
       real: () => `/api/saida/realizadas`,
+    pdf: (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
       sair: () => `/api/saida/sair`,
       del: () => `/api/saida/delete`,
     };
@@ -496,16 +497,9 @@
       }
     }
 
-    function pdfFromTable(title, tableId){
-      const node = document.getElementById(tableId).closest(".panel");
-      const opt = {
-        margin:       8,
-        filename:     `${title}.pdf`,
-        image:        { type: "jpeg", quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: "mm", format: "a4", orientation: "landscape" }
-      };
-      html2pdf().set(opt).from(node).save();
+    function downloadPdf(scope){
+      // PDF real gerado no servidor
+      window.open(API.pdf(scope), "_blank");
     }
 
     // ==== INIT ====
@@ -517,8 +511,8 @@
     $("#par").onchange = fetchAlvoSafe;
     $("#btnAdd").onclick = addOp;
 
-    $("#pdfMonitor").onclick = () => pdfFromTable("MONITORAMENTO_DAS_OPERACOES", "tblMonitor");
-    $("#pdfReal").onclick = () => pdfFromTable("OPERACOES_REALIZADAS", "tblReal");
+    $("#pdfMonitor").onclick = () => downloadPdf("monitor");
+    $("#pdfReal").onclick = () => downloadPdf("realizadas");
 
     // primeira carga
     fetchAlvoSafe();

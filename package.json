@@ -9,6 +9,7 @@
     "audit": "bash scripts/avp_audit.sh"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "pdfkit": "^0.15.0"
   }
 }
