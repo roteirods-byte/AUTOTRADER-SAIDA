@@ -118,14 +118,10 @@
     }
     .rowTop .left{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
     .tableWrap{
-      overflow-x:auto;
-      overflow-y:hidden;
+      overflow:auto;
       border:1px solid rgba(255,255,255,.08);
       border-radius:14px;
-      -ms-overflow-style: none; /* IE/Edge */
-      scrollbar-width: none; /* Firefox */
     }
-    .tableWrap::-webkit-scrollbar{ display:none; }
     table{width:100%;border-collapse:separate;border-spacing:0;min-width:980px;}
     thead th{
       position:sticky;top:0;
@@ -159,29 +155,7 @@
       .badge{min-width:180px}
       table{min-width:1100px;}
     }
-  
-/* === AVP: UX fixes === */
-#par{ color: var(--orange); font-weight:800; }
-    #par option{ color:var(--orange); background:#061017; }
-
-#par option{ color:#0b1420; }
-.coin{ color: var(--orange); font-weight:800; }
-
-/* remove number spinners (looks like scrollbar) */
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
-
-/* alvo manual row */
-.subrow{ display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; }
-.chk{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
-.pct{ width:90px; }
-.btnSmall{ padding:8px 10px; border-radius:12px; border:1px solid rgba(255,136,0,.6); background:rgba(255,136,0,.10); color:var(--orange); font-weight:800; cursor:pointer; }
-.btnSmall:hover{ background:rgba(255,136,0,.16); }
-/* make inputs not show inner scroll */
-.inp{ overflow:hidden; }
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -223,12 +197,8 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
         </div>
 
         <div>
-          <label>ALVO (AUTO do PRO / MANUAL)</label>
+          <label>US ALVO (do PRO, congelado)</label>
           <input id="alvo" type="number" step="0.000001" placeholder="—" readonly />
-          <div class="subrow">
-            <label class="chk"><input type="checkbox" id="alvoManual" /> ALVO manual (se PRO cair)</label>
-            <span class="muted" id="alvoHint">marcado: digite o ALVO acima</span>
-          </div>
         </div>
 
         <div>
@@ -383,38 +353,22 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
     }
 
     async function fetchAlvoSafe(){
-    const par = $("#par").value;
-    const side = $("#btnLong").classList.contains("active") ? "LONG" : "SHORT";
-    const manual = $("#alvoManual").checked;
-
-    if(manual){
-      $("#alvo").readOnly = false;
-      $("#alvoInfo").textContent = "Alvo do PRO: — (manual)";
-      return;
-    }
-
-    $("#alvo").readOnly = true;
-
-    if(!par){
-      $("#alvo").value = "";
-      $("#alvoInfo").textContent = "Alvo do PRO: —";
-      return;
-    }
-
-    try{
-      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
-      if(j && j.ok && isFinite(Number(j.alvo))){
-        $("#alvo").value = fmtPrice(j.alvo);
-        $("#alvoInfo").textContent = `Alvo do PRO: ${fmtPrice(j.alvo)}`;
-      }else{
-        $("#alvoInfo").textContent = "ERRO: ALVO do PRO inválido.";
+      const par = $("#par").value;
+      if(!par){ $("#alvo").value = ""; $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
+      try{
+        const j = await jget(API.alvo(par, side));
+        $("#alvo").value = (j.alvo != null) ? j.alvo : "";
+        $("#alvoInfo").textContent = `Alvo do PRO: ${j.alvo != null ? fmt3(j.alvo) : "—"}`;
+        setMsg($("#entryMsg"), "hint", "");
+      }catch(e){
+        $("#alvo").value = "";
+        $("#alvoInfo").textContent = "Alvo do PRO: —";
+        const m = (e && e.body && e.body.msg) ? e.body.msg : "Erro ao buscar ALVO.";
+        setMsg($("#entryMsg"), "err", `ERRO: ${m}`);
       }
-    }catch(e){
-      $("#alvoInfo").textContent = "ERRO: sem comunicação com o PRO.";
     }
-  }
 
-async function addOp(){
+    async function addOp(){
       const par = $("#par").value;
       const entrada = Number($("#entrada").value);
       const alvo = Number($("#alvo").value);
@@ -430,9 +384,6 @@ async function addOp(){
         setMsg($("#entryMsg"), "hint", "Enviando...");
         await jpost(API.add(), { par, side, entrada, alvo, alav });
         $("#entrada").value = "";
-      $("#alav").value = "";
-      if($("#alvoManual").checked){ $("#alvo").value = ""; }
-
         setMsg($("#entryMsg"), "ok", "OK: operação adicionada.");
         await refresh();
       }catch(e){
@@ -564,20 +515,8 @@ async function addOp(){
     $("#btnLong").onclick = () => setSide("LONG");
     $("#btnShort").onclick = () => setSide("SHORT");
     $("#par").onchange = fetchAlvoSafe;
+    $("#btnAdd").onclick = addOp;
 
-    // AVP: modo manual do ALVO (contingência se PRO cair)
-    $("#alvoManual").onchange = () => {
-      const manual = $("#alvoManual").checked;
-      $("#alvo").readOnly = !manual;
-      $("#alvoHint").textContent = manual ? "marcado: digite o ALVO acima" : "";
-      if(!manual) fetchAlvoSafe();
-    };
-
-    
-  // ALVO manual (contingência se PRO cair)
-  $("#btnAdd").onclick = addOp;
-
-    // AVP: modo manual do ALVO
     $("#pdfMonitor").onclick = () => pdfFromTable("MONITORAMENTO_DAS_OPERACOES", "tblMonitor");
     $("#pdfReal").onclick = () => pdfFromTable("OPERACOES_REALIZADAS", "tblReal");
 
