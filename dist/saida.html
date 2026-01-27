@@ -383,23 +383,38 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
     }
 
     async function fetchAlvoSafe(){
-      const par = $("#par").value;
-      if(!par){ $(      if($("#alvoManual").checked){
-        $("#alvo").value = ""; $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
-      try{
-        const j = await jget(API.alvo(par, side));
-        $("#alvo").value = (j.alvo != null) ? j.alvo : "";
-        $("#alvoInfo").textContent = `Alvo do PRO: ${j.alvo != null ? fmt3(j.alvo) : "—"}`;
-        setMsg($("#entryMsg"), "hint", "");
-      }catch(e){
-        $("#alvo").value = "";
-        $("#alvoInfo").textContent = "Alvo do PRO: —";
-        const m = (e && e.body && e.body.msg) ? e.body.msg : "Erro ao buscar ALVO.";
-        setMsg($("#entryMsg"), "err", `ERRO: ${m}`);
-      }
+    const par = $("#par").value;
+    const side = $("#btnLong").classList.contains("active") ? "LONG" : "SHORT";
+    const manual = $("#alvoManual").checked;
+
+    if(manual){
+      $("#alvo").readOnly = false;
+      $("#alvoInfo").textContent = "Alvo do PRO: — (manual)";
+      return;
     }
 
-    async function addOp(){
+    $("#alvo").readOnly = true;
+
+    if(!par){
+      $("#alvo").value = "";
+      $("#alvoInfo").textContent = "Alvo do PRO: —";
+      return;
+    }
+
+    try{
+      const j = await jget(`/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`);
+      if(j && j.ok && isFinite(Number(j.alvo))){
+        $("#alvo").value = fmtPrice(j.alvo);
+        $("#alvoInfo").textContent = `Alvo do PRO: ${fmtPrice(j.alvo)}`;
+      }else{
+        $("#alvoInfo").textContent = "ERRO: ALVO do PRO inválido.";
+      }
+    }catch(e){
+      $("#alvoInfo").textContent = "ERRO: sem comunicação com o PRO.";
+    }
+  }
+
+async function addOp(){
       const par = $("#par").value;
       const entrada = Number($("#entrada").value);
       const alvo = Number($("#alvo").value);
@@ -549,35 +564,20 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
     $("#btnLong").onclick = () => setSide("LONG");
     $("#btnShort").onclick = () => setSide("SHORT");
     $("#par").onchange = fetchAlvoSafe;
-    
-  // ALVO manual (contingência se PRO cair)
-  $("#alvoManual").onchange = ()=>{
-    const manual = $("#alvoManual").checked;
-    $("#alvo").readOnly = !manual;
-    if(manual){
-      $("#alvoInfo").textContent = "ALVO manual (digitado)";
-      $("#msgerr").textContent = "";
-    } else {
-      $("#alvoInfo").textContent = "";
-      // recarrega do PRO
-      fetchAlvoSafe();
-    }
-  };
 
-$("#btnAdd").onclick = addOp;
-
-    // AVP: modo manual do ALVO
+    // AVP: modo manual do ALVO (contingência se PRO cair)
     $("#alvoManual").onchange = () => {
       const manual = $("#alvoManual").checked;
       $("#alvo").readOnly = !manual;
-      if(!manual){
-        $("#alvoInfo").textContent = "ALVO automático (PRO).";
-        fetchAlvoSafe();
-      }else{
-        $("#alvoInfo").textContent = "ALVO manual habilitado. Não será atualizado pelo PRO.";
-      }
+      $("#alvoHint").textContent = manual ? "marcado: digite o ALVO acima" : "";
+      if(!manual) fetchAlvoSafe();
     };
 
+    
+  // ALVO manual (contingência se PRO cair)
+  $("#btnAdd").onclick = addOp;
+
+    // AVP: modo manual do ALVO
     $("#pdfMonitor").onclick = () => pdfFromTable("MONITORAMENTO_DAS_OPERACOES", "tblMonitor");
     $("#pdfReal").onclick = () => pdfFromTable("OPERACOES_REALIZADAS", "tblReal");
 
