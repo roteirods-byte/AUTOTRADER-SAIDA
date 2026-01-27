@@ -52,6 +52,8 @@ jobs:
             cd /home/${{ secrets.VM_USER }}/AUTOTRADER-SAIDA
             git fetch --all
             git reset --hard origin/main
+            # FIX: PRO DATA_DIR (para API enxergar pro.json)
+            sudo bash ./scripts/fix_pro_datadir.sh
             # reinicia serviço se existir (não falha se não existir)
             sudo systemctl restart autotrader-saida-v2.service || true
             sudo systemctl restart autotrader-saida-v2-api.service || true
