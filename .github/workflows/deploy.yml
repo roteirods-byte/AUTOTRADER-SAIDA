@@ -1,0 +1,76 @@
+name: Deploy SAIDA (AVP Gate)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  avp_audit:
+    name: AVP Audit (blocks deploy if fail)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Basic sanity checks (PRAZO gate)
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "=== Repo sanity ==="
+          test -f dist/saida.html
+          test -f server.js
+          test -f worker_saida_v2.py
+
+          echo "=== PRAZO gate: must NOT be broken ==="
+          # Regra: se tiver "PRAZO" quebrado (placeholder/erro), falha.
+          # Ajuste aqui se você usar outra palavra-chave.
+          if grep -RIn --exclude-dir=.git --exclude=*.zip "PRAZO QUEBRADO|PRAZO_BROKEN|TODO_PRAZO" . ; then
+            echo "ERRO: PRAZO quebrado detectado. Deploy bloqueado."
+            exit 1
+          fi
+
+      - name: AVP audit script (if exists)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f scripts/avp_audit.sh ]; then
+            chmod +x scripts/avp_audit.sh
+            scripts/avp_audit.sh
+          else
+            echo "scripts/avp_audit.sh não existe — seguindo só com sanity checks."
+          fi
+
+  deploy:
+    name: Deploy to VM (only after AVP)
+    runs-on: ubuntu-latest
+    needs: avp_audit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.VM_PATH }}"
+            echo "=== PULL ==="
+            git fetch --all --prune
+            git reset --hard "origin/main"
+
+            echo "=== RESTART SERVICE ==="
+            # Seu service real é autotrader-saida-v2-api.service, mas o secret VM_SERVICE é "autotrader-saida-v2"
+            # Então reiniciamos com o sufixo -api.service
+            sudo systemctl restart "${{ secrets.VM_SERVICE }}-api.service"
+            sudo systemctl is-active "${{ secrets.VM_SERVICE }}-api.service"
+
+            echo "=== HEALTHCHECK LOCAL ==="
+            curl -sS --max-time 8 http://127.0.0.1:8096/api/saida/ops | head -c 200 || true
+            echo
+            curl -sS --max-time 8 http://127.0.0.1:8096/saida | head -n 5 || true
+            echo
