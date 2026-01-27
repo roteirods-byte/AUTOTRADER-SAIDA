@@ -118,10 +118,14 @@
     }
     .rowTop .left{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
     .tableWrap{
-      overflow:auto;
+      overflow-x:auto;
+      overflow-y:hidden;
       border:1px solid rgba(255,255,255,.08);
       border-radius:14px;
+      -ms-overflow-style: none; /* IE/Edge */
+      scrollbar-width: none; /* Firefox */
     }
+    .tableWrap::-webkit-scrollbar{ display:none; }
     table{width:100%;border-collapse:separate;border-spacing:0;min-width:980px;}
     thead th{
       position:sticky;top:0;
@@ -158,6 +162,8 @@
   
 /* === AVP: UX fixes === */
 #par{ color: var(--orange); font-weight:800; }
+    #par option{ color:var(--orange); background:#061017; }
+
 #par option{ color:#0b1420; }
 .coin{ color: var(--orange); font-weight:800; }
 
@@ -221,9 +227,7 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
           <input id="alvo" type="number" step="0.000001" placeholder="—" readonly />
           <div class="subrow">
             <label class="chk"><input type="checkbox" id="alvoManual" /> ALVO manual (se PRO cair)</label>
-            <span class="chk">GANHO %</span>
-            <input id="alvoPct" class="inp pct" type="number" step="0.01" value="3.00" />
-            <button id="btnCalcAlvo" class="btnSmall" type="button">Calcular ALVO</button>
+            <span class="muted" id="alvoHint">marcado: digite o ALVO acima</span>
           </div>
         </div>
 
@@ -380,7 +384,8 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
 
     async function fetchAlvoSafe(){
       const par = $("#par").value;
-      if(!par){ $("#alvo").value = ""; $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
+      if(!par){ $(      if($("#alvoManual").checked){
+        $("#alvo").value = ""; $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
       try{
         const j = await jget(API.alvo(par, side));
         $("#alvo").value = (j.alvo != null) ? j.alvo : "";
@@ -410,6 +415,9 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
         setMsg($("#entryMsg"), "hint", "Enviando...");
         await jpost(API.add(), { par, side, entrada, alvo, alav });
         $("#entrada").value = "";
+      $("#alav").value = "";
+      if($("#alvoManual").checked){ $("#alvo").value = ""; }
+
         setMsg($("#entryMsg"), "ok", "OK: operação adicionada.");
         await refresh();
       }catch(e){
@@ -541,7 +549,22 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
     $("#btnLong").onclick = () => setSide("LONG");
     $("#btnShort").onclick = () => setSide("SHORT");
     $("#par").onchange = fetchAlvoSafe;
-    $("#btnAdd").onclick = addOp;
+    
+  // ALVO manual (contingência se PRO cair)
+  $("#alvoManual").onchange = ()=>{
+    const manual = $("#alvoManual").checked;
+    $("#alvo").readOnly = !manual;
+    if(manual){
+      $("#alvoInfo").textContent = "ALVO manual (digitado)";
+      $("#msgerr").textContent = "";
+    } else {
+      $("#alvoInfo").textContent = "";
+      // recarrega do PRO
+      fetchAlvoSafe();
+    }
+  };
+
+$("#btnAdd").onclick = addOp;
 
     // AVP: modo manual do ALVO
     $("#alvoManual").onchange = () => {
@@ -554,7 +577,6 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
         $("#alvoInfo").textContent = "ALVO manual habilitado. Não será atualizado pelo PRO.";
       }
     };
-    $("#btnCalcAlvo").onclick = calcAlvoLocal;
 
     $("#pdfMonitor").onclick = () => pdfFromTable("MONITORAMENTO_DAS_OPERACOES", "tblMonitor");
     $("#pdfReal").onclick = () => pdfFromTable("OPERACOES_REALIZADAS", "tblReal");
@@ -569,20 +591,3 @@ input[type=number]{ -moz-appearance:textfield; appearance:textfield; }
   </script>
 </body>
 </html>
-  // AVP: cálculo local de ALVO (contingência quando PRO estiver fora)
-  function calcAlvoLocal(){
-    const entrada = Number($("#entrada").value);
-    if(!isFinite(entrada) || entrada<=0){
-      $("#alvoInfo").textContent = "Digite ENTRADA válida para calcular o ALVO.";
-      return;
-    }
-    const side = getSide();
-    const pct = Number($("#alvoPct").value);
-    const p = (isFinite(pct) && pct>0) ? pct : 3.0;
-    const alvo = side==="SHORT" ? entrada*(1 - p/100) : entrada*(1 + p/100);
-    $("#alvoManual").checked = true;
-    $("#alvo").readOnly = false;
-    $("#alvo").value = fmtPrice(alvo);
-    $("#alvoInfo").textContent = "ALVO manual (calculado local). Não será atualizado pelo PRO.";
-  }
-

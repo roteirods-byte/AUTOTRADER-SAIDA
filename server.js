@@ -94,6 +94,10 @@ function loadMonitor() {
   return safeReadJson(MONITOR_FILE, { updated_brt: null, ops: [] });
 }
 
+function saveMonitor(obj){
+  safeWriteJson(MONITOR_PATH, obj);
+}
+
 function findOpById(list, id) {
   return (list || []).find(o => String(o.id) === String(id));
 }
@@ -306,6 +310,17 @@ app.post('/api/saida/delete', (req, res) => {
   if (active.ops.length === before) return res.status(404).json({ ok:false, msg:'Operação não encontrada.' });
   active.updated_brt = `${data} ${hora}`;
   saveActive(active);
+
+// Remove também do MONITOR (para sumir imediatamente da tela)
+try{
+  const mon = loadMonitor();
+  if(Array.isArray(mon.ops)){
+    mon.ops = mon.ops.filter(o => String(o.id) !== String(id));
+    mon.updated_brt = nowBrtDateTime().join(" ");
+    saveMonitor(mon);
+  }
+}catch(e){}
+
   return res.json({ ok:true });
 });
 
