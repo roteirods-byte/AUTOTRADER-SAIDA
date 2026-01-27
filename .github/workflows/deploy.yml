@@ -33,29 +33,16 @@ jobs:
           echo "OK: PRAZO gate passou."
 
   deploy_vm:
-    name: Deploy to VM (only after AVP)
+    name: Deploy on VM via Self-hosted Runner
     needs: avp_audit
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, autotrader-vm]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          port: ${{ secrets.VM_SSH_PORT }}
-          script: |
-            set -e
-            cd /home/${{ secrets.VM_USER }}/AUTOTRADER-SAIDA
-            git fetch --all
-            git reset --hard origin/main
-            # FIX: PRO DATA_DIR (para API enxergar pro.json)
-            sudo bash ./scripts/fix_pro_datadir.sh
-            # reinicia serviço se existir (não falha se não existir)
-            sudo systemctl restart autotrader-saida-v2.service || true
-            sudo systemctl restart autotrader-saida-v2-api.service || true
-            sudo nginx -t && sudo systemctl reload nginx
-            echo "DEPLOY OK"
+      - name: Deploy (sync -> restart -> healthcheck)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash ./scripts/deploy_runner.sh
+          echo "DEPLOY OK"
