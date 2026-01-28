@@ -360,22 +360,29 @@ input[type=number] { -moz-appearance: textfield; }
     }
 
     async function fetchAlvoSafe(){
-      const par = $("#par").value;
-      if(!par){ $("#alvo").value = ""; $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
-      try{
-        const j = await jget(API.alvo(par, side));
-        $("#alvo").value = (j.alvo != null) ? j.alvo : "";
-        $("#alvoInfo").textContent = `Alvo do PRO: ${j.alvo != null ? fmt3(j.alvo) : "—"}`;
-        setMsg($("#entryMsg"), "hint", "");
-      }catch(e){
-        $("#alvo").value = "";
-        $("#alvoInfo").textContent = "Alvo do PRO: —";
-        const m = (e && e.body && e.body.msg) ? e.body.msg : "Erro ao buscar ALVO.";
-        setMsg($("#entryMsg"), "err", `ERRO: ${m}`);
-      }
+  const par = $("#par").value;
+  if(!par){ $("#alvoInfo").textContent = "Alvo do PRO: —"; return; }
+  try{
+    const j = await jget(API.alvo(par, side));
+    const alvoNum = (j && j.alvo != null) ? Number(j.alvo) : NaN;
+    if(j && j.ok && Number.isFinite(alvoNum) && alvoNum > 0){
+      $("#alvo").value = alvoNum;
+      $("#alvoInfo").textContent = `Alvo do PRO: ${fmt3(alvoNum)}`;
+      setMsg($("#entryMsg"), "hint", "");
+    } else {
+      // PRO não tem alvo: mantém o valor digitado manualmente
+      $("#alvoInfo").textContent = "Alvo do PRO: — (digite manualmente)";
+      const m = (j && j.msg) ? j.msg : "ALVO não encontrado no PRO para este PAR/SIDE.";
+      setMsg($("#entryMsg"), "hint", `AVISO: ${m} Digite o ALVO manualmente.`);
     }
+  }catch(e){
+    $("#alvoInfo").textContent = "Alvo do PRO: — (digite manualmente)";
+    const m = (e && e.body && e.body.msg) ? e.body.msg : "Erro ao buscar ALVO.";
+    setMsg($("#entryMsg"), "hint", `AVISO: ${m} Digite o ALVO manualmente.`);
+  }
+}
 
-    async function addOp(){
+async function addOp(){
       const par = $("#par").value;
       const entrada = Number($("#entrada").value);
       const alvo = Number($("#alvo").value);
@@ -384,7 +391,7 @@ input[type=number] { -moz-appearance: textfield; }
       if(!par) return setMsg($("#entryMsg"), "err", "ERRO: selecione o PAR.");
       if(!side) return setMsg($("#entryMsg"), "err", "ERRO: selecione o SIDE.");
       if(!Number.isFinite(entrada) || entrada<=0) return setMsg($("#entryMsg"), "err", "ERRO: ENTRADA inválida.");
-      if(!Number.isFinite(alvo) || alvo<=0) return setMsg($("#entryMsg"), "err", "ERRO: ALVO do PRO inválido.");
+      if(!Number.isFinite(alvo) || alvo<=0) return setMsg($("#entryMsg"), "err", "ERRO: ALVO inválido (digite manualmente).");
       if(!Number.isFinite(alav) || alav<=0) return setMsg($("#entryMsg"), "err", "ERRO: ALAV inválida.");
 
       try{
