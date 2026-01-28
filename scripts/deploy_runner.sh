@@ -4,7 +4,8 @@ set -euo pipefail
 # Deploy pensado para rodar DENTRO da VM via Self-hosted Runner.
 # - sincroniza o workspace do runner -> pasta de produção
 # - aplica fix opcional do PRO (se existir)
-# - reinicia serviços e valida
+# - garante permissão de execução nos scripts (*.sh)
+# - aplica, reinicia serviços e valida
 #
 # Variáveis (opcionais):
 #   PROD_DIR=/home/roteiro_ds/AUTOTRADER-SAIDA
@@ -31,6 +32,9 @@ echo "=== 1) Sync workspace -> prod (rsync) ==="
 rsync -a --delete --exclude ".git" "${GITHUB_WORKSPACE}/" "${PROD_DIR}/"
 
 cd "$PROD_DIR"
+
+echo "=== 1.5) Garantir permissões de execução nos scripts (*.sh) ==="
+sudo chmod +x "$PROD_DIR"/scripts/*.sh 2>/dev/null || true
 
 echo "=== 2) Fix PRO DATA_DIR (se existir) ==="
 if [ -f "./scripts/fix_pro_datadir.sh" ]; then
