@@ -180,6 +180,12 @@ function computeGains(op) {
 // SAFE HELPERS (produção - anti-erro)
 // ================================
 function readVersion() {
+  // prioridade: arquivo VERSION (repo)
+  try {
+    const v = fs.readFileSync(path.join(__dirname, "VERSION"), "utf8").trim();
+    if (v) return v;
+  } catch (e) {}
+  // fallback: BUILD_ID ou package.json
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
     return (process.env.BUILD_ID || pkg.version || "unknown");
@@ -187,6 +193,7 @@ function readVersion() {
     return (process.env.BUILD_ID || "unknown");
   }
 }
+
 
 function normPar(x) {
   return String(x || "").trim().toUpperCase().replace(/USDT$/i, "");
@@ -254,6 +261,15 @@ app.use('/dist', express.static(DIST_DIR, { etag: true, immutable: false, maxAge
 app.get('/api/health', (req, res) => res.json({ ok:true, service:'autotrader-saida', ts: new Date().toISOString() }));
 
 // Version (para validar deploy no navegador)
+
+/**
+ * GET /api/saida/health
+ * Sempre responde JSON (sem HTML)
+ */
+app.get('/api/saida/health', (req, res) => {
+  return res.json({ ok:true, service:'autotrader-saida', ts: new Date().toISOString() });
+});
+
 app.get('/api/saida/version', (req, res) => {
   const version = readVersion();
   return res.json({ ok:true, service:'autotrader-saida', version, ts: new Date().toISOString() });
@@ -269,40 +285,48 @@ app.get('/api/saida/alvo', (req, res) => {
   if (!par) return res.status(400).json({ ok:false, msg:'Par inválido.' });
   if (!side) return res.status(400).json({ ok:false, msg:'Side inválido.' });
 
-  // tenta ENTRADA_PRO_JSON
   let alvo = null;
   let updated_brt = null;
+  let src = null;
 
-  if (ENTRADA_PRO_JSON && fs.existsSync(ENTRADA_PRO_JSON)) {
-    const pro = safeReadJson(ENTRADA_PRO_JSON, null);
-    // formatos possíveis:
-    // A) { updated_brt, alvos: [{par, side, alvo}, ...] }
-    // B) { updated_brt, alvo_por_par: { ADA: { LONG: 0.123, SHORT: 0.456 } } }
+  // 1) fonte oficial: PRO_JSON_FILE (pro.json do PRO)
+  try {
+    const pro = safeReadProJson();
     if (pro) {
       updated_brt = pro.updated_brt || pro.updated || null;
+      const v = extractAlvoFromPro(pro, par, side);
+      if (Number.isFinite(v) && v > 0) { alvo = v; src = 'PRO_JSON_FILE'; }
+    }
+  } catch (e) {}
 
+  // 2) fallback: ENTRADA_PRO_JSON (se existir)
+  if (alvo == null && ENTRADA_PRO_JSON && fs.existsSync(ENTRADA_PRO_JSON)) {
+    const pro = safeReadJson(ENTRADA_PRO_JSON, null);
+    if (pro) {
+      updated_brt = updated_brt || pro.updated_brt || pro.updated || null;
       if (Array.isArray(pro.alvos)) {
         const hit = pro.alvos.find(x => normalizePar(x.par) === par && normalizeSide(x.side) === side);
-        if (hit && Number.isFinite(Number(hit.alvo))) alvo = Number(hit.alvo);
+        if (hit && Number.isFinite(Number(hit.alvo)) && Number(hit.alvo) > 0) { alvo = Number(hit.alvo); src='ENTRADA_PRO_JSON'; }
       } else if (pro.alvo_por_par && pro.alvo_por_par[par] && pro.alvo_por_par[par][side] != null) {
         const v = Number(pro.alvo_por_par[par][side]);
-        if (Number.isFinite(v)) alvo = v;
+        if (Number.isFinite(v) && v > 0) { alvo = v; src='ENTRADA_PRO_JSON'; }
       }
     }
   }
 
-  // fallback local
+  // 3) fallback local: ALVO_PRO_FALLBACK
   if (alvo == null) {
     const fb = safeReadJson(ALVO_PRO_FALLBACK, {});
     const v = fb?.[par]?.[side];
-    if (v != null && Number.isFinite(Number(v))) alvo = Number(v);
+    if (v != null && Number.isFinite(Number(v)) && Number(v) > 0) { alvo = Number(v); src='ALVO_PRO_FALLBACK'; }
     updated_brt = updated_brt || fb.updated_brt || null;
   }
 
-  if (alvo == null) return res.status(404).json({ ok:false, msg:'Alvo não encontrado.' });
+  if (alvo == null) return res.status(404).json({ ok:false, msg:'Alvo não encontrado.', par, side });
 
-  return res.json({ ok:true, par, side, alvo, updated_brt });
+  return res.json({ ok:true, par, side, alvo, updated_brt, src });
 });
+
 
 /**
  * GET /api/saida/ops  -> operações ativas (cadastro)
@@ -487,3 +511,9 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`[SAIDA] server up on :${PORT} | DATA_DIR=${DATA_DIR}`);
 });
+
+// Fallback: qualquer rota /api/saida/* não encontrada -> JSON (nunca HTML)
+app.use('/api/saida', (req, res) => {
+  res.status(404).json({ ok:false, msg:'Rota não encontrada.', path: req.originalUrl });
+});
+
