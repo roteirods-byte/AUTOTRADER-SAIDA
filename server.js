@@ -30,6 +30,8 @@ const MONITOR_FILE    = path.join(DATA_DIR, 'monitor.json');
 // 1) se existir ENTRADA_PRO_JSON, tenta ler dele
 // 2) senão, usa data/alvo_pro.json (local)
 const ENTRADA_PRO_JSON = process.env.ENTRADA_PRO_JSON || ''; // ex: /home/roteiro_ds/autotrader-planilhas-python/data/entrada.json
+const PRO_JSON_FILE = process.env.PRO_JSON_FILE || '/home/roteiro_ds/AUTOTRADER-PRO/data/pro.json';
+
 const ALVO_PRO_FALLBACK = path.join(DATA_DIR, 'alvo_pro.json');
 
 function ensureDir(p) {
@@ -46,6 +48,52 @@ function safeReadJson(file, fallback) {
   } catch (e) {
     return fallback;
   }
+
+function readVersion() {
+  try {
+    const fp = path.join(__dirname, 'VERSION');
+    if (!fs.existsSync(fp)) return null;
+    return String(fs.readFileSync(fp, 'utf8')).trim() || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Extrai alvo do PRO (pro.json) em múltiplos formatos possíveis
+function extractAlvoFromProJson(pro, par, side) {
+  if (!pro) return { alvo: null, updated_brt: null, source: null };
+
+  const updated_brt = pro.updated_brt || pro.updated || pro.meta?.updated_brt || null;
+
+  // 1) mapeamento direto: { ADA: { LONG: 0.1, SHORT: 0.2 } }
+  const direct = pro?.[par]?.[side] ?? pro?.alvo_por_par?.[par]?.[side] ?? null;
+  if (direct != null && Number.isFinite(Number(direct))) {
+    return { alvo: Number(direct), updated_brt, source: 'pro.json(map)' };
+  }
+
+  // 2) listas comuns: items/rows/data/alvos
+  const arr =
+    (Array.isArray(pro.items) ? pro.items :
+    (Array.isArray(pro.rows) ? pro.rows :
+    (Array.isArray(pro.data) ? pro.data :
+    (Array.isArray(pro.alvos) ? pro.alvos : null))));
+
+  if (Array.isArray(arr)) {
+    for (const it of arr) {
+      const p = normalizePar(it.par || it.pair || it.symbol || it.moeda);
+      const s = normalizeSide(it.side || it.lado || it.direction);
+      if (p === par && s === side) {
+        const v = it.alvo ?? it.target ?? it.tp ?? it.price_target ?? it.price;
+        if (v != null && Number.isFinite(Number(v))) {
+          return { alvo: Number(v), updated_brt, source: 'pro.json(list)' };
+        }
+      }
+    }
+  }
+
+  return { alvo: null, updated_brt, source: 'pro.json(unknown)' };
+}
+
 }
 
 function safeWriteJson(file, obj) {
@@ -189,6 +237,13 @@ app.use('/dist', express.static(DIST_DIR, { etag: true, immutable: false, maxAge
 // Health
 app.get('/api/health', (req, res) => res.json({ ok:true, service:'autotrader-saida', ts: new Date().toISOString() }));
 
+// Version (para validar deploy no navegador)
+app.get('/api/saida/version', (req, res) => {
+  const version = readVersion();
+  return res.json({ ok:true, service:'autotrader-saida', version: version || '—', ts: new Date().toISOString() });
+});
+
+
 /**
  * GET /api/saida/alvo?par=ADA&side=LONG
  * Retorna alvo congelado do PRO.
@@ -199,29 +254,38 @@ app.get('/api/saida/alvo', (req, res) => {
   if (!par) return res.status(400).json({ ok:false, msg:'Par inválido.' });
   if (!side) return res.status(400).json({ ok:false, msg:'Side inválido.' });
 
-  // tenta ENTRADA_PRO_JSON
-  let alvo = null;
-  let updated_brt = null;
+  
+// tenta PRO_JSON_FILE (mais confiável: /home/roteiro_ds/AUTOTRADER-PRO/data/pro.json)
+let alvo = null;
+let updated_brt = null;
 
-  if (ENTRADA_PRO_JSON && fs.existsSync(ENTRADA_PRO_JSON)) {
-    const pro = safeReadJson(ENTRADA_PRO_JSON, null);
-    // formatos possíveis:
-    // A) { updated_brt, alvos: [{par, side, alvo}, ...] }
-    // B) { updated_brt, alvo_por_par: { ADA: { LONG: 0.123, SHORT: 0.456 } } }
-    if (pro) {
-      updated_brt = pro.updated_brt || pro.updated || null;
+if (PRO_JSON_FILE && fs.existsSync(PRO_JSON_FILE)) {
+  const pro = safeReadJson(PRO_JSON_FILE, null);
+  const out = extractAlvoFromProJson(pro, par, side);
+  if (out.alvo != null) alvo = out.alvo;
+  updated_brt = out.updated_brt || updated_brt || null;
+}
 
-      if (Array.isArray(pro.alvos)) {
-        const hit = pro.alvos.find(x => normalizePar(x.par) === par && normalizeSide(x.side) === side);
-        if (hit && Number.isFinite(Number(hit.alvo))) alvo = Number(hit.alvo);
-      } else if (pro.alvo_por_par && pro.alvo_por_par[par] && pro.alvo_por_par[par][side] != null) {
-        const v = Number(pro.alvo_por_par[par][side]);
-        if (Number.isFinite(v)) alvo = v;
-      }
+// tenta ENTRADA_PRO_JSON (formatos antigos)
+if (alvo == null && ENTRADA_PRO_JSON && fs.existsSync(ENTRADA_PRO_JSON)) {
+  const pro = safeReadJson(ENTRADA_PRO_JSON, null);
+  // formatos possíveis:
+  // A) { updated_brt, alvos: [{par, side, alvo}, ...] }
+  // B) { updated_brt, alvo_por_par: { ADA: { LONG: 0.123, SHORT: 0.456 } } }
+  if (pro) {
+    updated_brt = pro.updated_brt || pro.updated || updated_brt || null;
+
+    if (Array.isArray(pro.alvos)) {
+      const hit = pro.alvos.find(x => normalizePar(x.par) === par && normalizeSide(x.side) === side);
+      if (hit && Number.isFinite(Number(hit.alvo))) alvo = Number(hit.alvo);
+    } else if (pro.alvo_por_par && pro.alvo_por_par[par] && pro.alvo_por_par[par][side] != null) {
+      const v = Number(pro.alvo_por_par[par][side]);
+      if (Number.isFinite(v)) alvo = v;
     }
   }
+}
 
-  // fallback local
+// fallback local
   if (alvo == null) {
     const fb = safeReadJson(ALVO_PRO_FALLBACK, {});
     const v = fb?.[par]?.[side];

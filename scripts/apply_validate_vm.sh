@@ -21,7 +21,7 @@ echo "OK: backup em $BK"
 echo
 
 echo "=== B) BUILD ID (VERSION) ==="
-./scripts/bump_build.sh
+bash bash ./scripts/bump_build.sh
 
 echo
 
