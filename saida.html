@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AUTOTRADER-SAÍDA</title>
+  <style>
+    :root{
+      --bg:#051b22;
+      --panel1:#062a2e;
+      --panel2:#05212a;
+      --line:#0c3a46;
+      --txt:#e9f3f6;
+      --muted:#9fb6bf;
+      --orange:#ff8a00;
+      --green:#00d884;
+      --red:#ff4d4d;
+      --btn:#0b2f3a;
+      --shadow: 0 12px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 15% 0%, #0b2f3a 0%, var(--bg) 55%);
+      color:var(--txt);
+    }
+    .container{max-width:1480px;margin:26px auto 60px;padding:0 18px;}
+    .top{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+      margin-bottom:18px;
+    }
+    h1{margin:0;font-weight:800;letter-spacing:.4px}
+    .subtitle{margin-top:4px;color:var(--muted);font-size:13px}
+    .badge{
+      background:rgba(0,0,0,.15);
+      border:1px solid rgba(255,255,255,.08);
+      padding:10px 14px;border-radius:999px;
+      min-width:220px;text-align:center;
+      box-shadow:var(--shadow);
+    }
+    .badge .small{color:var(--muted);font-size:12px}
+    .badge .big{font-family:var(--mono);font-size:13px;margin-top:2px}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(6,42,46,.92) 0%, rgba(5,33,42,.92) 100%);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px 18px 16px;
+      margin-top:16px;
+    }
+    .panel h2{
+      margin:0 0 14px;
+      color:var(--orange);
+      font-size:13px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    /* ENTRY FORM */
+    .grid{
+      display:grid;
+      grid-template-columns: 140px 160px 170px 240px 120px 1fr;
+      gap:14px;
+      align-items:end;
+    }
+    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    select,input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      color:var(--txt);
+      outline:none;
+    }
+    select{appearance:auto}
+    input::placeholder{color:#6f8a94}
+    .btnRow{display:flex;gap:10px;align-items:center;justify-content:flex-start;}
+    .btn{
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--txt);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      user-select:none;
+      font-weight:700;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.18)}
+    .btn.orange{border-color:rgba(255,138,0,.5);color:var(--orange)}
+    .btn.primary{
+      background:rgba(255,138,0,.10);
+      border-color:rgba(255,138,0,.6);
+      color:var(--orange);
+    }
+    .btn.small{padding:7px 10px;font-size:12px;border-radius:10px}
+    .btn.danger{border-color:rgba(255,77,77,.7);color:var(--red);background:rgba(255,77,77,.08)}
+    .btn.ok{border-color:rgba(0,216,132,.6);color:var(--green);background:rgba(0,216,132,.08)}
+    .sidePill{
+      display:flex;gap:10px;
+    }
+    .sidePill .btn{min-width:74px;text-align:center}
+    .btn.longActive{border-color:rgba(0,216,132,.8); color:var(--green); background:rgba(0,216,132,.10)}
+    .btn.shortActive{border-color:rgba(255,77,77,.8); color:var(--red); background:rgba(255,77,77,.10)}
+
+    .hint{margin-top:10px;color:var(--muted);font-size:12px}
+    .error{margin-top:8px;color:var(--red);font-weight:800;font-size:12px}
+    .okline{margin-top:8px;color:var(--green);font-weight:800;font-size:12px}
+
+    /* TABLES */
+    .rowTop{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;
+    }
+    .rowTop .left{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
+    .tableWrap{
+      overflow:auto;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+    }
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:980px;}
+    thead th{
+      position:sticky;top:0;
+      background:rgba(0,0,0,.22);
+      color:var(--orange);
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      color:var(--txt);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    tbody tr:hover td{background:rgba(255,255,255,.03)}
+    .coin{color:var(--orange);font-weight:800}
+    .side.long{color:var(--green);font-weight:900}
+    .side.short{color:var(--red);font-weight:900}
+    .pct.pos{color:var(--green);font-weight:800}
+    .pct.neg{color:var(--red);font-weight:800}
+    .muted{color:var(--muted)}
+    .actions{display:flex;gap:8px;align-items:center}
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr 1fr; }
+      .badge{min-width:180px}
+      table{min-width:1100px;}
+    }
+  
+    /* Remove setas/spinner dos inputs number (evitar “barras de rolagem” dentro das caixas) */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+    input[type=number]{ -moz-appearance: textfield; appearance: textfield; }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>AUTOTRADER-SAÍDA</h1>
+        <div class="subtitle">Página única (SAÍDA): Entrada da operação + Monitoramento automático + Histórico</div>
+      </div>
+      <div class="badge">
+        <div class="small">Atualizado:</div>
+        <div id="updated" class="big">—</div>
+      </div>
+    </div>
+
+    <!-- 1) DADOS DE ENTRADA NA OPERAÇÃO -->
+    <div class="panel">
+      <h2>DADOS DE ENTRADA NA OPERAÇÃO</h2>
+
+      <div class="grid">
+        <div>
+          <label>PAR</label>
+          <select id="par">
+            <option value="">—</option>
+          </select>
+        </div>
+
+        <div>
+          <label>SIDE</label>
+          <div class="sidePill">
+            <button id="btnLong" class="btn">LONG</button>
+            <button id="btnShort" class="btn">SHORT</button>
+          </div>
+        </div>
+
+        <div>
+          <label>ENTRADA</label>
+          <input id="entrada" type="number" step="0.001" placeholder="ex: 1.234" />
+        </div>
+
+        <div>
+          <label>ALVO (manual)</label>
+          <input id="alvo" type="number" step="0.000001" placeholder="—" />
+        </div>
+
+        <div>
+          <label>ALAV</label>
+          <input id="alav" type="number" step="1" value="10" />
+        </div>
+
+        <div class="btnRow">
+          <button id="btnAdd" class="btn primary">Adicionar Operação</button>
+        </div>
+      </div>
+
+      <div id="alvoInfo" class="hint">Alvo do PRO: —</div>
+      <div id="entryMsg" class=""></div>
+    </div>
+
+    <!-- 2) MONITORAMENTO DAS OPERAÇÕES -->
+    <div class="panel">
+      <div class="rowTop">
+        <h2 style="margin:0">MONITORAMENTO DAS OPERAÇÕES</h2>
+        <div class="left">
+          <span>Total: <b id="totalMonitor">0</b></span>
+          <button id="pdfMonitor" class="btn orange">Baixar PDF</button>
+        </div>
+      </div>
+
+      <div class="tableWrap">
+        <table id="tblMonitor">
+          <thead>
+            <tr>
+              <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+              <th>DATA REG</th><th>HORA REG</th>
+              <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
+              <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
+              <th>SAIR</th><th>EXCLUIR</th>
+            </tr>
+          </thead>
+          <tbody id="monitorBody">
+            <tr><td colspan="15" class="muted">Sem operações no momento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="hint">
+        Auto-refresh: <b>15s</b> &nbsp;|&nbsp; Worker: <b>5 min</b> &nbsp;|&nbsp; ALVO fixo (congelado no ADD)
+      </div>
+    </div>
+
+    <!-- 3) OPERAÇÕES REALIZADAS -->
+    <div class="panel">
+      <div class="rowTop">
+        <h2 style="margin:0">OPERAÇÕES REALIZADAS</h2>
+        <div class="left">
+          <span>Total: <b id="totalReal">0</b></span>
+          <button id="pdfReal" class="btn orange">Baixar PDF</button>
+        </div>
+      </div>
+
+      <div class="tableWrap">
+        <table id="tblReal">
+          <thead>
+            <tr>
+              <th>PAR</th><th>SIDE</th><th>ENTRADA</th><th>ALVO</th><th>ALAV</th>
+              <th>DATA REG</th><th>HORA REG</th>
+              <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
+              <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
+              <th>SAIR</th><th>EXCLUIR</th>
+            </tr>
+          </thead>
+          <tbody id="realBody">
+            <tr><td colspan="15" class="muted">Sem operações realizadas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="hint">Esta planilha não tem atualização. É cópia do MONITOR no momento do clique em SAIR.</div>
+    </div>
+  </div>
+
+  <!-- PDF -->
+  <!-- PDF agora é gerado no servidor (arquivo real) -->
+
+  <script>
+    // ==== CONFIG ====
+    const API = {
+      // alvo: (par, side) => `/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`, // DESATIVADO (alvo manual)
+      add:  () => `/api/saida/add`,
+      monitor: () => `/api/saida/monitor`,
+      real: () => `/api/saida/realizadas`,
+    pdf: (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
+      sair: () => `/api/saida/sair`,
+      del: () => `/api/saida/delete`,
+    };
+
+    const COINS = [
+      "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
+      "LDO","LINK","LTC","NEAR","OP","PEPE","POL","RATS","RENDER","RUNE","SEI","SHIB","SOL","SUI","TIA","TNSR","TON",
+      "TRX","UNI","WIF","XRP"
+    ];
+
+    // ==== HELPERS ====
+    const $ = (sel) => document.querySelector(sel);
+    const fmt3 = (v) => (v==null || v==="" || isNaN(v)) ? "—" : Number(v).toFixed(3);
+    const fmt2 = (v) => (v==null || v==="" || isNaN(v)) ? "—" : (Number(v).toFixed(2) + "%");
+    const pctClass = (v) => (v==null || v==="" || isNaN(v)) ? "" : (Number(v) >= 0 ? "pos" : "neg");
+
+    async function jget(url){
+      const r = await fetch(url, { cache: "no-store" });
+      const txt = await r.text();
+      let j;
+      try { j = JSON.parse(txt); } catch(e){ j = { ok:false, msg:"Resposta inválida" }; }
+      if(!r.ok) throw { status:r.status, body:j, raw:txt };
+      return j;
+    }
+
+    async function jpost(url, body){
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        cache: "no-store",
+        body: JSON.stringify(body || {})
+      });
+      const txt = await r.text();
+      let j;
+      try { j = JSON.parse(txt); } catch(e){ j = { ok:false, msg:"Resposta inválida" }; }
+      if(!r.ok) throw { status:r.status, body:j, raw:txt };
+      return j;
+    }
+
+    function setMsg(el, type, msg){
+      el.className = type === "ok" ? "okline" : (type === "err" ? "error" : "hint");
+      el.textContent = msg;
+    }
+
+    // ==== STATE ====
+    let side = "LONG";
+
+    function setSide(newSide){
+      side = newSide;
+      $("#btnLong").classList.toggle("longActive", side === "LONG");
+      $("#btnShort").classList.toggle("shortActive", side === "SHORT");
+      fetchAlvoSafe();
+    }
+
+    function fillCoins(){
+      const sel = $("#par");
+      for(const c of COINS){
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+      }
+    }
+
+    async function fetchAlvoSafe(){
+  const par = $("#par").value;
+  if(!par){
+    $("#alvoInfo").textContent = "Alvo: manual";
+    return;
+  }
+  // Alvo é manual: não chamar API.alvo (evita erro no console quando rota não existe)
+  $("#alvoInfo").textContent = "Alvo: manual";
+  setMsg($("#entryMsg"), "hint", "");
+}
+
+    }
+
+    async function addOp(){
+      const par = $("#par").value;
+      const entrada = Number($("#entrada").value);
+      const alvo = Number($("#alvo").value);
+      const alav = Number($("#alav").value);
+
+      if(!par) return setMsg($("#entryMsg"), "err", "ERRO: selecione o PAR.");
+      if(!side) return setMsg($("#entryMsg"), "err", "ERRO: selecione o SIDE.");
+      if(!Number.isFinite(entrada) || entrada<=0) return setMsg($("#entryMsg"), "err", "ERRO: ENTRADA inválida.");
+      if(!Number.isFinite(alvo) || alvo<=0) return setMsg($("#entryMsg"), "err", "ERRO: ALVO inválido.");
+      if(!Number.isFinite(alav) || alav<=0) return setMsg($("#entryMsg"), "err", "ERRO: ALAV inválida.");
+
+      try{
+        setMsg($("#entryMsg"), "hint", "Enviando...");
+        await jpost(API.add(), { par, side, entrada, alvo, alav });
+        $("#entrada").value = "";
+        $("#alvo").value = "";
+        $("#alav").value = "";
+        setMsg($("#entryMsg"), "ok", "OK: operação adicionada.");
+        await refresh();
+      }catch(e){
+        const m = (e && e.body && e.body.msg) ? e.body.msg : "Falha ao adicionar.";
+        setMsg($("#entryMsg"), "err", `ERRO: ${m}`);
+      }
+    }
+
+    function makeRow(op, scope){
+      const tr = document.createElement("tr");
+
+      const tdPar = document.createElement("td");
+      tdPar.innerHTML = `<span class="coin">${op.par || "—"}</span>`;
+      tr.appendChild(tdPar);
+
+      const tdSide = document.createElement("td");
+      const s = String(op.side || "").toUpperCase();
+      tdSide.innerHTML = `<span class="side ${s === "SHORT" ? "short":"long"}">${s || "—"}</span>`;
+      tr.appendChild(tdSide);
+
+      const cols = [
+        fmt3(op.entrada),
+        fmt3(op.alvo),
+        (op.alav != null ? String(op.alav) : "—"),
+        (op.data_reg || "—"),
+        (op.hora_reg || "—"),
+        fmt3(op.atual),
+        `<span class="pct ${pctClass(op.ganho_alvo)}">${fmt2(op.ganho_alvo)}</span>`,
+        `<span class="pct ${pctClass(op.ganho_atual)}">${fmt2(op.ganho_atual)}</span>`,
+        (op.situacao || "—"),
+        (op.data_atual || "—"),
+        (op.hora_atual || "—"),
+      ];
+
+      for(const c of cols){
+        const td = document.createElement("td");
+        td.innerHTML = c;
+        tr.appendChild(td);
+      }
+
+      // SAIR
+      const tdSair = document.createElement("td");
+      tdSair.className = "actions";
+      if(scope === "monitor"){
+        const b = document.createElement("button");
+        b.className = "btn small ok";
+        b.textContent = "SAIR";
+        b.onclick = async () => {
+          if(!confirm("Confirmar SAIR desta operação?")) return;
+          try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
+          catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
+        };
+        tdSair.appendChild(b);
+      } else {
+        tdSair.innerHTML = "<span class='muted'>—</span>";
+      }
+      tr.appendChild(tdSair);
+
+      // EXCLUIR
+      const tdDel = document.createElement("td");
+      tdDel.className = "actions";
+      const b2 = document.createElement("button");
+      b2.className = "btn small danger";
+      b2.textContent = "EXCLUIR";
+      b2.onclick = async () => {
+        if(!confirm("Confirmar EXCLUIR?")) return;
+        try{ await jpost(API.del(), { id: op.id, scope: (scope === "real" ? "real" : "active") }); await refresh(); }
+        catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR."); }
+      };
+      tdDel.appendChild(b2);
+      tr.appendChild(tdDel);
+
+      return tr;
+    }
+
+    function renderTable(bodyEl, ops, scope){
+      bodyEl.innerHTML = "";
+      if(!ops || !ops.length){
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 15;
+        td.className = "muted";
+        td.textContent = (scope === "real") ? "Sem operações realizadas." : "Sem operações no momento.";
+        tr.appendChild(td);
+        bodyEl.appendChild(tr);
+        return;
+      }
+      for(const op of ops){
+        bodyEl.appendChild(makeRow(op, scope));
+      }
+    }
+
+    function setUpdated(txt){
+      $("#updated").textContent = txt || "—";
+    }
+
+    async function refresh(){
+      try{
+        const m = await jget(API.monitor());
+        setUpdated(m.updated_brt || "—");
+        renderTable($("#monitorBody"), (m.ops || []), "monitor");
+        $("#totalMonitor").textContent = String((m.ops || []).length);
+
+        const r = await jget(API.real());
+        renderTable($("#realBody"), (r.ops || []), "real");
+        $("#totalReal").textContent = String((r.ops || []).length);
+      }catch(e){
+        // Não quebra a página
+        console.error("refresh error", e);
+      }
+    }
+
+    function downloadPdf(scope){
+      // PDF real gerado no servidor
+      window.open(API.pdf(scope), "_blank");
+    }
+
+    // ==== INIT ====
+    fillCoins();
+    setSide("LONG");
+
+    $("#btnLong").onclick = () => setSide("LONG");
+    $("#btnShort").onclick = () => setSide("SHORT");
+    $("#par").onchange = fetchAlvoSafe;
+    $("#btnAdd").onclick = addOp;
+
+    $("#pdfMonitor").onclick = () => downloadPdf("monitor");
+    $("#pdfReal").onclick = () => downloadPdf("realizadas");
+
+    // primeira carga
+    fetchAlvoSafe();
+    refresh();
+
+    // auto-refresh (não pode quebrar)
+    window.refresh = refresh;
+    setInterval(() => { refresh(); }, 15000);
+  </script>
+</body>
+</html>
