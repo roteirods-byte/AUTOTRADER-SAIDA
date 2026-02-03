@@ -16,9 +16,3 @@ data/
 backups_ops/
 logs/
 *.log
-
-# --- DADOS VIVOS (NAO VERSIONAR) ---
-data/
-backups_ops/
-logs/
-*.log
