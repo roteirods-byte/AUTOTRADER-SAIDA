@@ -14,6 +14,7 @@ mantenha a mesma saída/colunas e substitua apenas a parte de preço.
 
 import os, json, math
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import requests
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "data"))
@@ -25,7 +26,7 @@ TIMEOUT = float(os.environ.get("HTTP_TIMEOUT", "6"))
 
 def brt_now_parts():
     # Se a VM já está em BRT, fica perfeito.
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("America/Sao_Paulo"))
     return now.strftime("%d/%m/%Y"), now.strftime("%H:%M"), now.strftime("%Y-%m-%d %H:%M")
 
 def safe_read_json(path, fallback):
