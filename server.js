@@ -149,7 +149,33 @@ function saveReal(obj) {
   safeWriteJson(OPS_REAL_FILE, obj);
 }
 function loadMonitor() {
-  return safeReadJson(MONITOR_FILE, { updated_brt: null, ops: [] });
+  const monitor = safeReadJson(MONITOR_FILE, { updated_brt: null, ops: [] });
+  const active  = loadActive();
+
+  const mOps = Array.isArray(monitor.ops) ? monitor.ops : [];
+  const aOps = Array.isArray(active.ops) ? active.ops : [];
+
+  // merge por id (preferir o que já veio do monitor, se existir)
+  const byId = new Map();
+  for (const op of aOps) byId.set(String(op.id), op);
+  for (const op of mOps) byId.set(String(op.id), Object.assign({}, byId.get(String(op.id)), op));
+
+  const { data, hora } = nowBRTParts();
+
+  const ops = Array.from(byId.values()).map(op => {
+    const gains = computeGains(op);
+    return Object.assign(
+      {
+        situacao: op.situacao || 'EM ANDAMENTO',
+        data_atual: op.data_atual || data,
+        hora_atual: op.hora_atual || hora,
+      },
+      op,
+      gains
+    );
+  });
+
+  return Object.assign({}, monitor, { updated_brt: `${data} ${hora}`, ops });
 }
 
 function findOpById(list, id) {
@@ -384,7 +410,7 @@ app.get('/api/saida/pdf', (req, res) => {
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-  pdfTable(res, { title: `AUTOTRADER-SAIDA - ${name}`, columns, rows });
+  pdfTable(res, `AUTOTRADER-SAIDA - ${name}`, columns, rows);
 });
 
 /**
