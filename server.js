@@ -87,9 +87,8 @@ function nowBRT() {
 
   doc.fontSize(16).text('AUTOTRADER-SAÍDA', { align: 'left' });
   doc.moveDown(0.2);
-  doc.fontSize(11).text(`${title}  |  
+  doc.fontSize(11).text(`${title}  |  Gerado em: ${nowBRT()}`, { align: 'left' });
   doc.moveDown(0.8);
-
   // Layout simples (tabela em texto):
   doc.fontSize(8);
   const colGap = 8;
