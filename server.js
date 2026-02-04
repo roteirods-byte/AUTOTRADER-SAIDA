@@ -71,14 +71,23 @@ function pdfTable(res, title, columns, rows) {
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="${String(title || '').replace(/\s+/g,'_')}.pdf"`);
 
-  const doc = new PDFDocument({ margin: 28, size: 'A4' });
+  const doc = new PDFDocument({ layout: 'landscape',  margin: 28, size: 'A4', layout: 'landscape' });
   doc.pipe(res);
 
   const { data, hora } = nowBRTParts();
+function nowBRT() {
+  const d = new Date();
+  const parts = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit'
+  }).format(d);
+  return parts.replace(',', '');
+}
 
   doc.fontSize(16).text('AUTOTRADER-SAÍDA', { align: 'left' });
   doc.moveDown(0.2);
-  doc.fontSize(11).text(`${title}  |  Gerado em: ${data} ${hora}`, { align: 'left' });
+  doc.fontSize(11).text(`${title}  |  
   doc.moveDown(0.8);
 
   // Layout simples (tabela em texto):
@@ -542,4 +551,3 @@ app.listen(PORT, () => {
 app.use('/api/saida', (req, res) => {
   res.status(404).json({ ok:false, msg:'Rota não encontrada.', path: req.originalUrl });
 });
-
