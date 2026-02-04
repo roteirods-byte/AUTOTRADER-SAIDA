@@ -163,28 +163,31 @@ function loadMonitor() {
   const mOps = Array.isArray(monitor.ops) ? monitor.ops : [];
   const aOps = Array.isArray(active.ops) ? active.ops : [];
 
-  // merge por id (preferir o que já veio do monitor, se existir)
-  const byId = new Map();
-  for (const op of aOps) byId.set(String(op.id), op);
-  for (const op of mOps) byId.set(String(op.id), Object.assign({}, byId.get(String(op.id)), op));
+  // montar mapa do monitor (para enriquecer), mas a lista FINAL é só a lista ativa
+  const mById = new Map();
+  for (const op of mOps) mById.set(String(op.id), op);
 
   const { data, hora } = nowBRTParts();
 
-  const ops = Array.from(byId.values()).map(op => {
-    const gains = computeGains(op);
+  const ops = aOps.map(op => {
+    const mid = mById.get(String(op.id)) || {};
+    const merged = Object.assign({}, op, mid); // mantém dados fixos e usa atual/ganhos do monitor quando existir
+    const gains = computeGains(merged);
+
     return Object.assign(
       {
-        situacao: op.situacao || 'EM ANDAMENTO',
-        data_atual: op.data_atual || data,
-        hora_atual: op.hora_atual || hora,
+        situacao: merged.situacao || 'EM ANDAMENTO',
+        data_atual: merged.data_atual || data,
+        hora_atual: merged.hora_atual || hora,
       },
-      op,
+      merged,
       gains
     );
   });
 
   return Object.assign({}, monitor, { updated_brt: `${data} ${hora}`, ops });
 }
+
 
 function findOpById(list, id) {
   return (list || []).find(o => String(o.id) === String(id));

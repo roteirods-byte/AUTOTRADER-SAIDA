@@ -16,3 +16,10 @@ data/
 backups_ops/
 logs/
 *.log
+
+# ambiente local (NAO versionar)
+.venv/
+
+# backups (NAO versionar)
+*.bak_*
+dist/*.bak_*

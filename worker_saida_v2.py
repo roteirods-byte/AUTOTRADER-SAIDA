@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-AUTOTRADER-SAIDA — Worker de monitoramento (SAÍDA V2)
-
-- Lê data/ops_active.json (operações ativas)
-- Busca preço atual (Binance Spot como fallback)
-- Calcula GANHO/ALVO e GANHO ATUAL
-- Escreve data/monitor.json (consumido pelo painel)
-
-Observação: se você já tem um worker mais avançado (2 corretoras etc.),
-mantenha a mesma saída/colunas e substitua apenas a parte de preço.
-"""
 
 import os, json, math
 from datetime import datetime
@@ -19,13 +8,11 @@ import requests
 
 DATA_DIR = os.environ.get("DATA_DIR", os.path.join(os.path.dirname(__file__), "data"))
 OPS_ACTIVE_FILE = os.path.join(DATA_DIR, "ops_active.json")
-MONITOR_FILE = os.path.join(DATA_DIR, "monitor.json")
+MONITOR_FILE    = os.path.join(DATA_DIR, "monitor.json")
 
-BINANCE_BASE = os.environ.get("BINANCE_BASE", "https://api.binance.com")
-TIMEOUT = float(os.environ.get("HTTP_TIMEOUT", "6"))
+TIMEOUT = float(os.environ.get("HTTP_TIMEOUT", "8"))
 
 def brt_now_parts():
-    # Se a VM já está em BRT, fica perfeito.
     now = datetime.now(ZoneInfo("America/Sao_Paulo"))
     return now.strftime("%d/%m/%Y"), now.strftime("%H:%M"), now.strftime("%Y-%m-%d %H:%M")
 
@@ -46,14 +33,33 @@ def safe_write_json(path, obj):
         json.dump(obj, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
 
-def binance_price(symbol: str):
+def bitget_price(par: str):
+    # Bitget: USDT-FUTURES, símbolo tipo ATOMUSDT
     try:
-        url = f"{BINANCE_BASE}/api/v3/ticker/price"
-        r = requests.get(url, params={"symbol": symbol}, timeout=TIMEOUT)
+        url = "https://api.bitget.com/api/v2/mix/market/symbol-price"
+        r = requests.get(url, params={"productType":"USDT-FUTURES","symbol":f"{par}USDT"}, timeout=TIMEOUT)
         if r.status_code != 200:
             return None
         j = r.json()
-        return float(j.get("price"))
+        data = j.get("data") or []
+        if not data:
+            return None
+        return float(data[0].get("price"))
+    except Exception:
+        return None
+
+def okx_price(par: str):
+    # OKX: SWAP perpétuo USDT, instId tipo ATOM-USDT-SWAP
+    try:
+        url = "https://www.okx.com/api/v5/market/ticker"
+        r = requests.get(url, params={"instId":f"{par}-USDT-SWAP"}, timeout=TIMEOUT)
+        if r.status_code != 200:
+            return None
+        j = r.json()
+        data = j.get("data") or []
+        if not data:
+            return None
+        return float(data[0].get("last"))
     except Exception:
         return None
 
@@ -89,8 +95,10 @@ def main():
         entrada = float(op.get("entrada") or 0)
         alvo = float(op.get("alvo") or 0)
 
-        symbol = f"{par}USDT"
-        atual = binance_price(symbol)
+        # 2 corretoras: tenta Bitget, se falhar usa OKX
+        atual = bitget_price(par)
+        if atual is None:
+            atual = okx_price(par)
 
         g_alvo = gain_percent(side, entrada, alvo) if alvo else None
         g_atual = gain_percent(side, entrada, atual) if atual else None
@@ -100,12 +108,12 @@ def main():
             situacao = "ALVO ATINGIDO"
 
         out = dict(op)
-        out["data_atual"] = data_atual
-        out["hora_atual"] = hora_atual
-        out["atual"] = fmt_price(atual)
-        out["ganho_alvo"] = fmt_pct(g_alvo)
+        out["data_atual"]  = data_atual
+        out["hora_atual"]  = hora_atual
+        out["atual"]       = fmt_price(atual)
+        out["ganho_alvo"]  = fmt_pct(g_alvo)
         out["ganho_atual"] = fmt_pct(g_atual)
-        out["situacao"] = situacao
+        out["situacao"]    = situacao
         out_ops.append(out)
 
     safe_write_json(MONITOR_FILE, {
