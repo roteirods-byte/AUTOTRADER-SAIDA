@@ -512,8 +512,8 @@
       }
 
       
-      
       // ACOES (colunas finais)
+      // SAIR: apenas no MONITOR
       if(scope === "monitor"){
         const tdSair = document.createElement("td");
         tdSair.className = "actions";
@@ -528,20 +528,6 @@
         tdSair.appendChild(bSair);
         tr.appendChild(tdSair);
       }
-
-      const tdExc = document.createElement("td");
-      tdExc.className = "actions";
-      const bExc = document.createElement("button");
-      bExc.className = "btn small danger";
-      bExc.textContent = "EXCLUIR";
-      bExc.onclick = async () => {
-        if(!confirm("Confirmar EXCLUIR esta operação?")) return;
-        try{ await jpost(API.excluir(), { id: op.id }); await refresh(); }
-        catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR."); }
-      };
-      tdExc.appendChild(bExc);
-      tr.appendChild(tdExc);
-}
 
       // EXCLUIR: MONITOR e REALIZADAS
       const tdExc = document.createElement("td");
