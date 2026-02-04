@@ -322,7 +322,7 @@
               <th>DATA REG</th><th>HORA REG</th>
               <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
               <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-              <th>SAIR</th><th>EXCLUIR</th>
+              <th>EXCLUIR</th>
             </tr>
           </thead>
           <tbody id="monitorBody">
@@ -354,7 +354,7 @@
               <th>DATA REG</th><th>HORA REG</th>
               <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
               <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-              <th>SAIR</th><th>EXCLUIR</th>
+              <th>EXCLUIR</th>
             </tr>
           </thead>
           <tbody id="realBody">
@@ -511,39 +511,39 @@
         tr.appendChild(td);
       }
 
-      // SAIR
-      const tdSair = document.createElement("td");
-      tdSair.className = "actions";
+      
+      // ACOES (colunas finais)
+      // SAIR: apenas no MONITOR
       if(scope === "monitor"){
-        const b = document.createElement("button");
-        b.className = "btn small ok";
-        b.textContent = "SAIR";
-        b.onclick = async () => {
+        const tdSair = document.createElement("td");
+        tdSair.className = "actions";
+        const bSair = document.createElement("button");
+        bSair.className = "btn small ok";
+        bSair.textContent = "SAIR";
+        bSair.onclick = async () => {
           if(!confirm("Confirmar SAIR desta operação?")) return;
           try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
           catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
         };
-        tdSair.appendChild(b);
-      } else {
-        tdSair.innerHTML = "<span class='muted'>—</span>";
+        tdSair.appendChild(bSair);
+        tr.appendChild(tdSair);
       }
-      tr.appendChild(tdSair);
 
-      // EXCLUIR
-      const tdDel = document.createElement("td");
-      tdDel.className = "actions";
-      const b2 = document.createElement("button");
-      b2.className = "btn small danger";
-      b2.textContent = "EXCLUIR";
-      b2.onclick = async () => {
-        if(!confirm("Confirmar EXCLUIR?")) return;
-        try{ await jpost(API.del(), { id: op.id, scope: (scope === "real" ? "real" : "active") }); await refresh(); }
+      // EXCLUIR: MONITOR e REALIZADAS
+      const tdExc = document.createElement("td");
+      tdExc.className = "actions";
+      const bExc = document.createElement("button");
+      bExc.className = "btn small danger";
+      bExc.textContent = "EXCLUIR";
+      bExc.onclick = async () => {
+        if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+        try{ await jpost(API.excluir(), { id: op.id }); await refresh(); }
         catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR."); }
       };
-      tdDel.appendChild(b2);
-      tr.appendChild(tdDel);
+      tdExc.appendChild(bExc);
+      tr.appendChild(tdExc);
 
-      return tr;
+return tr;
     }
 
     function renderTable(bodyEl, ops, scope){
@@ -551,7 +551,7 @@
       if(!ops || !ops.length){
         const tr = document.createElement("tr");
         const td = document.createElement("td");
-        td.colSpan = 15;
+        td.colSpan = (scope === "real") ? 14 : 15;
         td.className = "muted";
         td.textContent = (scope === "real") ? "Sem operações realizadas." : "Sem operações no momento.";
         tr.appendChild(td);
