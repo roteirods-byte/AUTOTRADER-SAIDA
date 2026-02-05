@@ -504,15 +504,10 @@ app.post('/api/saida/sair', (req, res) => {
 });
 
 
-/**
- * POST /api/saida/edit
- * body: { id, alvo, alav }
- * Atualiza ALVO e ALAV da operação ativa.
- */
 app.post('/api/saida/edit', (req, res) => {
   const id = String(req.body?.id ?? req.query.id ?? '').trim();
-  const alvo = Number(req.body?.alvo);
-  const alav = Number(req.body?.alav);
+  const alvo = Number(req.body?.alvo ?? req.query.alvo);
+  const alav = Number(req.body?.alav ?? req.query.alav);
 
   if (!id) return res.status(400).json({ ok:false, msg:'ID inválido.' });
   if (!Number.isFinite(alvo) || alvo <= 0) return res.status(400).json({ ok:false, msg:'ALVO inválido.' });
@@ -531,6 +526,7 @@ app.post('/api/saida/edit', (req, res) => {
 
   return res.json({ ok:true });
 });
+
 
 /**
  * POST /api/saida/delete
