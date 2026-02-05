@@ -503,16 +503,16 @@ app.post('/api/saida/sair', (req, res) => {
   res.json({ ok:true });
 });
 
+
 /**
  * POST /api/saida/edit
- * body: { id, alvo, alav, entrada? }
- * Atualiza campos da operação ativa.
+ * body: { id, alvo, alav }
+ * Atualiza ALVO e ALAV da operação ativa.
  */
 app.post('/api/saida/edit', (req, res) => {
   const id = String(req.body?.id ?? req.query.id ?? '').trim();
   const alvo = Number(req.body?.alvo);
   const alav = Number(req.body?.alav);
-  const entradaRaw = (req.body?.entrada ?? req.query.entrada);
 
   if (!id) return res.status(400).json({ ok:false, msg:'ID inválido.' });
   if (!Number.isFinite(alvo) || alvo <= 0) return res.status(400).json({ ok:false, msg:'ALVO inválido.' });
@@ -525,19 +525,12 @@ app.post('/api/saida/edit', (req, res) => {
   active.ops[idx].alvo = alvo;
   active.ops[idx].alav = alav;
 
-  if (entradaRaw !== undefined) {
-    const entrada = Number(entradaRaw);
-    if (!Number.isFinite(entrada) || entrada <= 0) return res.status(400).json({ ok:false, msg:'ENTRADA inválida.' });
-    active.ops[idx].entrada = entrada;
-  }
-
   const { data, hora } = nowBRTParts();
   active.updated_brt = `${data} ${hora}`;
   saveActive(active);
 
   return res.json({ ok:true });
 });
-
 
 /**
  * POST /api/saida/delete

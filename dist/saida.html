@@ -322,11 +322,11 @@
               <th>DATA REG</th><th>HORA REG</th>
               <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
               <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-              <th>EDITAR</th><th>EXCLUIR</th>
+              <th>SAIR</th><th>EDITAR</th><th>EXCLUIR</th>
             </tr>
           </thead>
           <tbody id="monitorBody">
-            <tr><td colspan="15" class="muted">Sem operações no momento.</td></tr>
+            <tr><td colspan="16" class="muted">Sem operações no momento.</td></tr>
           </tbody>
         </table>
       </div>
@@ -374,13 +374,13 @@
     // ==== CONFIG ====
     const API = {
       // alvo: (par, side) => `/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`, // DESATIVADO (alvo manual)
-      add:  () => `/api/saida/add`,
+      add:     () => `/api/saida/add`,
       monitor: () => `/api/saida/monitor`,
-      real: () => `/api/saida/realizadas`,
-      pdf: (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
-      sair: () => `/api/saida/sair`,
-      del: () => `/api/saida/delete`,
-      edit: () => `/api/saida/edit`,
+      real:    () => `/api/saida/realizadas`,
+      pdf:     (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
+      sair:    () => `/api/saida/sair`,
+      del:     () => `/api/saida/delete`,
+      edit:    () => `/api/saida/edit`,
     };
 
     const COINS = [
@@ -512,11 +512,24 @@
         tr.appendChild(td);
       }
 
-      
-      // ACOES (colunas finais)
+      // ===== AÇÕES =====
 
-      // EDITAR: apenas no MONITOR
       if(scope === "monitor"){
+        // SAIR
+        const tdSair = document.createElement("td");
+        tdSair.className = "actions";
+        const bSair = document.createElement("button");
+        bSair.className = "btn small ok";
+        bSair.textContent = "SAIR";
+        bSair.onclick = async () => {
+          if(!confirm("Confirmar SAIR desta operação?")) return;
+          try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
+          catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
+        };
+        tdSair.appendChild(bSair);
+        tr.appendChild(tdSair);
+
+        // EDITAR
         const tdEd = document.createElement("td");
         tdEd.className = "actions";
         const bEd = document.createElement("button");
@@ -527,12 +540,10 @@
           if(novoAlvoTxt === null) return;
           const novaAlavTxt = prompt("Nova ALAV (ex: 10):", (op.alav ?? "").toString());
           if(novaAlavTxt === null) return;
-
           const alvo = Number(novoAlvoTxt);
           const alav = Number(novaAlavTxt);
           if(!Number.isFinite(alvo) || alvo <= 0) return alert("ALVO inválido.");
           if(!Number.isFinite(alav) || alav <= 0) return alert("ALAV inválida.");
-
           try{ await jpost(API.edit(), { id: op.id, alvo, alav }); await refresh(); }
           catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EDITAR."); }
         };
@@ -540,23 +551,9 @@
         tr.appendChild(tdEd);
       }
 
-      // EXCLUIR: MONITOR e REALIZADAS (no MONITOR também contém o botão SAIR)
+      // EXCLUIR (monitor e realizadas)
       const tdExc = document.createElement("td");
       tdExc.className = "actions";
-
-      // SAIR: apenas no MONITOR (fica na coluna EXCLUIR)
-      if(scope === "monitor"){
-        const bSair = document.createElement("button");
-        bSair.className = "btn small ok";
-        bSair.textContent = "SAIR";
-        bSair.onclick = async () => {
-          if(!confirm("Confirmar SAIR desta operação?")) return;
-          try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
-          catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
-        };
-        tdExc.appendChild(bSair);
-      }
-
       const bExc = document.createElement("button");
       bExc.className = "btn small danger";
       bExc.textContent = "EXCLUIR";
@@ -573,7 +570,7 @@
       tdExc.appendChild(bExc);
       tr.appendChild(tdExc);
 
-return tr;
+      return tr;
     }
 
     function renderTable(bodyEl, ops, scope){
@@ -581,7 +578,7 @@ return tr;
       if(!ops || !ops.length){
         const tr = document.createElement("tr");
         const td = document.createElement("td");
-        td.colSpan = (scope === "real") ? 14 : 15;
+        td.colSpan = (scope === "real") ? 14 : 16;
         td.className = "muted";
         td.textContent = (scope === "real") ? "Sem operações realizadas." : "Sem operações no momento.";
         tr.appendChild(td);
@@ -638,9 +635,6 @@ return tr;
     window.refresh = refresh;
     setInterval(() => { refresh(); }, 15000);
   </script>
-
-
-
 
 </body>
 </html>
