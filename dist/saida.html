@@ -373,14 +373,13 @@
   <script>
     // ==== CONFIG ====
     const API = {
-      // alvo: (par, side) => `/api/saida/alvo?par=${encodeURIComponent(par)}&side=${encodeURIComponent(side)}`, // DESATIVADO (alvo manual)
-      add:  () => `/api/saida/add`,
-      monitor: () => `/api/saida/monitor`,
-      real: () => `/api/saida/realizadas`,
-    pdf: (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
-      sair: () => `/api/saida/sair`,
-      del: () => `/api/saida/delete`,
-    };
+  add:     () => `/api/saida/add`,
+  monitor: () => `/api/saida/monitor`,
+  real:    () => `/api/saida/realizadas`,
+  pdf:     (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
+  sair:    () => `/api/saida/sair`,
+  del:     () => `/api/saida/delete`,
+};
 
     const COINS = [
       "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
@@ -480,38 +479,72 @@
     }
 
     function makeRow(op, scope){
-      const tr = document.createElement("tr");
+  const tr = document.createElement("tr");
 
-      const tdPar = document.createElement("td");
-      tdPar.innerHTML = `<span class="coin">${op.par || "—"}</span>`;
-      tr.appendChild(tdPar);
+  const tdPar = document.createElement("td");
+  tdPar.innerHTML = `<span class="coin">${op.par || "—"}</span>`;
+  tr.appendChild(tdPar);
 
-      const tdSide = document.createElement("td");
-      const s = String(op.side || "").toUpperCase();
-      tdSide.innerHTML = `<span class="side ${s === "SHORT" ? "short":"long"}">${s || "—"}</span>`;
-      tr.appendChild(tdSide);
+  const tdSide = document.createElement("td");
+  const s = String(op.side || "").toUpperCase();
+  tdSide.innerHTML = `<span class="side ${s === "SHORT" ? "short":"long"}">${s || "—"}</span>`;
+  tr.appendChild(tdSide);
 
-      const cols = [
-        fmt3(op.entrada),
-        fmt3(op.alvo),
-        (op.alav != null ? String(op.alav) : "—"),
-        (op.data_reg || "—"),
-        (op.hora_reg || "—"),
-        fmt3(op.atual),
-        `<span class="pct ${pctClass(op.ganho_alvo)}">${fmt2(op.ganho_alvo)}</span>`,
-        `<span class="pct ${pctClass(op.ganho_atual)}">${fmt2(op.ganho_atual)}</span>`,
-        (op.situacao || "—"),
-        (op.data_atual || "—"),
-        (op.hora_atual || "—"),
-      ];
+  const cols = [
+    fmt3(op.entrada),
+    fmt3(op.alvo),
+    (op.alav != null ? String(op.alav) : "—"),
+    (op.data_reg || "—"),
+    (op.hora_reg || "—"),
+    fmt3(op.atual),
+    `<span class="pct ${pctClass(op.ganho_alvo)}">${fmt2(op.ganho_alvo)}</span>`,
+    `<span class="pct ${pctClass(op.ganho_atual)}">${fmt2(op.ganho_atual)}</span>`,
+    (op.situacao || "—"),
+    (op.data_atual || "—"),
+    (op.hora_atual || "—"),
+  ];
 
-      for(const c of cols){
-        const td = document.createElement("td");
-        td.innerHTML = c;
-        tr.appendChild(td);
-      }
+  for(const c of cols){
+    const td = document.createElement("td");
+    td.innerHTML = c;
+    tr.appendChild(td);
+  }
 
-      
+  // ÚNICA coluna final: EXCLUIR (contém SAIR + EXCLUIR no monitor)
+  const tdAcoes = document.createElement("td");
+  tdAcoes.className = "actions";
+
+  if(scope === "monitor"){
+    const bSair = document.createElement("button");
+    bSair.className = "btn small ok";
+    bSair.textContent = "SAIR";
+    bSair.onclick = async () => {
+      if(!confirm("Confirmar SAIR desta operação?")) return;
+      try { await jpost(API.sair(), { id: op.id }); await refresh(); }
+      catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
+    };
+    tdAcoes.appendChild(bSair);
+  }
+
+  const bExc = document.createElement("button");
+  bExc.className = "btn small danger";
+  bExc.textContent = "EXCLUIR";
+  bExc.onclick = async () => {
+    if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+    try{
+      const scopeDel = (scope === "real") ? "real" : "active";
+      await jpost(API.del(), { id: op.id, scope: scopeDel });
+      await refresh();
+    }catch(e){
+      alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR.");
+    }
+  };
+  tdAcoes.appendChild(bExc);
+
+  tr.appendChild(tdAcoes);
+  return tr;
+}
+     
       // ACOES (colunas finais)
       // SAIR: apenas no MONITOR
       if(scope === "monitor"){
@@ -608,34 +641,6 @@ return tr;
     window.refresh = refresh;
     setInterval(() => { refresh(); }, 15000);
   </script>
-
-<script>
-/* onclick_sair_excluir_v1 */
-document.addEventListener("click", async (e) => {
-  const sair = e.target.closest(".btn-sair");
-  const exc  = e.target.closest(".btn-excluir");
-  if(!sair && !exc) return;
-
-  const id = (sair || exc).getAttribute("data-id") || (sair || exc).dataset.id;
-  if(!id){ alert("ERRO: id não encontrado"); return; }
-
-  try{
-    if(sair){
-      const r = await fetch("/api/saida/exit?id="+encodeURIComponent(id), {method:"POST"});
-      const j = await r.json().catch(()=>({ok:false}));
-      if(!r.ok || !j.ok) throw new Error("SAIR falhou");
-    }else{
-      const r = await fetch("/api/saida/delete?id="+encodeURIComponent(id), {method:"POST"});
-      const j = await r.json().catch(()=>({ok:false}));
-      if(!r.ok || !j.ok) throw new Error("EXCLUIR falhou");
-    }
-    // atualiza tela na hora
-    location.reload();
-  }catch(err){
-    alert("ERRO: "+err.message);
-  }
-});
-</script>
 
 </body>
 </html>
