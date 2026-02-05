@@ -372,14 +372,16 @@
 
   <script>
     // ==== CONFIG ====
-    const API = {
+  const API = {
   add:     () => `/api/saida/add`,
   monitor: () => `/api/saida/monitor`,
   real:    () => `/api/saida/realizadas`,
   pdf:     (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
   sair:    () => `/api/saida/sair`,
   del:     () => `/api/saida/delete`,
+  edit:    () => `/api/saida/edit`,
 };
+
 
     const COINS = [
       "AAVE","ADA","APT","ARB","ATOM","AVAX","AXS","BCH","BNB","BTC","DOGE","DOT","ETH","FET","FIL","FLUX","ICP","INJ",
