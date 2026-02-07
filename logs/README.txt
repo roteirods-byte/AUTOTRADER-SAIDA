@@ -1,1 +1,0 @@
-Logs locais (nao versionar).
