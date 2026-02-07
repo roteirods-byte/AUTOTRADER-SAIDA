@@ -1,0 +1,17 @@
+[Unit]
+Description=AUTOTRADER-SAIDA API (site /saida + /api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/AUTOTRADER-SAIDA
+Environment=NODE_ENV=production
+# (opcional) se usar variaveis, crie /etc/autotrader-saida.env e descomente:
+# EnvironmentFile=-/etc/autotrader-saida.env
+ExecStart=/usr/bin/node /root/AUTOTRADER-SAIDA/server.js
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
