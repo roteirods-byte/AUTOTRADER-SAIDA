@@ -1,0 +1,14 @@
+[Unit]
+Description=AUTOTRADER-SAIDA worker (atualiza precos)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/AUTOTRADER-SAIDA
+ExecStart=/usr/bin/python3 /root/AUTOTRADER-SAIDA/worker_saida_v2.py
+# (opcional) se usar variaveis, crie /etc/autotrader-saida.env e descomente:
+# EnvironmentFile=-/etc/autotrader-saida.env
+
+[Install]
+WantedBy=multi-user.target
