@@ -322,7 +322,7 @@
               <th>DATA REG</th><th>HORA REG</th>
               <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
               <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-              <th>SAIR</th><th>EDITAR</th><th>EXCLUIR</th>
+              <th>EXCLUIR</th>
             </tr>
           </thead>
           <tbody id="monitorBody">
@@ -354,7 +354,7 @@
               <th>DATA REG</th><th>HORA REG</th>
               <th>ATUAL</th><th>GANHO ALVO</th><th>GANHO ATUAL</th>
               <th>SITUAÇÃO</th><th>DATA ATUAL</th><th>HORA ATUAL</th>
-              <th>SAIR</th><th>EDITAR</th><th>EXCLUIR</th>
+              <th>EXCLUIR</th>
             </tr>
           </thead>
           <tbody id="realBody">
@@ -380,7 +380,6 @@
     pdf: (scope) => `/api/saida/pdf?scope=${encodeURIComponent(scope)}`,
       sair: () => `/api/saida/sair`,
       del: () => `/api/saida/delete`,
-      edit: () => `/api/saida/edit`,
     };
 
     const COINS = [
@@ -511,70 +510,52 @@
         td.innerHTML = c;
         tr.appendChild(td);
       }
-// ACOES (colunas finais)
-// SAIR: apenas no MONITOR
-if(scope === "monitor"){
-  const tdSair = document.createElement("td");
-  tdSair.className = "actions";
-  const bSair = document.createElement("button");
-  bSair.className = "btn small ok";
-  bSair.textContent = "SAIR";
-  bSair.onclick = async () => {
-    if(!confirm("Confirmar SAIR desta operação?")) return;
-    try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
-    catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
-  };
-  tdSair.appendChild(bSair);
-  tr.appendChild(tdSair);
 
-  // EDITAR: apenas no MONITOR
-  const tdEd = document.createElement("td");
-  tdEd.className = "actions";
-  const bEd = document.createElement("button");
-  bEd.className = "btn small";
-  bEd.textContent = "EDITAR";
-  bEd.onclick = async () => {
-    const novoAlvoTxt = prompt("Novo ALVO (ex: 123.456):", (op.alvo ?? "").toString());
-    if(novoAlvoTxt === null) return;
+      
+      
+      // ACOES (colunas finais)
+      if(scope === "monitor"){
+        const tdSair = document.createElement("td");
+        tdSair.className = "actions";
+        const bSair = document.createElement("button");
+        bSair.className = "btn small ok";
+        bSair.textContent = "SAIR";
+        bSair.onclick = async () => {
+          if(!confirm("Confirmar SAIR desta operação?")) return;
+          try{ await jpost(API.sair(), { id: op.id }); await refresh(); }
+          catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no SAIR."); }
+        };
+        tdSair.appendChild(bSair);
+        tr.appendChild(tdSair);
+      }
 
-    const novaAlavTxt = prompt("Nova ALAV (ex: 10):", (op.alav ?? "").toString());
-    if(novaAlavTxt === null) return;
-
-    const alvo = Number(novoAlvoTxt);
-    const alav = Number(novaAlavTxt);
-
-    if(!Number.isFinite(alvo) || alvo <= 0) return alert("ALVO inválido.");
-    if(!Number.isFinite(alav) || alav <= 0) return alert("ALAV inválida.");
-
-    try{
-      await jpost(API.edit(), { id: op.id, alvo, alav });
-      await refresh();
-    }catch(e){
-      alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EDITAR.");
-    }
-  };
-  tdEd.appendChild(bEd);
-  tr.appendChild(tdEd);
+      const tdExc = document.createElement("td");
+      tdExc.className = "actions";
+      const bExc = document.createElement("button");
+      bExc.className = "btn small danger";
+      bExc.textContent = "EXCLUIR";
+      bExc.onclick = async () => {
+        if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+        try{ await jpost(API.excluir(), { id: op.id }); await refresh(); }
+        catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR."); }
+      };
+      tdExc.appendChild(bExc);
+      tr.appendChild(tdExc);
 }
 
-// EXCLUIR: MONITOR e REALIZADAS
-const tdExc = document.createElement("td");
-tdExc.className = "actions";
-const bExc = document.createElement("button");
-bExc.className = "btn small danger";
-bExc.textContent = "EXCLUIR";
-bExc.onclick = async () => {
-  if(!confirm("Confirmar EXCLUIR esta operação?")) return;
-  try{
-    const scopeDel = (scope === "real") ? "real" : "active";
-    await jpost(API.del(), { id: op.id, scope: scopeDel });
-    await refresh();
-  }catch(e){
-    alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR.");
-  }
-};
-tdExc.appendChild(bExc);
-tr.appendChild(tdExc);
+      // EXCLUIR: MONITOR e REALIZADAS
+      const tdExc = document.createElement("td");
+      tdExc.className = "actions";
+      const bExc = document.createElement("button");
+      bExc.className = "btn small danger";
+      bExc.textContent = "EXCLUIR";
+      bExc.onclick = async () => {
+        if(!confirm("Confirmar EXCLUIR esta operação?")) return;
+        try{ await jpost(API.excluir(), { id: op.id }); await refresh(); }
+        catch(e){ alert((e && e.body && e.body.msg) ? e.body.msg : "Falha no EXCLUIR."); }
+      };
+      tdExc.appendChild(bExc);
+      tr.appendChild(tdExc);
 
 return tr;
     }
@@ -641,6 +622,34 @@ return tr;
     window.refresh = refresh;
     setInterval(() => { refresh(); }, 15000);
   </script>
+
+<script>
+/* onclick_sair_excluir_v1 */
+document.addEventListener("click", async (e) => {
+  const sair = e.target.closest(".btn-sair");
+  const exc  = e.target.closest(".btn-excluir");
+  if(!sair && !exc) return;
+
+  const id = (sair || exc).getAttribute("data-id") || (sair || exc).dataset.id;
+  if(!id){ alert("ERRO: id não encontrado"); return; }
+
+  try{
+    if(sair){
+      const r = await fetch("/api/saida/exit?id="+encodeURIComponent(id), {method:"POST"});
+      const j = await r.json().catch(()=>({ok:false}));
+      if(!r.ok || !j.ok) throw new Error("SAIR falhou");
+    }else{
+      const r = await fetch("/api/saida/delete?id="+encodeURIComponent(id), {method:"POST"});
+      const j = await r.json().catch(()=>({ok:false}));
+      if(!r.ok || !j.ok) throw new Error("EXCLUIR falhou");
+    }
+    // atualiza tela na hora
+    location.reload();
+  }catch(err){
+    alert("ERRO: "+err.message);
+  }
+});
+</script>
 
 </body>
 </html>

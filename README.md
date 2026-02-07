@@ -31,3 +31,8 @@
 
 ## Regras do projeto
 - Proibido: `.github`, deploy automático, secrets.
+
+
+## Regra importante
+- Existe **apenas um** arquivo oficial do painel: `dist/saida.html`.
+- Não criar/usar `saida.html` na raiz (evita publicar o arquivo errado).
